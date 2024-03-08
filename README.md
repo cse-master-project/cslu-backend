@@ -1,1 +1,1 @@
-# cse-master-backend
+안녕하세요 민영이와 예진이의 서버입니다 ^ ㅡ ^ b
