@@ -12,7 +12,6 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/v1")
 public class UserLoginController {
     private final UserLoginService userLoginService;
