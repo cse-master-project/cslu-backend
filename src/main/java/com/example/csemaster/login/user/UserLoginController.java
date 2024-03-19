@@ -1,7 +1,6 @@
 package com.example.csemaster.login.user;
 
 import com.example.csemaster.login.user.dto.UserDTO;
-import com.example.csemaster.login.user.response.TokenResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,18 +33,31 @@ public class UserLoginController {
         return "축하합니다";
     }
 
+    @PostMapping("/auth/google/sign-up")
+    public ResponseEntity<?> signUp(@RequestParam String accessToken, String nickname) {
+        String googleId = userLoginService.isGoogleAuth(accessToken);
 
-    @PostMapping("/google-login")
+        if (googleId != null) {
+            userLoginService.createUser(googleId, nickname);
+
+            return ResponseEntity.ok(userLoginService.getTokens(googleId));
+        } else {
+            // 구글 액세스토큰이 유효하지 않을 경우
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Unauthorized: Google login failed");
+        }
+    }
+    @PostMapping("/auth/google")
     public ResponseEntity<?> googleLogin(@RequestParam String accessToken) {
         // 넘겨받은 액세스 토큰으로 구글 api에 검증 요청
         String googleId = userLoginService.isGoogleAuth(accessToken);
 
         if (googleId != null) {
             // 구글id로 DB 검색 후, 등록된 유저인 경우 토큰 발급
-            TokenResponse tokenResponse = userLoginService.getTokens(googleId);
+            String userId = userLoginService.getUserId(googleId);
 
-            if (tokenResponse != null) {
-                return ResponseEntity.ok(tokenResponse);
+            if (userId != null) {
+                return ResponseEntity.ok(userLoginService.getTokens(userId));
             } else {
                 // 최초 등록을 하지 않은 유저
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

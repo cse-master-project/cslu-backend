@@ -3,8 +3,10 @@ package com.example.csemaster.login.user;
 import com.example.csemaster.login.user.dto.UserDTO;
 import com.example.csemaster.login.user.entity.ActiveUserEntity;
 import com.example.csemaster.login.user.entity.UserEntity;
+import com.example.csemaster.login.user.entity.UserRefreshTokenEntity;
 import com.example.csemaster.login.user.mapper.UserMapper;
 import com.example.csemaster.login.user.repository.ActiveUserRepository;
+import com.example.csemaster.login.user.repository.UserRefreshTokenRepository;
 import com.example.csemaster.login.user.repository.UserRepository;
 import com.example.csemaster.login.user.response.TokenResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,23 +14,28 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 public class UserLoginService {
     private final UserRepository userRepository;
     private final ActiveUserRepository activeUserRepository;
+    private final UserRefreshTokenRepository refreshTokenRepository;
     private final JwtGenerator jwtGenerator;
 
     @Autowired
-    public UserLoginService(UserRepository userRepository, ActiveUserRepository activeUserRepository, JwtGenerator jwtGenerator) {
+    public UserLoginService(UserRepository userRepository, ActiveUserRepository activeUserRepository, JwtGenerator jwtGenerator, UserRefreshTokenRepository userRefreshTokenRepository) {
         this.userRepository = userRepository;
         this.activeUserRepository = activeUserRepository;
         this.jwtGenerator = jwtGenerator;
+        this.refreshTokenRepository = userRefreshTokenRepository;
     }
 
     public List<UserDTO> getAllUsers() {
@@ -61,13 +68,40 @@ public class UserLoginService {
             return null;
         }
     }
-
-    public TokenResponse getTokens(String googleId) {
+    public String getUserId(String googleId) {
         ActiveUserEntity user = activeUserRepository.findByGoogleId(googleId);
         if (user != null) {
-            return jwtGenerator.generateToken(googleId);
+            return user.getUserId();
         } else {
             return null;
         }
+    }
+    public TokenResponse getTokens(String userId) {
+        TokenResponse token = jwtGenerator.generateToken(userId);
+
+        UserRefreshTokenEntity refreshToken = new UserRefreshTokenEntity();
+        refreshToken.setUserId(userId);
+        refreshToken.setRefreshToken(token.getRefreshToken());
+        refreshToken.setIssueAt(token.getIssueAt());
+        refreshToken.setExpAt(token.getExpAt());
+        refreshTokenRepository.save(refreshToken);
+
+        return token;
+    }
+
+    @Transactional
+    public void createUser(String googleId, String nickname) {
+        UserEntity user = new UserEntity();
+        UUID uuid = UUID.randomUUID();
+        user.setUserId(uuid.toString());
+        user.setIsActive(true);
+        userRepository.save(user);
+
+        ActiveUserEntity activeUser = new ActiveUserEntity();
+        activeUser.setUserId(uuid.toString());
+        activeUser.setGoogleId(googleId);
+        activeUser.setNickname(nickname);
+        activeUser.setCreateAt(LocalDateTime.now());
+        activeUserRepository.save(activeUser);
     }
 }

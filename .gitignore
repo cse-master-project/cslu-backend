@@ -36,4 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 
-config.properties
+application-secret.properties
+application-jwt.properties

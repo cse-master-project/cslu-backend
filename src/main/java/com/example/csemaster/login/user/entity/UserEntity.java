@@ -13,6 +13,7 @@ import lombok.Setter;
 @Table(name = "user")
 public class UserEntity {
     @Id
+    @Column(name="user_id")
     private String userId;
 
     @Column(name = "is_active", nullable = false)

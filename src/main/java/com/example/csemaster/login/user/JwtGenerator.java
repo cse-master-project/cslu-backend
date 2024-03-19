@@ -9,32 +9,54 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 // JWT 생성 객체
 @Component
 public class JwtGenerator {
     private final Key key; // HS256 알고리즘을 사용하는 SecretKey 생성
+    private static long ACCESS_TOKEN_EXPIRE_TIME; // 1시간 (단위: 밀리초)
+    private static long REFRESH_TOKEN_EXPIRE_TIME; // 7일
+
+    @Value("${ACCESS_TOKEN_EXPIRE_TIME}")
+    public void setAccessTokenExpireTime(long expireTime) {
+        ACCESS_TOKEN_EXPIRE_TIME = expireTime;
+    }
+    @Value("${REFRESH_TOKEN_EXPIRE_TIME}")
+    public void setRefreshTokenExpireTime(long expireTime) {
+        REFRESH_TOKEN_EXPIRE_TIME = expireTime;
+    }
 
     public JwtGenerator(@Value("${jwt.secret}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
     public TokenResponse generateToken(String userId) {
-        long nowMillis = System.currentTimeMillis();
+        Instant now = Instant.now();
+        Instant accessTokenExpiration = now.plusMillis(ACCESS_TOKEN_EXPIRE_TIME); // 액세스 토큰 만료 시간
+        Instant refreshTokenExpiration = now.plusMillis(REFRESH_TOKEN_EXPIRE_TIME); // 리프레시 토큰 만료 시간
 
         String accessToken = Jwts.builder()
-                .setSubject(userId) // 토큰의 주체 설정
-                .setIssuedAt(new Date(nowMillis)) // 발행 시간 설정
-                .setExpiration(new Date(nowMillis + 3600000)) // 1시간 뒤 만료
-                .signWith(key, SignatureAlgorithm.HS256) // 서명 알고리즘과 키 설정
-                .compact(); // JWT 생성
-
-        String refreshToken = Jwts.builder()
-                .setExpiration(new Date(nowMillis + 3600000 * 12 * 7))  // 7일뒤 만료
+                .setSubject(userId)
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(accessTokenExpiration))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        return TokenResponse.of(accessToken, refreshToken);
+        String refreshToken = Jwts.builder()
+                .setSubject(userId)
+                .setExpiration(Date.from(refreshTokenExpiration))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        return TokenResponse.of(
+                accessToken,
+                refreshToken,
+                LocalDateTime.ofInstant(now, ZoneId.systemDefault()),
+                LocalDateTime.ofInstant(refreshTokenExpiration, ZoneId.systemDefault())
+        );
     }
 }
