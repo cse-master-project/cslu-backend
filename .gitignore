@@ -35,6 +35,5 @@ out/
 
 ### VS Code ###
 .vscode/
-
-application-secret.properties
+application-mysql.properties
 application-jwt.properties
