@@ -1,6 +1,6 @@
 package com.example.csemaster.login.user;
 
-import com.example.csemaster.login.user.response.TokenResponse;
+import com.example.csemaster.login.user.response.UserTokenResponse;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -16,7 +16,7 @@ import java.util.Date;
 
 // JWT 생성 객체
 @Component
-public class JwtGenerator {
+public class UserJwtProvider {
     private final Key key; // HS256 알고리즘을 사용하는 SecretKey 생성
     private static long ACCESS_TOKEN_EXPIRE_TIME; // 1시간 (단위: 밀리초)
     private static long REFRESH_TOKEN_EXPIRE_TIME; // 7일
@@ -30,11 +30,11 @@ public class JwtGenerator {
         REFRESH_TOKEN_EXPIRE_TIME = expireTime;
     }
 
-    public JwtGenerator(@Value("${jwt.secret}") String secretKey) {
+    public UserJwtProvider(@Value("${jwt.secret}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
-    public TokenResponse generateToken(String userId) {
+    public UserTokenResponse generateToken(String userId) {
         Instant now = Instant.now();
         Instant accessTokenExpiration = now.plusMillis(ACCESS_TOKEN_EXPIRE_TIME); // 액세스 토큰 만료 시간
         Instant refreshTokenExpiration = now.plusMillis(REFRESH_TOKEN_EXPIRE_TIME); // 리프레시 토큰 만료 시간
@@ -52,7 +52,7 @@ public class JwtGenerator {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        return TokenResponse.of(
+        return UserTokenResponse.of(
                 accessToken,
                 refreshToken,
                 LocalDateTime.ofInstant(now, ZoneId.systemDefault()),

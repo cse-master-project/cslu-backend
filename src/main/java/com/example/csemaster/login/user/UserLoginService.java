@@ -8,7 +8,7 @@ import com.example.csemaster.login.user.mapper.UserMapper;
 import com.example.csemaster.login.user.repository.ActiveUserRepository;
 import com.example.csemaster.login.user.repository.UserRefreshTokenRepository;
 import com.example.csemaster.login.user.repository.UserRepository;
-import com.example.csemaster.login.user.response.TokenResponse;
+import com.example.csemaster.login.user.response.UserTokenResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,13 +28,13 @@ public class UserLoginService {
     private final UserRepository userRepository;
     private final ActiveUserRepository activeUserRepository;
     private final UserRefreshTokenRepository refreshTokenRepository;
-    private final JwtGenerator jwtGenerator;
+    private final UserJwtProvider userJwtProvider;
 
     @Autowired
-    public UserLoginService(UserRepository userRepository, ActiveUserRepository activeUserRepository, JwtGenerator jwtGenerator, UserRefreshTokenRepository userRefreshTokenRepository) {
+    public UserLoginService(UserRepository userRepository, ActiveUserRepository activeUserRepository, UserJwtProvider userJwtProvider, UserRefreshTokenRepository userRefreshTokenRepository) {
         this.userRepository = userRepository;
         this.activeUserRepository = activeUserRepository;
-        this.jwtGenerator = jwtGenerator;
+        this.userJwtProvider = userJwtProvider;
         this.refreshTokenRepository = userRefreshTokenRepository;
     }
 
@@ -76,8 +76,8 @@ public class UserLoginService {
             return null;
         }
     }
-    public TokenResponse getTokens(String userId) {
-        TokenResponse token = jwtGenerator.generateToken(userId);
+    public UserTokenResponse getTokens(String userId) {
+        UserTokenResponse token = userJwtProvider.generateToken(userId);
 
         UserRefreshTokenEntity refreshToken = new UserRefreshTokenEntity();
         refreshToken.setUserId(userId);
