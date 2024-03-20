@@ -1,6 +1,6 @@
 package com.example.csemaster.jwt;
 
-import com.example.csemaster.login.manager.ManagerModel;
+import com.example.csemaster.login.manager.ManagerEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,14 +15,14 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "manager_refresh_token")
-public class RefreshTokenEntity {
+public class ManagerRefreshTokenEntity {
     @Id
     @Column(name = "manager_id_for_a_t")
     private String managerId;
 
     @OneToOne
     @JoinColumn(name = "manager_id_for_a_t", referencedColumnName = "manager_id")
-    private ManagerModel manager;
+    private ManagerEntity manager;
 
     @Column(name = "manager_refresh_token", length = 256)
     private String refreshToken;

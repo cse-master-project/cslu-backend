@@ -1,7 +1,6 @@
 package com.example.csemaster.jwt;
 
-import com.example.csemaster.login.manager.ManagerLoginDto;
-import com.example.csemaster.login.manager.ManagerModel;
+import com.example.csemaster.login.manager.ManagerEntity;
 import com.example.csemaster.login.manager.ManagerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
@@ -9,8 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -27,11 +24,11 @@ public class UserDetailsService implements org.springframework.security.core.use
     }
 
     // 해당하는 User의 데이터가 존재한다면 UserDetails 객체로 만들어서 리턴
-    private UserDetails createUserDetails(ManagerModel managerModel) {
+    private UserDetails createUserDetails(ManagerEntity managerEntity) {
         return User.builder()
-                .username(managerModel.getUsername())
-                .password(passwordEncoder.encode(managerModel.getPassword()))
-                .roles(managerModel.getRoles().toArray(new String[0]))
+                .username(managerEntity.getUsername())
+                .password(passwordEncoder.encode(managerEntity.getPassword()))
+                .roles(managerEntity.getRoles().toArray(new String[0]))
                 .build();
     }
 

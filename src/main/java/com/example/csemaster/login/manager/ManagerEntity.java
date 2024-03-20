@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Builder
 @Entity
 @Table(name = "manager")
-public class ManagerModel implements UserDetails {
+public class ManagerEntity implements UserDetails {
     @Id
     @Column(name = "manager_id", length = 20)
     private String managerId;

@@ -7,8 +7,8 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface RefreshTokenMapper {
     @Mapping(target = "managerId", source = "managerLoginDto.managerId")
-    @Mapping(target = "refreshToken", source = "jwtToken.accessToken")
+    @Mapping(target = "refreshToken", source = "managerJwtInfo.accessToken")
     @Mapping(target = "issuedAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "expirationTime", expression = "java(java.time.LocalDateTime.now().plusHours(1))")
-    RefreshTokenEntity toRefreshTokenEntity(ManagerLoginDto managerLoginDto, JwtToken jwtToken);
+    ManagerRefreshTokenEntity toRefreshTokenEntity(ManagerLoginDto managerLoginDto, ManagerJwtInfo managerJwtInfo);
 }

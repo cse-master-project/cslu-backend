@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,27 +15,24 @@ import java.time.LocalDateTime;
 @Service
 public class ManagerLoginService {
     private final ManagerRepository managerRepository;
-    private final ManagerLoginMapper managerLoginMapper;
-
     private final RefreshTokenMapper refreshTokenMapper;
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final ManagerJwtProvider managerJwtProvider;
 
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
-    public ManagerLoginService(ManagerRepository managerRepository, ManagerLoginMapper managerLoginMapper, AuthenticationManagerBuilder authenticationManagerBuilder, JwtTokenProvider jwtTokenProvider, RefreshTokenRepository refreshTokenRepository, RefreshTokenMapper refreshTokenMapper) {
+    public ManagerLoginService(ManagerRepository managerRepository, AuthenticationManagerBuilder authenticationManagerBuilder, ManagerJwtProvider managerJwtProvider, RefreshTokenRepository refreshTokenRepository, RefreshTokenMapper refreshTokenMapper) {
         this.managerRepository = managerRepository;
-        this.managerLoginMapper = managerLoginMapper;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
-        this.jwtTokenProvider = jwtTokenProvider;
+        this.managerJwtProvider = managerJwtProvider;
         this.refreshTokenRepository = refreshTokenRepository;
         this.refreshTokenMapper = refreshTokenMapper;
     }
 
     @Transactional
-    public JwtToken login(ManagerLoginDto managerLoginDto) {
+    public ManagerJwtInfo login(ManagerLoginDto managerLoginDto) {
         // 1. managerLoginDto를 기반으로 Authentication 객체 생성
         // 이때 authentication은 인증 여부를 확인하는 authenticated 값이 false
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(managerLoginDto.getManagerId(), managerLoginDto.getManagerPw());
@@ -47,53 +42,42 @@ public class ManagerLoginService {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         // 3. 인증 정보를 기반으로 JWT 토큰 생성
-        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
+        ManagerJwtInfo managerJwtInfo = managerJwtProvider.generateToken(authentication);
 
         // 4. 토큰 정보를 AccessTokenEntity에 저장
-
-        /*LocalDateTime now = LocalDateTime.now();
-
-        RefreshTokenEntity refreshTokenEntity = new RefreshTokenEntity();
-        refreshTokenEntity.setManagerId(managerLoginDto.getManagerId());
-        refreshTokenEntity.setRefreshToken(jwtToken.getAccessToken());
-        refreshTokenEntity.setIssuedAt(now);
-        refreshTokenEntity.setExpirationTime(now.plusDays(1));
-
-        accessTokenRepository.save(refreshTokenEntity);*/
-
-        RefreshTokenEntity refreshTokenEntity = refreshTokenMapper.toRefreshTokenEntity(managerLoginDto, jwtToken);
-        refreshTokenRepository.save(refreshTokenEntity);
+        ManagerRefreshTokenEntity managerRefreshTokenEntity = refreshTokenMapper.toRefreshTokenEntity(managerLoginDto, managerJwtInfo);
+        refreshTokenRepository.save(managerRefreshTokenEntity);
 
         log.info("로그인 성공");
-        return jwtToken;
+        return managerJwtInfo;
     }
 
     @Transactional
-    public JwtToken refreshToken(String refreshToken) {
+    public ManagerJwtInfo refreshToken(String refreshToken) {
         // 1. 리프레시 토큰 검증
-        if (!jwtTokenProvider.validateRefreshToken(refreshToken)) {
+        if (!managerJwtProvider.validateRefreshToken(refreshToken)) {
             throw new RuntimeException("Invalid refresh token");
         }
 
         // 2. 리프레시 토큰으로부터 사용자 정보 추출
-        Authentication authentication = jwtTokenProvider.getAuthentication(refreshToken);
+        Authentication authentication = managerJwtProvider.getAuthentication(refreshToken);
 
         // 3. 새로운 액세스 토큰과 리프레시 토큰 생성
-        JwtToken newJwtToken = jwtTokenProvider.generateToken(authentication);
+        ManagerJwtInfo newManagerJwtInfo = managerJwtProvider.generateToken(authentication);
 
         // 4. 새로운 리프레시 토큰으로 RefreshTokenEntity 업데이트
-        RefreshTokenEntity refreshTokenEntity = refreshTokenRepository.findById(authentication.getName())
+        ManagerRefreshTokenEntity managerRefreshTokenEntity = refreshTokenRepository.findById(authentication.getName())
                 .orElseThrow(() -> new RuntimeException("Refresh token entity not found"));
 
-        refreshTokenEntity.setRefreshToken(newJwtToken.getRefreshToken());
-        refreshTokenEntity.setIssuedAt(LocalDateTime.now());
-        refreshTokenEntity.setExpirationTime(LocalDateTime.now().plusHours(1));
-        refreshTokenRepository.save(refreshTokenEntity);
+        managerRefreshTokenEntity.setRefreshToken(newManagerJwtInfo.getRefreshToken());
+        managerRefreshTokenEntity.setIssuedAt(LocalDateTime.now());
+        managerRefreshTokenEntity.setExpirationTime(LocalDateTime.now().plusHours(1));
+        refreshTokenRepository.save(managerRefreshTokenEntity);
 
 
         log.info("액세스 토큰 및 리프레시 토큰 재발급 성공");
 
-        return newJwtToken;
+        return newManagerJwtInfo;
     }
 
     // db 연결 테스트용

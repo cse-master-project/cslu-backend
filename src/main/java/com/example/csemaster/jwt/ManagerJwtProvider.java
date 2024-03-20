@@ -1,7 +1,5 @@
 package com.example.csemaster.jwt;
 
-import com.example.csemaster.login.manager.ManagerModel;
-import com.example.csemaster.login.manager.ManagerRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -21,11 +19,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
-import static org.hibernate.query.sqm.tree.SqmNode.log;
-
 @Slf4j
 @Component
-public class JwtTokenProvider {
+public class ManagerJwtProvider {
     private final Key key;
 
     @Value("${THIRTY_MINUTES}")
@@ -35,13 +31,13 @@ public class JwtTokenProvider {
     private long oneHour;
 
     // secret 값 가져와서 key에 저장
-    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
+    public ManagerJwtProvider(@Value("${jwt.secret}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
     // manager 정보를 가지고 AccessToken, RefreshToken을 생성하는 메서드
-    public JwtToken generateToken(Authentication authentication) {
+    public ManagerJwtInfo generateToken(Authentication authentication) {
         // 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -64,7 +60,7 @@ public class JwtTokenProvider {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        return JwtToken.builder()
+        return ManagerJwtInfo.builder()
                 .grantType("Bearer")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

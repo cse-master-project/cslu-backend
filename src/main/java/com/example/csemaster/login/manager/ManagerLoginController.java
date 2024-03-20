@@ -1,12 +1,10 @@
 package com.example.csemaster.login.manager;
 
-import com.example.csemaster.jwt.JwtToken;
-import com.example.csemaster.jwt.JwtTokenProvider;
+import com.example.csemaster.jwt.ManagerJwtInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,20 +28,20 @@ public class ManagerLoginController {
     public String login(@RequestBody ManagerLoginDto managerLoginDto, HttpServletResponse response) {
         // return managerLoginService.login(managerLoginDto);
 
-        JwtToken jwtToken = managerLoginService.login(managerLoginDto);
+        ManagerJwtInfo managerJwtInfo = managerLoginService.login(managerLoginDto);
 
-        response.setHeader("Authorization", "Bearer " + jwtToken.getAccessToken());
-        response.setHeader("Refresh-Token", jwtToken.getRefreshToken());
+        response.setHeader("Authorization", "Bearer " + managerJwtInfo.getAccessToken());
+        response.setHeader("Refresh-Token", managerJwtInfo.getRefreshToken());
 
         return "로그인";
     }
 
     @PostMapping("/refresh")
     public String refreshToken(HttpServletRequest request, HttpServletResponse response) {
-        JwtToken jwtToken = managerLoginService.refreshToken(request.getHeader("Refresh-Token"));
+        ManagerJwtInfo managerJwtInfo = managerLoginService.refreshToken(request.getHeader("Refresh-Token"));
 
-        response.setHeader("Authorization", "Bearer " + jwtToken.getAccessToken());
-        response.setHeader("Refresh-Token", jwtToken.getRefreshToken());
+        response.setHeader("Authorization", "Bearer " + managerJwtInfo.getAccessToken());
+        response.setHeader("Refresh-Token", managerJwtInfo.getRefreshToken());
 
         return "액세스 토큰 & 리프레시 토큰 재발급";
     }
