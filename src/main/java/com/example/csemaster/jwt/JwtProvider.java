@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class ManagerJwtProvider {
+public class JwtProvider {
     private final Key key;
 
     @Value("${THIRTY_MINUTES}")
@@ -30,18 +30,19 @@ public class ManagerJwtProvider {
     @Value("${ONE_HOUR}")
     private long oneHour;
 
+    @Value("${ACCESS_TOKEN_EXPIRE_TIME}")
+    private long ACCESS_TOKEN_EXPIRE_TIME; // 1시간 (단위: 밀리초)
+
+    @Value("${REFRESH_TOKEN_EXPIRE_TIME}")
+    private long REFRESH_TOKEN_EXPIRE_TIME; // 7일
+
     // secret 값 가져와서 key에 저장
-    public ManagerJwtProvider(@Value("${jwt.secret}") String secretKey) {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
+    public JwtProvider(@Value("${jwt.secret}") String key) {
+        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(key));
     }
 
     // manager 정보를 가지고 AccessToken, RefreshToken을 생성하는 메서드
-    public ManagerJwtInfo generateToken(Authentication authentication) {
-        // 권한 가져오기
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
+    public JwtInfo generateToken(Authentication authentication) {
 
         long now = (new Date()).getTime();
 
@@ -49,7 +50,7 @@ public class ManagerJwtProvider {
         Date accessTokenExpiresIn = new Date(now + thirtyMinutes);
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
-                .claim("auth", authorities)
+                .claim("auth", MemberRole.ADMIN)
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -60,7 +61,35 @@ public class ManagerJwtProvider {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        return ManagerJwtInfo.builder()
+        return JwtInfo.builder()
+                .grantType("Bearer")
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    // 유저의 userId를 받아 엑세스토큰을 생성하는 메소드
+    public JwtInfo generateToken(String userId) {
+        // 권한 가져오기
+        long now = (new Date()).getTime();
+
+        // 엑세스토큰 만료 기간 1시간
+        String accessToken = Jwts.builder()
+                .setSubject(userId)
+                .setIssuedAt(new Date(now))
+                .setExpiration(new Date(now + ACCESS_TOKEN_EXPIRE_TIME))
+                .claim("auth", MemberRole.USER)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        // 리프레시토큰 만료 기간 7일
+        String refreshToken = Jwts.builder()
+                .setSubject(userId)
+                .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        return JwtInfo.builder()
                 .grantType("Bearer")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -81,8 +110,9 @@ public class ManagerJwtProvider {
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-        UserDetails principle = new User(claims.getSubject(), "", authorities);
-        return new UsernamePasswordAuthenticationToken(principle, "", authorities);
+        // 클레임에서 userId(managerId)와 권한(USER | ADMIN) 추출 후 UserDetails 객체 생성
+        UserDetails principal = new User(claims.getSubject(), "", authorities);
+        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
     // 토큰 정보를 검증하는 메서드
@@ -94,13 +124,13 @@ public class ManagerJwtProvider {
                     .parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException e) {
-            log.info("Invalid JWT Token", e);
+            log.info("Invalid JWT Token");
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT Token", e);
         } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT Token", e);
+            log.info("Unsupported JWT Token");
         } catch (IllegalArgumentException e) {
-            log.info("JWT claims string is empty", e);
+            log.info("JWT claims string is empty");
         }
         return false;
     }

@@ -1,5 +1,7 @@
 package com.example.csemaster.login.user;
 
+import com.example.csemaster.jwt.JwtInfo;
+import com.example.csemaster.jwt.JwtProvider;
 import com.example.csemaster.login.user.dto.UserDTO;
 import com.example.csemaster.login.user.entity.ActiveUserEntity;
 import com.example.csemaster.login.user.entity.UserEntity;
@@ -8,7 +10,6 @@ import com.example.csemaster.login.user.mapper.UserMapper;
 import com.example.csemaster.login.user.repository.ActiveUserRepository;
 import com.example.csemaster.login.user.repository.UserRefreshTokenRepository;
 import com.example.csemaster.login.user.repository.UserRepository;
-import com.example.csemaster.login.user.response.UserTokenResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,13 +29,13 @@ public class UserLoginService {
     private final UserRepository userRepository;
     private final ActiveUserRepository activeUserRepository;
     private final UserRefreshTokenRepository refreshTokenRepository;
-    private final UserJwtProvider userJwtProvider;
+    private final JwtProvider jwtProvider;
 
     @Autowired
-    public UserLoginService(UserRepository userRepository, ActiveUserRepository activeUserRepository, UserJwtProvider userJwtProvider, UserRefreshTokenRepository userRefreshTokenRepository) {
+    public UserLoginService(UserRepository userRepository, ActiveUserRepository activeUserRepository, JwtProvider jwtProvider, UserRefreshTokenRepository userRefreshTokenRepository) {
         this.userRepository = userRepository;
         this.activeUserRepository = activeUserRepository;
-        this.userJwtProvider = userJwtProvider;
+        this.jwtProvider = jwtProvider;
         this.refreshTokenRepository = userRefreshTokenRepository;
     }
 
@@ -76,14 +77,12 @@ public class UserLoginService {
             return null;
         }
     }
-    public UserTokenResponse getTokens(String userId) {
-        UserTokenResponse token = userJwtProvider.generateToken(userId);
+    public JwtInfo getTokens(String userId) {
+        JwtInfo token = jwtProvider.generateToken(userId);
 
         UserRefreshTokenEntity refreshToken = new UserRefreshTokenEntity();
         refreshToken.setUserId(userId);
         refreshToken.setRefreshToken(token.getRefreshToken());
-        refreshToken.setIssueAt(token.getIssueAt());
-        refreshToken.setExpAt(token.getExpAt());
         refreshTokenRepository.save(refreshToken);
 
         return token;

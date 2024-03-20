@@ -18,21 +18,21 @@ public class ManagerLoginService {
     private final RefreshTokenMapper refreshTokenMapper;
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final ManagerJwtProvider managerJwtProvider;
+    private final JwtProvider jwtProvider;
 
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
-    public ManagerLoginService(ManagerRepository managerRepository, AuthenticationManagerBuilder authenticationManagerBuilder, ManagerJwtProvider managerJwtProvider, RefreshTokenRepository refreshTokenRepository, RefreshTokenMapper refreshTokenMapper) {
+    public ManagerLoginService(ManagerRepository managerRepository, AuthenticationManagerBuilder authenticationManagerBuilder, JwtProvider jwtProvider, RefreshTokenRepository refreshTokenRepository, RefreshTokenMapper refreshTokenMapper) {
         this.managerRepository = managerRepository;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
-        this.managerJwtProvider = managerJwtProvider;
+        this.jwtProvider = jwtProvider;
         this.refreshTokenRepository = refreshTokenRepository;
         this.refreshTokenMapper = refreshTokenMapper;
     }
 
     @Transactional
-    public ManagerJwtInfo login(ManagerLoginDto managerLoginDto) {
+    public JwtInfo login(ManagerLoginDto managerLoginDto) {
         // 1. managerLoginDto를 기반으로 Authentication 객체 생성
         // 이때 authentication은 인증 여부를 확인하는 authenticated 값이 false
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(managerLoginDto.getManagerId(), managerLoginDto.getManagerPw());
@@ -42,34 +42,34 @@ public class ManagerLoginService {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         // 3. 인증 정보를 기반으로 JWT 토큰 생성
-        ManagerJwtInfo managerJwtInfo = managerJwtProvider.generateToken(authentication);
+        JwtInfo jwtInfo = jwtProvider.generateToken(authentication);
 
         // 4. 토큰 정보를 AccessTokenEntity에 저장
-        ManagerRefreshTokenEntity managerRefreshTokenEntity = refreshTokenMapper.toRefreshTokenEntity(managerLoginDto, managerJwtInfo);
+        ManagerRefreshTokenEntity managerRefreshTokenEntity = refreshTokenMapper.toRefreshTokenEntity(managerLoginDto, jwtInfo);
         refreshTokenRepository.save(managerRefreshTokenEntity);
 
         log.info("로그인 성공");
-        return managerJwtInfo;
+        return jwtInfo;
     }
 
     @Transactional
-    public ManagerJwtInfo refreshToken(String refreshToken) {
+    public JwtInfo refreshToken(String refreshToken) {
         // 1. 리프레시 토큰 검증
-        if (!managerJwtProvider.validateRefreshToken(refreshToken)) {
+        if (!jwtProvider.validateRefreshToken(refreshToken)) {
             throw new RuntimeException("Invalid refresh token");
         }
 
         // 2. 리프레시 토큰으로부터 사용자 정보 추출
-        Authentication authentication = managerJwtProvider.getAuthentication(refreshToken);
+        Authentication authentication = jwtProvider.getAuthentication(refreshToken);
 
         // 3. 새로운 액세스 토큰과 리프레시 토큰 생성
-        ManagerJwtInfo newManagerJwtInfo = managerJwtProvider.generateToken(authentication);
+        JwtInfo newJwtInfo = jwtProvider.generateToken(authentication);
 
         // 4. 새로운 리프레시 토큰으로 RefreshTokenEntity 업데이트
         ManagerRefreshTokenEntity managerRefreshTokenEntity = refreshTokenRepository.findById(authentication.getName())
                 .orElseThrow(() -> new RuntimeException("Refresh token entity not found"));
 
-        managerRefreshTokenEntity.setRefreshToken(newManagerJwtInfo.getRefreshToken());
+        managerRefreshTokenEntity.setRefreshToken(newJwtInfo.getRefreshToken());
         managerRefreshTokenEntity.setIssuedAt(LocalDateTime.now());
         managerRefreshTokenEntity.setExpirationTime(LocalDateTime.now().plusHours(1));
         refreshTokenRepository.save(managerRefreshTokenEntity);
@@ -77,7 +77,7 @@ public class ManagerLoginService {
 
         log.info("액세스 토큰 및 리프레시 토큰 재발급 성공");
 
-        return newManagerJwtInfo;
+        return newJwtInfo;
     }
 
     // db 연결 테스트용

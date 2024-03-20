@@ -1,6 +1,6 @@
 package com.example.csemaster.login.manager;
 
-import com.example.csemaster.jwt.ManagerJwtInfo;
+import com.example.csemaster.jwt.JwtInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -28,20 +28,20 @@ public class ManagerLoginController {
     public String login(@RequestBody ManagerLoginDto managerLoginDto, HttpServletResponse response) {
         // return managerLoginService.login(managerLoginDto);
 
-        ManagerJwtInfo managerJwtInfo = managerLoginService.login(managerLoginDto);
+        JwtInfo jwtInfo = managerLoginService.login(managerLoginDto);
 
-        response.setHeader("Authorization", "Bearer " + managerJwtInfo.getAccessToken());
-        response.setHeader("Refresh-Token", managerJwtInfo.getRefreshToken());
+        response.setHeader("Authorization", "Bearer " + jwtInfo.getAccessToken());
+        response.setHeader("Refresh-Token", jwtInfo.getRefreshToken());
 
         return "로그인";
     }
 
     @PostMapping("/refresh")
     public String refreshToken(HttpServletRequest request, HttpServletResponse response) {
-        ManagerJwtInfo managerJwtInfo = managerLoginService.refreshToken(request.getHeader("Refresh-Token"));
+        JwtInfo jwtInfo = managerLoginService.refreshToken(request.getHeader("Refresh-Token"));
 
-        response.setHeader("Authorization", "Bearer " + managerJwtInfo.getAccessToken());
-        response.setHeader("Refresh-Token", managerJwtInfo.getRefreshToken());
+        response.setHeader("Authorization", "Bearer " + jwtInfo.getAccessToken());
+        response.setHeader("Refresh-Token", jwtInfo.getRefreshToken());
 
         return "액세스 토큰 & 리프레시 토큰 재발급";
     }

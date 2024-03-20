@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
     private final ManagerRepository managerRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
     public UserDetails loadUserByUsername(String managerId) throws UsernameNotFoundException {
@@ -28,12 +27,7 @@ public class UserDetailsService implements org.springframework.security.core.use
         return User.builder()
                 .username(managerEntity.getUsername())
                 .password(passwordEncoder.encode(managerEntity.getPassword()))
-                .roles(managerEntity.getRoles().toArray(new String[0]))
+                .roles(String.valueOf(MemberRole.ADMIN))
                 .build();
     }
-
-    // -----------------------------------
-
-
-
 }
