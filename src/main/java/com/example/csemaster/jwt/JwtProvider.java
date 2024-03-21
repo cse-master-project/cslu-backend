@@ -25,18 +25,17 @@ public class JwtProvider {
     private final Key key;
 
     @Value("${THIRTY_MINUTES}")
-    private long thirtyMinutes;
+    private long ADMIN_ACCESS_TOKEN_EXPIRE_TIME;
 
     @Value("${ONE_HOUR}")
-    private long oneHour;
+    private long ADMIN_REFRESH_TOKEN_EXPIRE_TIME;
 
     @Value("${ACCESS_TOKEN_EXPIRE_TIME}")
-    private long ACCESS_TOKEN_EXPIRE_TIME; // 1시간 (단위: 밀리초)
+    private long USER_ACCESS_TOKEN_EXPIRE_TIME; // 1시간 (단위: 밀리초)
 
     @Value("${REFRESH_TOKEN_EXPIRE_TIME}")
-    private long REFRESH_TOKEN_EXPIRE_TIME; // 7일
+    private long USER_REFRESH_TOKEN_EXPIRE_TIME; // 7일
 
-    // secret 값 가져와서 key에 저장
     public JwtProvider(@Value("${jwt.secret}") String key) {
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(key));
     }
@@ -47,17 +46,16 @@ public class JwtProvider {
         long now = (new Date()).getTime();
 
         // Access Token 생성
-        Date accessTokenExpiresIn = new Date(now + thirtyMinutes);
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
-                .claim("auth", MemberRole.ADMIN)
-                .setExpiration(accessTokenExpiresIn)
+                .claim("auth", MemberRole.ADMIN.getValue())
+                .setExpiration(new Date(now + ADMIN_ACCESS_TOKEN_EXPIRE_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
         // Refresh Token 생성
         String refreshToken = Jwts.builder()
-                .setExpiration(new Date(now + oneHour))
+                .setExpiration(new Date(now + ADMIN_REFRESH_TOKEN_EXPIRE_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
@@ -73,19 +71,19 @@ public class JwtProvider {
         // 권한 가져오기
         long now = (new Date()).getTime();
 
-        // 엑세스토큰 만료 기간 1시간
+        // 엑세스 토큰 발급 (만료 기간 1시간)
         String accessToken = Jwts.builder()
                 .setSubject(userId)
                 .setIssuedAt(new Date(now))
-                .setExpiration(new Date(now + ACCESS_TOKEN_EXPIRE_TIME))
-                .claim("auth", MemberRole.USER)
+                .setExpiration(new Date(now + USER_ACCESS_TOKEN_EXPIRE_TIME))
+                .claim("auth", MemberRole.USER.getValue())
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
-
-        // 리프레시토큰 만료 기간 7일
+        System.out.println(MemberRole.USER);
+        // 리프레시 토큰 발급 (만료 기간 7일)
         String refreshToken = Jwts.builder()
                 .setSubject(userId)
-                .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
+                .setExpiration(new Date(now + USER_REFRESH_TOKEN_EXPIRE_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
@@ -96,21 +94,21 @@ public class JwtProvider {
                 .build();
     }
 
-    // Jwt 토큰을 복호화하여 토큰에 들어있는 정보를 꺼내는 메서드
+    // 토큰에서 인증정보를 추출하는 메소드
     public Authentication getAuthentication(String accessToken) {
         Claims claims = parseClaims(accessToken);
 
         if (claims.get("auth") == null) {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
-
+        System.out.println(claims.get("auth"));
         // 클레임에서 권한 정보 가져오기
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(claims.get("auth").toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-        // 클레임에서 userId(managerId)와 권한(USER | ADMIN) 추출 후 UserDetails 객체 생성
+        // 클레임에서 userId(managerId), 권한 추출 후 인증 객체로 반환
         UserDetails principal = new User(claims.getSubject(), "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
@@ -135,7 +133,7 @@ public class JwtProvider {
         return false;
     }
 
-    // accessToken
+    // accessToken의 클레임 추출
     private Claims parseClaims(String accessToken) {
         try {
             return Jwts.parserBuilder()

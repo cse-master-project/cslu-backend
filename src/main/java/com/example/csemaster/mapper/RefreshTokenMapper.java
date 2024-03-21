@@ -1,6 +1,8 @@
-package com.example.csemaster.jwt;
+package com.example.csemaster.mapper;
 
+import com.example.csemaster.entity.ManagerRefreshTokenEntity;
 import com.example.csemaster.features.login.manager.ManagerLoginDto;
+import com.example.csemaster.jwt.JwtInfo;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

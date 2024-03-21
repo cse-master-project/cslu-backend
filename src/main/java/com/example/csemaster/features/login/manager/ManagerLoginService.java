@@ -1,6 +1,9 @@
 package com.example.csemaster.features.login.manager;
 
+import com.example.csemaster.entity.ManagerRefreshTokenEntity;
 import com.example.csemaster.jwt.*;
+import com.example.csemaster.mapper.RefreshTokenMapper;
+import com.example.csemaster.repository.RefreshTokenRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.example.csemaster.jwt;
+package com.example.csemaster.entity;
 
 import com.example.csemaster.features.login.manager.ManagerEntity;
 import jakarta.persistence.*;

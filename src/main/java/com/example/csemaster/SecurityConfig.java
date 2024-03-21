@@ -22,18 +22,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                // REST API이므로 basic auth 및 csrf 보안을 사용하지 않음
+                // HTTP 기본 인증, CSRF 보안, 세션 비활성화
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .csrf(csrf -> csrf.disable())
-                // JWT를 사용하기 때문에 세션을 사용하지 않음
-                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(sessionManagement ->
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // 엔드포인트별 권한 설정
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api/user/auth/google").permitAll()
                         .requestMatchers("/api/manager/**").hasRole("ADMIN")
-                        .requestMatchers("/api/user/**").authenticated()
+                        .requestMatchers("/api/user/**").hasRole("USER")
                         .anyRequest().permitAll())
 
-                // JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
+                // 인증과정에서 JWT 검증을 수행하는 기본 필터와 사용자 정의 필터 추가
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider),
                         UsernamePasswordAuthenticationFilter.class)
                 .build();

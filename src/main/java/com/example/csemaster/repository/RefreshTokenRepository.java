@@ -1,5 +1,6 @@
-package com.example.csemaster.jwt;
+package com.example.csemaster.repository;
 
+import com.example.csemaster.entity.ManagerRefreshTokenEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
