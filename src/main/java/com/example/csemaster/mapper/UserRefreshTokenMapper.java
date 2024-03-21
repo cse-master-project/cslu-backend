@@ -1,7 +1,7 @@
-package com.example.csemaster.login.user.mapper;
+package com.example.csemaster.mapper;
 
-import com.example.csemaster.login.user.dto.UserRefreshTokenDTO;
-import com.example.csemaster.login.user.entity.UserRefreshTokenEntity;
+import com.example.csemaster.dto.UserRefreshTokenDTO;
+import com.example.csemaster.entity.UserRefreshTokenEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

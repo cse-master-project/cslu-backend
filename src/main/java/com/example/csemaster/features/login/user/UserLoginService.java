@@ -1,15 +1,15 @@
-package com.example.csemaster.login.user;
+package com.example.csemaster.features.login.user;
 
 import com.example.csemaster.jwt.JwtInfo;
 import com.example.csemaster.jwt.JwtProvider;
-import com.example.csemaster.login.user.dto.UserDTO;
-import com.example.csemaster.login.user.entity.ActiveUserEntity;
-import com.example.csemaster.login.user.entity.UserEntity;
-import com.example.csemaster.login.user.entity.UserRefreshTokenEntity;
-import com.example.csemaster.login.user.mapper.UserMapper;
-import com.example.csemaster.login.user.repository.ActiveUserRepository;
-import com.example.csemaster.login.user.repository.UserRefreshTokenRepository;
-import com.example.csemaster.login.user.repository.UserRepository;
+import com.example.csemaster.dto.UserDTO;
+import com.example.csemaster.entity.ActiveUserEntity;
+import com.example.csemaster.entity.UserEntity;
+import com.example.csemaster.entity.UserRefreshTokenEntity;
+import com.example.csemaster.mapper.UserMapper;
+import com.example.csemaster.repository.ActiveUserRepository;
+import com.example.csemaster.repository.UserRefreshTokenRepository;
+import com.example.csemaster.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

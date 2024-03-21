@@ -1,6 +1,6 @@
 package com.example.csemaster.jwt;
 
-import com.example.csemaster.login.manager.ManagerLoginDto;
+import com.example.csemaster.features.login.manager.ManagerLoginDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

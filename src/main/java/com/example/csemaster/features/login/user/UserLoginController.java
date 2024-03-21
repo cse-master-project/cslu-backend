@@ -1,6 +1,6 @@
-package com.example.csemaster.login.user;
+package com.example.csemaster.features.login.user;
 
-import com.example.csemaster.login.user.dto.UserDTO;
+import com.example.csemaster.dto.UserDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

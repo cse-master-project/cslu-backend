@@ -1,4 +1,4 @@
-package com.example.csemaster.login.user.dto;
+package com.example.csemaster.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,4 +1,4 @@
-package com.example.csemaster.login.user.entity;
+package com.example.csemaster.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

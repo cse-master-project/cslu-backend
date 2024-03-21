@@ -1,4 +1,4 @@
-package com.example.csemaster.login.manager;
+package com.example.csemaster.features.login.manager;
 
 import com.example.csemaster.jwt.JwtInfo;
 import jakarta.servlet.http.HttpServletRequest;

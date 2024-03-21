@@ -1,6 +1,6 @@
 package com.example.csemaster.jwt;
 
-import com.example.csemaster.login.manager.ManagerEntity;
+import com.example.csemaster.features.login.manager.ManagerEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

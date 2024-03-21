@@ -1,4 +1,4 @@
-package com.example.csemaster.login.manager;
+package com.example.csemaster.features.login.manager;
 
 import lombok.Data;
 

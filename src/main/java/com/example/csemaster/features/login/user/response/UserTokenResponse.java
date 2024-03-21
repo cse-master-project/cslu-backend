@@ -1,4 +1,4 @@
-package com.example.csemaster.login.user.response;
+package com.example.csemaster.features.login.user.response;
 
 import lombok.Getter;
 import lombok.Setter;
