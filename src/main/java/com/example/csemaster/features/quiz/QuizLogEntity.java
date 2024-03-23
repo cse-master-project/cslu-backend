@@ -11,14 +11,16 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@Entity
 @Table(name = "quiz_log")
+@IdClass(QuizLogPK.class)
 public class QuizLogEntity {
     @Id
     @Column(name = "quiz_id_for_quiz_log")
     private Long quizId;
 
     @Id
-    @Column(name = "quiz_id_for_quiz_log")
+    @Column(name = "user_id_for_quiz_log")
     private String userId;
 
     @Id
@@ -38,6 +40,8 @@ public class QuizLogEntity {
     private QuizEntity quiz;
 
     @ManyToOne
-    @JoinColumn(name="quiz_id_for_quiz_log", referencedColumnName = "user_id")
+    @JoinColumn(name="user_id_for_quiz_log", referencedColumnName = "user_id")
     private UserEntity user;
 }
+
+
