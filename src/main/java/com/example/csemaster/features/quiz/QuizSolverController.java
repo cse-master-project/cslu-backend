@@ -5,6 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping("/api/quiz")
 public class QuizSolverController {
@@ -25,4 +26,19 @@ public class QuizSolverController {
         return quizSolverService.getQuiz(userId, subject, detailSubject);
     }
 
+    @PostMapping("/solver")
+    public void solveQuiz(@RequestBody QuizSolverRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+
+        quizSolverService.saveQuizResult(userId, request.getQuizId(), request.getIsCorrect());
+    }
+
+    @PostMapping("/report")
+    public void quizReport(@RequestBody QuizReportRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+
+        quizSolverService.saveQuizReport(userId, request.getQuizId(), request.getContent());
+    }
 }
