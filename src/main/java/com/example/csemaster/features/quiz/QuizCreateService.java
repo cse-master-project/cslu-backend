@@ -176,7 +176,7 @@ public class QuizCreateService {
         // User Quiz 테이블에 추가
         UserQuizEntity userQuizEntity = new UserQuizEntity();
         userQuizEntity.setUserQuizId(quizId);
-        userQuizEntity.setPermissionStatus(false);
+        userQuizEntity.setPermissionStatus(0);
         userQuizEntity.setUserId(userEntity.get());
 
         userQuizRepository.save(userQuizEntity);

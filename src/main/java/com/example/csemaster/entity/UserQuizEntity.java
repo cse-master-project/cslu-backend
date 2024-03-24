@@ -22,7 +22,7 @@ public class UserQuizEntity {
     private QuizEntity quiz;
 
     @Column(name = "permission_status")
-    private Boolean permissionStatus;
+    private Integer permissionStatus;
 
     @OneToOne
     @JoinColumn(name = "user_id_for_user_quiz")
