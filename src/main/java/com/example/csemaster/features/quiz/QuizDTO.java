@@ -1,5 +1,6 @@
 package com.example.csemaster.features.quiz;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,7 +16,7 @@ public class QuizDTO {
 
     private String subject;
     private String detailSubject;
-    private double correctRate;
-    private Map<String, Object> jsonContent;
-    private LocalDateTime createAt;
+    //private double correctRate;
+    private String jsonContent;
+    //private LocalDateTime createAt;
 }

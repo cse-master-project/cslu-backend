@@ -47,7 +47,7 @@ public class ManagerLoginService {
         // 3. 인증 정보를 기반으로 JWT 토큰 생성
         JwtInfo jwtInfo = jwtProvider.generateToken(authentication);
 
-        // 4. 토큰 정보를 AccessTokenEntity에 저장
+        // 4. 토큰 정보를 RefreshTokenEntity에 저장
         ManagerRefreshTokenEntity managerRefreshTokenEntity = refreshTokenMapper.toRefreshTokenEntity(managerLoginDto, jwtInfo);
         refreshTokenRepository.save(managerRefreshTokenEntity);
 
