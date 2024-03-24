@@ -112,63 +112,6 @@ public class DefaultQuizService {
             }
 
             return true;
-
-            /*// 'quiz', 'answer' 필드가 존재하는지 확인
-            if (!rootNode.has("quiz") || rootNode.path("quiz").asText().isEmpty() ||
-                    !rootNode.has("answer")) {
-                System.out.println("퀴즈 앤서 존재 빈문자열");
-                return false;
-            } else if (!allowedTypes.contains(typeValue)) {
-                System.out.println("필드 1-5");
-                // 'type' 필드가 1~5를 가지고 있는지 확인
-                return false;
-            } else if ("1".equals(typeValue) && !rootNode.path("answer").asText().isEmpty()) {
-                System.out.println("1번임");
-            // 1. 4지선다
-                JsonNode optionNode = rootNode.path("option");
-                // 선택지가 배열이며, 4개인지 확인
-                if (!optionNode.isArray() || (optionNode.size() != 4)) {
-                    return false;
-                }
-            } else if("2".equals(typeValue) && !rootNode.path("answer").asText().isEmpty()) {
-            // 2. 단답식
-                return false;
-            } else if ("3".equals(typeValue) && !rootNode.path("answer").isEmpty()) {
-                System.out.println("3번임");
-            // 3. 선 긋기
-                JsonNode leftOptionNode = rootNode.path("left_option");
-                JsonNode rightOptionNode = rootNode.path("right_option");
-                // 'left_option', 'right_option' 필드가 배열이며, 존재하는지 확인
-                if (!rootNode.has("left_option") || !rootNode.has("right_option")
-                        || !leftOptionNode.isArray() || !rightOptionNode.isArray()
-                        || (leftOptionNode.size() < 1) || (rightOptionNode.size() < 1)
-                        || rootNode.path("answer").isEmpty()) {
-                    return false;
-                }
-                JsonNode answerNode = rootNode.path("answer");
-                // 'answer' 필드가 배열인지 확인
-                if (!answerNode.isArray() || (answerNode.isEmpty())) {
-                    return false;
-                }
-            } else if ("4".equals(typeValue) && !rootNode.path("answer").asText().isEmpty()) {
-                System.out.println("4번임");
-            // 4. O/X
-                Set<String> zeroOrOne = Set.of("0", "1");
-                String answerValue = rootNode.path("answer").asText();
-                // 'answer' 필드가 0, 1만 가지고 있는지 확인
-                if (!zeroOrOne.contains(answerValue)) {
-                    return false;
-                }
-            } else if ("5".equals(typeValue) && !rootNode.path("answer").isEmpty()) {
-                System.out.println();
-            // 5. 빈칸 채우기
-                JsonNode answerNode = rootNode.path("answer");
-                // 'answer' 필드가 배열인지 확인
-                if (!answerNode.isArray() || answerNode.isEmpty()) {
-                    return false;
-                }
-            }
-            return true;*/
         } catch (Exception e) {
             e.printStackTrace();
             return false;
