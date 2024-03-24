@@ -32,8 +32,4 @@ public class ManagerRefreshTokenEntity {
 
     @Column(name = "manager_refresh_token_exp_at")
     private LocalDateTime expirationTime;
-
-    public void updateRefreshToken(String newToken) {
-        this.refreshToken = newToken;
-    }
 }

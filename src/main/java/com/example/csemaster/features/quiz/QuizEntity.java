@@ -1,15 +1,13 @@
 package com.example.csemaster.features.quiz;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,6 +15,7 @@ import java.time.LocalDateTime;
 @Table(name = "quiz")
 public class QuizEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "quiz_id")
     private Long quizId;
 
@@ -29,7 +28,6 @@ public class QuizEntity {
     @Column(name = "quiz_correct_rate")
     private double correctRate;
 
-    // 모든 형식의 json을 받게 map을 사용하였으나 차후 개선 필요
     @Column(name = "quiz_content", columnDefinition = "TEXT")
     private String jsonContent;
 

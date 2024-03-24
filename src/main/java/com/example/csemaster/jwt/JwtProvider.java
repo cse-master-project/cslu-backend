@@ -25,10 +25,10 @@ public class JwtProvider {
     private final Key key;
 
     @Value("${THIRTY_MINUTES}")
-    private long ADMIN_ACCESS_TOKEN_EXPIRE_TIME;
+    private long ADMIN_ACCESS_TOKEN_EXPIRE_TIME; // 30분
 
     @Value("${ONE_HOUR}")
-    private long ADMIN_REFRESH_TOKEN_EXPIRE_TIME;
+    private long ADMIN_REFRESH_TOKEN_EXPIRE_TIME; // 1시간
 
     @Value("${ACCESS_TOKEN_EXPIRE_TIME}")
     private long USER_ACCESS_TOKEN_EXPIRE_TIME; // 1시간 (단위: 밀리초)
