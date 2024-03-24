@@ -120,7 +120,6 @@ public class DefaultQuizService {
         }
     }
 
-    @Transactional
     public Long addQuiz(QuizDTO quizDTO) {
         // jsonContent 형식 검사
         if (!isValidJsonContent(quizDTO.getJsonContent())) {
@@ -167,5 +166,15 @@ public class DefaultQuizService {
 
         log.info("Default Quiz 저장 완료");
         return true;
+    }
+
+    @Transactional
+    public Boolean addQuizAndDefaultQuiz(QuizDTO quizDTO, String token) {
+        // Quiz 테이블에 추가하고 ID 반환
+        Long quizId = addQuiz(quizDTO);
+        // 반환된 ID를 사용하여 DefaultQuiz 추가
+        Boolean defaultQuiz = addDefaultQuiz(quizId, token);
+
+        return defaultQuiz;
     }
 }

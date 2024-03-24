@@ -24,10 +24,9 @@ public class DefaultQuizController {
         // "Bearer " 접두사 제거
         String token = tokenHeader != null ? tokenHeader.replace("Bearer ", "") : null;
 
-        Long quiz = defaultQuizService.addQuiz(quizDTO);
-        Boolean defaultQuiz = defaultQuizService.addDefaultQuiz(quiz, token);
+        Boolean defaultQuiz = defaultQuizService.addQuizAndDefaultQuiz(quizDTO, token);
         if (!defaultQuiz) {
-            return ResponseEntity.badRequest().body("Failed - addDefaultQuiz()");
+            return ResponseEntity.badRequest().body("DefaultQuizController - addDefaultQuiz()");
         }
 
         return ResponseEntity.ok().body("Quiz has been saved successfully");
