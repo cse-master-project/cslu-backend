@@ -16,7 +16,7 @@ public class ActiveUserEntity {
     private String userId;
 
     @OneToOne
-    @JoinColumn(name = "user_id_for_active", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id_for_active", referencedColumnName = "user_id", insertable = false, updatable = false)
     private UserEntity user;
 
     @Column(name="google_id")
