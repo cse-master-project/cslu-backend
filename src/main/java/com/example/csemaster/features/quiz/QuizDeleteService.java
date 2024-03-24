@@ -21,7 +21,7 @@ public class QuizDeleteService {
 
         // 존재하는 quiz인지 확인
         if (!quiz.isPresent()) {
-            throw new RuntimeException("Incorrect jsonContent");
+            throw new RuntimeException("Incorrect quizId");
         }
 
         quizRepository.deleteByQuizId(quizId);
