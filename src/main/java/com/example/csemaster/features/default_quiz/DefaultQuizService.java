@@ -1,10 +1,13 @@
 package com.example.csemaster.features.default_quiz;
 
+import com.example.csemaster.entity.UserEntity;
 import com.example.csemaster.features.login.manager.ManagerEntity;
 import com.example.csemaster.features.login.manager.ManagerRepository;
+import com.example.csemaster.features.login.user.UserLoginService;
 import com.example.csemaster.features.quiz.QuizDTO;
 import com.example.csemaster.features.quiz.QuizEntity;
 import com.example.csemaster.jwt.JwtProvider;
+import com.example.csemaster.repository.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,8 @@ public class DefaultQuizService {
     private final QuizRepository quizRepository;
     private final ManagerRepository managerRepository;
     private final DefaultQuizRepository defaultQuizRepository;
+    private final UserLoginService userLoginService;
+    private final UserRepository userRepository;
 
     // jsonContent 형식 검사
     public boolean isValidJsonContent(String jsonContent) {
@@ -168,6 +173,36 @@ public class DefaultQuizService {
         return true;
     }
 
+    public Boolean addUserQuiz(Long quizId, String token) {
+        // 토큰 검증
+        if (!jwtProvider.validateToken(token)) {
+            throw new RuntimeException("Invalid token");
+        }
+
+        // 토큰으로부터 사용자 정보 추출
+        String userId = userLoginService.getUserId(token);
+
+        // userId를 사용하여 UserEntity 조회
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if (!userEntity.isPresent()) {
+            throw new RuntimeException("Manager not found with id: " + quizId);
+        }
+
+        // quizId가 존재하는지 확인
+        Optional<QuizEntity> quizEntity = quizRepository.findByQuizId(quizId);
+        if (!quizEntity.isPresent()) {
+            throw new RuntimeException("Incorrect quizId");
+        }
+
+        // User Quiz 테이블에 추가
+        UserQuizEntity userQuizEntity = new UserQuizEntity();
+        userQuizEntity.setUserQuizId(quizId);
+        userQuizEntity.setPermissionStatus(false);
+        userQuizEntity.setUserId(userEntity.get());
+
+        return true;
+    }
+
     @Transactional
     public Boolean addQuizAndDefaultQuiz(QuizDTO quizDTO, String token) {
         // Quiz 테이블에 추가하고 ID 반환
@@ -177,4 +212,16 @@ public class DefaultQuizService {
 
         return defaultQuiz;
     }
+
+    @Transactional
+    public Boolean addQuizAndUserQuiz(QuizDTO quizDTO, String token) {
+        // Quiz 테이블에 추가하고 ID 반환
+        Long quizId = addQuiz(quizDTO);
+        // 반환된 ID를 사용하여 UserQuiz 추가
+        Boolean userQuiz = addUserQuiz(quizId, token);
+
+        return userQuiz;
+    }
+
+
 }

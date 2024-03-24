@@ -31,4 +31,19 @@ public class DefaultQuizController {
 
         return ResponseEntity.ok().body("Quiz has been saved successfully");
     }
+
+    @PostMapping("/user")
+    public ResponseEntity<?> addUserQuiz(@RequestBody QuizDTO quizDTO, HttpServletRequest request) {
+        // 헤더에서 토큰 추출
+        String tokenHeader = request.getHeader("Authorization");
+        // "Bearer " 접두사 제거
+        String token = tokenHeader != null ? tokenHeader.replace("Bearer ", "") : null;
+
+        Boolean userQuiz = defaultQuizService.addQuizAndUserQuiz(quizDTO, token);
+        if(!userQuiz) {
+            return ResponseEntity.badRequest().body("DefaultQuizController - addUserQuiz()");
+        }
+
+        return ResponseEntity.ok().body("Quiz has been saved successfully");
+    }
 }
