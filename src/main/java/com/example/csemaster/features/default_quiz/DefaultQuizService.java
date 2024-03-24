@@ -121,9 +121,7 @@ public class DefaultQuizService {
     }
 
     @Transactional
-    public Boolean addQuiz(String token, QuizDTO quizDTO) {
-        System.out.println("이거 맞냐고 " + isValidJsonContent(quizDTO.getJsonContent()));
-
+    public Long addQuiz(QuizDTO quizDTO) {
         // jsonContent 형식 검사
         if (!isValidJsonContent(quizDTO.getJsonContent())) {
             throw new RuntimeException("Incorrect jsonContent");
@@ -135,16 +133,7 @@ public class DefaultQuizService {
 
         log.info("Quiz 저장 완료");
 
-        // 저장한 quiz의 id 추출
-        Long savedQuizId = quizEntity.getQuizId();
-
-        // Default Quiz 메서드 호출
-        Boolean defaultQuiz = addDefaultQuiz(savedQuizId, token);
-        if (!defaultQuiz) {
-            throw new RuntimeException("Failed - addDefaultQuiz()");
-        }
-
-        return true;
+        return quizEntity.getQuizId();
     }
 
     public Boolean addDefaultQuiz(Long quizId, String token) {
@@ -161,6 +150,12 @@ public class DefaultQuizService {
         Optional<ManagerEntity> managerEntityOptional = managerRepository.findById(managerId);
         if (!managerEntityOptional.isPresent()) {
             throw new RuntimeException("Manager not found with id: " + managerId);
+        }
+
+        // quizId가 존재하는지 확인
+        Optional<QuizEntity> quizEntity = quizRepository.findByQuizId(quizId);
+        if (!quizEntity.isPresent()) {
+            throw new RuntimeException("Incorrect quizId");
         }
 
         // Default Quiz 테이블에 추가
