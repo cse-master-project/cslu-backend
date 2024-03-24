@@ -1,6 +1,5 @@
-package com.example.csemaster.features.quiz;
+package com.example.csemaster.entity;
 
-import com.example.csemaster.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

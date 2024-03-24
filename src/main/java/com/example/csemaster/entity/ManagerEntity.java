@@ -1,4 +1,4 @@
-package com.example.csemaster.features.login.manager;
+package com.example.csemaster.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.example.csemaster.features.quiz;
+package com.example.csemaster.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

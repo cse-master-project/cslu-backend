@@ -1,4 +1,4 @@
-package com.example.csemaster.features.default_quiz;
+package com.example.csemaster.dto;
 
 import lombok.Data;
 

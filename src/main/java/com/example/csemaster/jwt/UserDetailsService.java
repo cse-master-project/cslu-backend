@@ -1,7 +1,7 @@
 package com.example.csemaster.jwt;
 
-import com.example.csemaster.features.login.manager.ManagerEntity;
-import com.example.csemaster.features.login.manager.ManagerRepository;
+import com.example.csemaster.entity.ManagerEntity;
+import com.example.csemaster.repository.ManagerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

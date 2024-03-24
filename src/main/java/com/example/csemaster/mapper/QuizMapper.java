@@ -1,5 +1,7 @@
-package com.example.csemaster.features.quiz;
+package com.example.csemaster.mapper;
 
+import com.example.csemaster.entity.QuizEntity;
+import com.example.csemaster.dto.response.QuizResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

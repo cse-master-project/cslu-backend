@@ -1,5 +1,7 @@
-package com.example.csemaster.features.quiz;
+package com.example.csemaster.repository;
 
+import com.example.csemaster.entity.QuizLogEntity;
+import com.example.csemaster.entity.QuizLogPK;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

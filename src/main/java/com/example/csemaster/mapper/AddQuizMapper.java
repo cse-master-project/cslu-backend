@@ -1,7 +1,7 @@
-package com.example.csemaster.features.default_quiz;
+package com.example.csemaster.mapper;
 
-import com.example.csemaster.features.quiz.QuizDTO;
-import com.example.csemaster.features.quiz.QuizEntity;
+import com.example.csemaster.dto.QuizDTO;
+import com.example.csemaster.entity.QuizEntity;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

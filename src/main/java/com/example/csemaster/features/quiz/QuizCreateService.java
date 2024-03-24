@@ -1,18 +1,18 @@
-package com.example.csemaster.features.default_quiz;
+package com.example.csemaster.features.quiz;
 
-import com.example.csemaster.entity.UserEntity;
-import com.example.csemaster.features.login.manager.ManagerEntity;
-import com.example.csemaster.features.login.manager.ManagerRepository;
+import com.example.csemaster.dto.QuizDTO;
+import com.example.csemaster.entity.*;
 import com.example.csemaster.features.login.user.UserLoginService;
-import com.example.csemaster.features.quiz.QuizDTO;
-import com.example.csemaster.features.quiz.QuizEntity;
 import com.example.csemaster.jwt.JwtProvider;
+import com.example.csemaster.mapper.AddQuizMapper;
+import com.example.csemaster.repository.DefaultQuizRepository;
+import com.example.csemaster.repository.ManagerRepository;
+import com.example.csemaster.repository.QuizRepository;
 import com.example.csemaster.repository.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +22,7 @@ import java.util.Set;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class DefaultQuizService {
+public class QuizCreateService {
     private final JwtProvider jwtProvider;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final AddQuizMapper addQuizMapper;
@@ -140,16 +140,7 @@ public class DefaultQuizService {
         return quizEntity.getQuizId();
     }
 
-    public Boolean addDefaultQuiz(Long quizId, String token) {
-        // 토큰 검증
-        if (!jwtProvider.validateToken(token)) {
-            throw new RuntimeException("Invalid token");
-        }
-
-        // 토큰으로부터 사용자 정보 추출
-        Authentication authentication = jwtProvider.getAuthentication(token);
-        String managerId = authentication.getName();
-
+    public Boolean addDefaultQuiz(Long quizId, String managerId) {
         // managerId를 사용하여 ManagerEntity 조회
         Optional<ManagerEntity> managerEntityOptional = managerRepository.findById(managerId);
         if (!managerEntityOptional.isPresent()) {
@@ -173,15 +164,7 @@ public class DefaultQuizService {
         return true;
     }
 
-    public Boolean addUserQuiz(Long quizId, String token) {
-        // 토큰 검증
-        if (!jwtProvider.validateToken(token)) {
-            throw new RuntimeException("Invalid token");
-        }
-
-        // 토큰으로부터 사용자 정보 추출
-        String userId = userLoginService.getUserId(token);
-
+    public Boolean addUserQuiz(Long quizId, String userId) {
         // userId를 사용하여 UserEntity 조회
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if (!userEntity.isPresent()) {
@@ -204,23 +187,21 @@ public class DefaultQuizService {
     }
 
     @Transactional
-    public Boolean addQuizAndDefaultQuiz(QuizDTO quizDTO, String token) {
+    public Boolean addQuizAndDefaultQuiz(QuizDTO quizDTO, String managerId) {
         // Quiz 테이블에 추가하고 ID 반환
         Long quizId = addQuiz(quizDTO);
-        // 반환된 ID를 사용하여 DefaultQuiz 추가
-        Boolean defaultQuiz = addDefaultQuiz(quizId, token);
 
-        return defaultQuiz;
+        // 반환된 ID를 사용하여 DefaultQuiz 추가
+        return addDefaultQuiz(quizId, managerId);
     }
 
     @Transactional
-    public Boolean addQuizAndUserQuiz(QuizDTO quizDTO, String token) {
+    public Boolean addQuizAndUserQuiz(QuizDTO quizDTO, String userId) {
         // Quiz 테이블에 추가하고 ID 반환
         Long quizId = addQuiz(quizDTO);
-        // 반환된 ID를 사용하여 UserQuiz 추가
-        Boolean userQuiz = addUserQuiz(quizId, token);
 
-        return userQuiz;
+        // 반환된 ID를 사용하여 UserQuiz 추가
+        return addUserQuiz(quizId, userId);
     }
 
 

@@ -1,5 +1,13 @@
 package com.example.csemaster.features.quiz;
 
+import com.example.csemaster.dto.response.QuizResponse;
+import com.example.csemaster.entity.QuizEntity;
+import com.example.csemaster.entity.QuizLogEntity;
+import com.example.csemaster.entity.QuizReportEntity;
+import com.example.csemaster.mapper.QuizMapper;
+import com.example.csemaster.repository.QuizLogRepository;
+import com.example.csemaster.repository.QuizReportRepository;
+import com.example.csemaster.repository.QuizRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

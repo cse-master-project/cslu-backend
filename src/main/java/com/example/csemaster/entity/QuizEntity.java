@@ -1,4 +1,4 @@
-package com.example.csemaster.features.quiz;
+package com.example.csemaster.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity
 @Table(name = "quiz")
 public class QuizEntity {
     @Id

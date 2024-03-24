@@ -1,7 +1,5 @@
-package com.example.csemaster.features.default_quiz;
+package com.example.csemaster.entity;
 
-import com.example.csemaster.features.login.manager.ManagerEntity;
-import com.example.csemaster.features.quiz.QuizEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,6 +1,5 @@
 package com.example.csemaster.entity;
 
-import com.example.csemaster.features.login.manager.ManagerEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

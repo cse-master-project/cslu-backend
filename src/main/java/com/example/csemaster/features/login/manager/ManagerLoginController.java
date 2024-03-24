@@ -1,5 +1,6 @@
 package com.example.csemaster.features.login.manager;
 
+import com.example.csemaster.dto.ManagerLoginDTO;
 import com.example.csemaster.jwt.JwtInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,7 +26,7 @@ public class ManagerLoginController {
     public String login(@RequestBody ManagerLoginDto managerLoginDto) { return managerLoginService.login(managerLoginDto); }*/
 
     @PostMapping("/login")
-    public String login(@RequestBody ManagerLoginDto managerLoginDto, HttpServletResponse response) {
+    public String login(@RequestBody ManagerLoginDTO managerLoginDto, HttpServletResponse response) {
         // return managerLoginService.login(managerLoginDto);
 
         JwtInfo jwtInfo = managerLoginService.login(managerLoginDto);

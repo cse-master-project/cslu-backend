@@ -1,4 +1,4 @@
-package com.example.csemaster.features.quiz;
+package com.example.csemaster.dto.request;
 
 import lombok.Getter;
 

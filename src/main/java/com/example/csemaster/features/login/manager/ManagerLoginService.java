@@ -1,9 +1,11 @@
 package com.example.csemaster.features.login.manager;
 
+import com.example.csemaster.dto.ManagerLoginDTO;
 import com.example.csemaster.entity.ManagerRefreshTokenEntity;
 import com.example.csemaster.jwt.*;
 import com.example.csemaster.mapper.RefreshTokenMapper;
-import com.example.csemaster.repository.RefreshTokenRepository;
+import com.example.csemaster.repository.ManagerRepository;
+import com.example.csemaster.repository.ManagerRefreshTokenRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,19 +25,19 @@ public class ManagerLoginService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtProvider jwtProvider;
 
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final ManagerRefreshTokenRepository managerRefreshTokenRepository;
 
     @Autowired
-    public ManagerLoginService(ManagerRepository managerRepository, AuthenticationManagerBuilder authenticationManagerBuilder, JwtProvider jwtProvider, RefreshTokenRepository refreshTokenRepository, RefreshTokenMapper refreshTokenMapper) {
+    public ManagerLoginService(ManagerRepository managerRepository, AuthenticationManagerBuilder authenticationManagerBuilder, JwtProvider jwtProvider, ManagerRefreshTokenRepository managerRefreshTokenRepository, RefreshTokenMapper refreshTokenMapper) {
         this.managerRepository = managerRepository;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.jwtProvider = jwtProvider;
-        this.refreshTokenRepository = refreshTokenRepository;
+        this.managerRefreshTokenRepository = managerRefreshTokenRepository;
         this.refreshTokenMapper = refreshTokenMapper;
     }
 
     @Transactional
-    public JwtInfo login(ManagerLoginDto managerLoginDto) {
+    public JwtInfo login(ManagerLoginDTO managerLoginDto) {
         // 1. managerLoginDto를 기반으로 Authentication 객체 생성
         // 이때 authentication은 인증 여부를 확인하는 authenticated 값이 false
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(managerLoginDto.getManagerId(), managerLoginDto.getManagerPw());
@@ -49,7 +51,7 @@ public class ManagerLoginService {
 
         // 4. 토큰 정보를 RefreshTokenEntity에 저장
         ManagerRefreshTokenEntity managerRefreshTokenEntity = refreshTokenMapper.toRefreshTokenEntity(managerLoginDto, jwtInfo);
-        refreshTokenRepository.save(managerRefreshTokenEntity);
+        managerRefreshTokenRepository.save(managerRefreshTokenEntity);
 
         log.info("로그인 성공");
         return jwtInfo;
@@ -69,13 +71,13 @@ public class ManagerLoginService {
         JwtInfo newJwtInfo = jwtProvider.generateToken(authentication);
 
         // 4. 새로운 리프레시 토큰으로 RefreshTokenEntity 업데이트
-        ManagerRefreshTokenEntity managerRefreshTokenEntity = refreshTokenRepository.findById(authentication.getName())
+        ManagerRefreshTokenEntity managerRefreshTokenEntity = managerRefreshTokenRepository.findById(authentication.getName())
                 .orElseThrow(() -> new RuntimeException("Refresh token entity not found"));
 
         managerRefreshTokenEntity.setRefreshToken(newJwtInfo.getRefreshToken());
         managerRefreshTokenEntity.setIssuedAt(LocalDateTime.now());
         managerRefreshTokenEntity.setExpirationTime(LocalDateTime.now().plusHours(1));
-        refreshTokenRepository.save(managerRefreshTokenEntity);
+        managerRefreshTokenRepository.save(managerRefreshTokenEntity);
 
 
         log.info("액세스 토큰 및 리프레시 토큰 재발급 성공");
