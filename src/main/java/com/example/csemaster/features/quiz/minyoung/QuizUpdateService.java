@@ -1,6 +1,7 @@
-package com.example.csemaster.features.quiz;
+package com.example.csemaster.features.quiz.minyoung;
 
 import com.example.csemaster.entity.QuizEntity;
+import com.example.csemaster.features.quiz.QuizCreateService;
 import com.example.csemaster.repository.QuizRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

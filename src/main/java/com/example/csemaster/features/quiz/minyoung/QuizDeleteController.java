@@ -1,4 +1,4 @@
-package com.example.csemaster.features.quiz;
+package com.example.csemaster.features.quiz.minyoung;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

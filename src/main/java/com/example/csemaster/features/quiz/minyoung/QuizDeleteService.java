@@ -1,4 +1,4 @@
-package com.example.csemaster.features.quiz;
+package com.example.csemaster.features.quiz.minyoung;
 
 import com.example.csemaster.entity.QuizEntity;
 import com.example.csemaster.repository.QuizRepository;
