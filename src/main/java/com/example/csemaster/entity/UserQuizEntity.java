@@ -1,7 +1,5 @@
 package com.example.csemaster.entity;
 
-import com.example.csemaster.entity.UserEntity;
-import com.example.csemaster.entity.QuizEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,7 +21,7 @@ public class UserQuizEntity {
     @JoinColumn(name = "user_quiz_id", referencedColumnName = "quiz_id")
     private QuizEntity quiz;
 
-    @Column(name = "permission_staus")
+    @Column(name = "permission_status")
     private Boolean permissionStatus;
 
     @OneToOne

@@ -35,11 +35,11 @@ public class QuizLogEntity {
 
 
     @ManyToOne
-    @JoinColumn(name="quiz_id_for_quiz_log", referencedColumnName = "quiz_id")
+    @JoinColumn(name="quiz_id_for_quiz_log", referencedColumnName = "quiz_id", insertable = false, updatable = false)
     private QuizEntity quiz;
 
     @ManyToOne
-    @JoinColumn(name="user_id_for_quiz_log", referencedColumnName = "user_id")
+    @JoinColumn(name="user_id_for_quiz_log", referencedColumnName = "user_id", insertable = false, updatable = false)
     private UserEntity user;
 }
 

@@ -18,7 +18,7 @@ public class QuizLogPK implements Serializable {
     @Column(name = "quiz_id_for_quiz_log")
     private Long quizId;
 
-    @Column(name = "quiz_id_for_quiz_log")
+    @Column(name = "user_id_for_quiz_log")
     private String userId;
 
     @Column(name = "try_cnt")

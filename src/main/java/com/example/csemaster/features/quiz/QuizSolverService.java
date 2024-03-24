@@ -8,24 +8,18 @@ import com.example.csemaster.mapper.QuizMapper;
 import com.example.csemaster.repository.QuizLogRepository;
 import com.example.csemaster.repository.QuizReportRepository;
 import com.example.csemaster.repository.QuizRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class QuizSolverService {
     private final QuizRepository quizRepository;
     private final QuizLogRepository quizLogRepository;
     private final QuizReportRepository quizReportRepository;
-
-    @Autowired
-    public QuizSolverService(QuizRepository quizRepository, QuizLogRepository quizLogRepository, QuizReportRepository quizReportRepository) {
-        this.quizRepository = quizRepository;
-        this.quizLogRepository = quizLogRepository;
-        this.quizReportRepository = quizReportRepository;
-    }
 
     public QuizResponse getQuiz(String userId, String subject, String detailSubject) {
         List<QuizEntity> quiz = quizRepository.getAnOpenQuiz(userId, subject, detailSubject);

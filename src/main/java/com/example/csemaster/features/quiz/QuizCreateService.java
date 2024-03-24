@@ -2,13 +2,9 @@ package com.example.csemaster.features.quiz;
 
 import com.example.csemaster.dto.QuizDTO;
 import com.example.csemaster.entity.*;
-import com.example.csemaster.features.login.user.UserLoginService;
 import com.example.csemaster.jwt.JwtProvider;
 import com.example.csemaster.mapper.AddQuizMapper;
-import com.example.csemaster.repository.DefaultQuizRepository;
-import com.example.csemaster.repository.ManagerRepository;
-import com.example.csemaster.repository.QuizRepository;
-import com.example.csemaster.repository.UserRepository;
+import com.example.csemaster.repository.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +25,8 @@ public class QuizCreateService {
     private final QuizRepository quizRepository;
     private final ManagerRepository managerRepository;
     private final DefaultQuizRepository defaultQuizRepository;
-    private final UserLoginService userLoginService;
     private final UserRepository userRepository;
+    private final UserQuizRepository userQuizRepository;
 
     // jsonContent 형식 검사
     public boolean isValidJsonContent(String jsonContent) {
@@ -182,6 +178,8 @@ public class QuizCreateService {
         userQuizEntity.setUserQuizId(quizId);
         userQuizEntity.setPermissionStatus(false);
         userQuizEntity.setUserId(userEntity.get());
+
+        userQuizRepository.save(userQuizEntity);
 
         return true;
     }
