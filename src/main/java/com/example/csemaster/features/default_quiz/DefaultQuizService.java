@@ -56,8 +56,10 @@ public class DefaultQuizService {
 
             // 1. 4지선다
             if ("1".equals(typeValue)) {
-                // 'answer' 필드의 길이가 1인지 확인
-                if (answerValue.length() != 1) {
+                Set<String> answerTypes = Set.of("1", "2", "3", "4");
+
+                // 'answer' 필드가 1~4 값을 가졌는지 확인
+                if (!answerTypes.contains(answerValue)) {
                     return false;
                 }
 
