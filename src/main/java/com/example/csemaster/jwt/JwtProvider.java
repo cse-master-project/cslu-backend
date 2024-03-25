@@ -1,8 +1,13 @@
 package com.example.csemaster.jwt;
 
+import com.example.csemaster.entity.ManagerRefreshTokenEntity;
+import com.example.csemaster.entity.UserRefreshTokenEntity;
+import com.example.csemaster.repository.ManagerRefreshTokenRepository;
+import com.example.csemaster.repository.UserRefreshTokenRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +22,7 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,7 +42,12 @@ public class JwtProvider {
     @Value("${REFRESH_TOKEN_EXPIRE_TIME}")
     private long USER_REFRESH_TOKEN_EXPIRE_TIME; // 7일
 
-    public JwtProvider(@Value("${jwt.secret}") String key) {
+    private final ManagerRefreshTokenRepository managerRefreshTokenRepository;
+    private final UserRefreshTokenRepository userRefreshTokenRepository;
+
+    public JwtProvider(@Value("${jwt.secret}") String key,
+                       ManagerRefreshTokenRepository managerRefreshTokenRepository,
+                       UserRefreshTokenRepository userRefreshTokenRepository) {
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(key));
     }
 
@@ -149,19 +160,24 @@ public class JwtProvider {
     // refreshToken 검증 메서드
     public boolean validateRefreshToken(String token) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token);
-            return true;
+            // user id는 36글자인데 managerId는 20자 이하이므로 길이로 유저 구분
+            String id = parseClaims(token).getSubject();
+
+            if (id.length() < 36) {
+                Optional<ManagerRefreshTokenEntity> refreshToken = managerRefreshTokenRepository.findById(id);
+                return refreshToken.isPresent();
+            } else {
+                Optional<UserRefreshTokenEntity> refreshToken = userRefreshTokenRepository.findById(id);
+                return refreshToken.isPresent();
+            }
         } catch (ExpiredJwtException e) {
-            log.info("Expired Refresh Token", e);
+            log.info("Expired Refresh Token");
         } catch (SecurityException | MalformedJwtException e) {
-            log.info("Invalid Refresh Token", e);
+            log.info("Invalid Refresh Token");
         } catch (UnsupportedJwtException e) {
-            log.info("Unsupported Refresh Token", e);
+            log.info("Unsupported Refresh Token");
         } catch (IllegalArgumentException e) {
-            log.info("Refresh Token claims string is empty", e);
+            log.info("Refresh Token claims string is empty");
         }
 
         return false;
