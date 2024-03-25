@@ -14,10 +14,10 @@ public class ApprovalQuizService {
     public List<UnApprovalQuizDTO> getUnApprovalQuiz() {
         return userQuizRepository.getAnApprovalQuiz();
     }
-    public ResponseEntity<?> setQuizPermission(Long quizId) {
+    public ResponseEntity<?> setQuizPermission(Long quizId, Integer state) {
         return userQuizRepository.findById(quizId)
                 .map(quiz -> {
-                    quiz.setPermissionStatus(true);
+                    quiz.setPermissionStatus(state);
                     userQuizRepository.save(quiz);
                     return ResponseEntity.ok().build();
                 }).orElse(ResponseEntity.notFound().build());

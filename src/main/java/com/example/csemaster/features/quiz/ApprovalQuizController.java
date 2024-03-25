@@ -16,8 +16,14 @@ public class ApprovalQuizController {
         return approvalQuizService.getUnApprovalQuiz();
     }
 
+    // 0 : 대기, 1 : 승인, -1 : 거절
     @PutMapping("/{id}/approve")
-    public ResponseEntity<?> quizApprove(@PathVariable("id") Long quizId) {
-        return approvalQuizService.setQuizPermission(quizId);
+    public ResponseEntity<?> userQuizApprove(@PathVariable("id") Long quizId) {
+        return approvalQuizService.setQuizPermission(quizId, 1);
+    }
+
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<?> userQuizReject(@PathVariable("id") Long quizId) {
+        return approvalQuizService.setQuizPermission(quizId, -1);
     }
 }
