@@ -7,7 +7,6 @@ import com.example.csemaster.repository.UserRefreshTokenRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,8 +46,10 @@ public class JwtProvider {
 
     public JwtProvider(@Value("${jwt.secret}") String key,
                        ManagerRefreshTokenRepository managerRefreshTokenRepository,
-                       UserRefreshTokenRepository userRefreshTokenRepository) {
+                       UserRefreshTokenRepository userRefreshTokenRepository, ManagerRefreshTokenRepository managerRefreshTokenRepository1, UserRefreshTokenRepository userRefreshTokenRepository1) {
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(key));
+        this.managerRefreshTokenRepository = managerRefreshTokenRepository1;
+        this.userRefreshTokenRepository = userRefreshTokenRepository1;
     }
 
     // manager 정보를 가지고 AccessToken, RefreshToken을 생성하는 메서드
@@ -135,7 +136,7 @@ public class JwtProvider {
         } catch (SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT Token");
         } catch (ExpiredJwtException e) {
-            log.info("Expired JWT Token", e);
+            log.info("Expired JWT Token");
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT Token");
         } catch (IllegalArgumentException e) {
