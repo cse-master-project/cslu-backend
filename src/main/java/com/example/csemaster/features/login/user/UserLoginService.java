@@ -1,50 +1,36 @@
 package com.example.csemaster.features.login.user;
 
-import com.example.csemaster.jwt.JwtInfo;
-import com.example.csemaster.jwt.JwtProvider;
-import com.example.csemaster.dto.UserDTO;
 import com.example.csemaster.entity.ActiveUserEntity;
 import com.example.csemaster.entity.UserEntity;
 import com.example.csemaster.entity.UserRefreshTokenEntity;
-import com.example.csemaster.mapper.UserMapper;
+import com.example.csemaster.jwt.JwtInfo;
+import com.example.csemaster.jwt.JwtProvider;
 import com.example.csemaster.repository.ActiveUserRepository;
+import com.example.csemaster.repository.UserAccessTokenBlacklistRepository;
 import com.example.csemaster.repository.UserRefreshTokenRepository;
 import com.example.csemaster.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserLoginService {
     private final UserRepository userRepository;
     private final ActiveUserRepository activeUserRepository;
     private final UserRefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
-
-    @Autowired
-    public UserLoginService(UserRepository userRepository, ActiveUserRepository activeUserRepository, JwtProvider jwtProvider, UserRefreshTokenRepository userRefreshTokenRepository) {
-        this.userRepository = userRepository;
-        this.activeUserRepository = activeUserRepository;
-        this.jwtProvider = jwtProvider;
-        this.refreshTokenRepository = userRefreshTokenRepository;
-    }
-
-    public List<UserDTO> getAllUsers() {
-        List<UserEntity> users = userRepository.findAll();
-        return users.stream()
-                .map(UserMapper.INSTANCE::entityToDTO)
-                .collect(Collectors.toList());
-    }
+    private final UserAccessTokenBlacklistRepository userAccessTokenBlacklistRepository;
 
     public String isGoogleAuth(String accessToken) {
         try {
@@ -102,5 +88,18 @@ public class UserLoginService {
         activeUser.setNickname(nickname);
         activeUser.setCreateAt(LocalDateTime.now());
         activeUserRepository.save(activeUser);
+    }
+
+    public ResponseEntity<?> logout(String userId, String accessToken) {
+        // 현재 유효한 엑세스토큰을 블랙 처리 후 리프레시 토큰은 DB에서 삭제
+        UserAccessTokenBlacklistEntity accessTokenBlacklistEntity = new UserAccessTokenBlacklistEntity();
+        accessTokenBlacklistEntity.setUserId(userId);
+        accessTokenBlacklistEntity.setAccessToken(accessToken);
+        userAccessTokenBlacklistRepository.save(accessTokenBlacklistEntity);
+
+        Optional<UserRefreshTokenEntity> refreshToken = refreshTokenRepository.findById(userId);
+        refreshToken.ifPresent(refreshTokenRepository::delete);
+
+        return ResponseEntity.ok().build();
     }
 }
