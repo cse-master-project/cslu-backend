@@ -67,4 +67,15 @@ public class UserLoginController {
 
         return userLoginService.logout(userId, accessToken);
     }
+
+    @PostMapping("/deactivate")
+    public ResponseEntity<?> deactivateUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+        String accessToken = (String) authentication.getCredentials();
+
+        // 로그아웃으로 토큰 만료 후 비활성화
+        userLoginService.logout(userId, accessToken);
+        return userLoginService.deactivate(userId);
+    }
 }

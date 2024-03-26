@@ -1,14 +1,13 @@
 package com.example.csemaster.features.login.user;
 
 import com.example.csemaster.entity.ActiveUserEntity;
+import com.example.csemaster.entity.DeleteUserEntity;
 import com.example.csemaster.entity.UserEntity;
 import com.example.csemaster.entity.UserRefreshTokenEntity;
 import com.example.csemaster.jwt.JwtInfo;
 import com.example.csemaster.jwt.JwtProvider;
-import com.example.csemaster.repository.ActiveUserRepository;
-import com.example.csemaster.repository.UserAccessTokenBlacklistRepository;
-import com.example.csemaster.repository.UserRefreshTokenRepository;
-import com.example.csemaster.repository.UserRepository;
+import com.example.csemaster.mapper.ActiveUserMapper;
+import com.example.csemaster.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +30,7 @@ public class UserLoginService {
     private final UserRefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
     private final UserAccessTokenBlacklistRepository userAccessTokenBlacklistRepository;
+    private final DeleteUserRepository deleteUserRepository;
 
     public String isGoogleAuth(String accessToken) {
         try {
@@ -101,5 +101,22 @@ public class UserLoginService {
         refreshToken.ifPresent(refreshTokenRepository::delete);
 
         return ResponseEntity.ok().build();
+    }
+
+    @Transactional
+    public ResponseEntity<?> deactivate(String userId) {
+        return activeUserRepository.findById(userId)
+                        .map(activeUser -> {
+                            activeUser.getUser().setIsActive(false);
+                            userRepository.save(activeUser.getUser());
+
+                            DeleteUserEntity deleteUser = ActiveUserMapper.INSTANCE.activeToDelete(activeUser);
+                            deleteUser.setDeleteAt(LocalDateTime.now());
+                            deleteUserRepository.save(deleteUser);
+
+                            activeUserRepository.delete(activeUser);
+
+                            return ResponseEntity.ok().build();
+                        }).orElse(ResponseEntity.notFound().build());
     }
 }
