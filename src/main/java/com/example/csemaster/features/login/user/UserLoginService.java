@@ -104,19 +104,25 @@ public class UserLoginService {
     }
 
     @Transactional
-    public ResponseEntity<?> deactivate(String userId) {
+    public ResponseEntity<?> deactivateUser(String userId) {
         return activeUserRepository.findById(userId)
-                        .map(activeUser -> {
-                            activeUser.getUser().setIsActive(false);
-                            userRepository.save(activeUser.getUser());
+                        .map(this::handleUserDeactivation)
+                .orElse(ResponseEntity.notFound().build());
+    }
 
-                            DeleteUserEntity deleteUser = ActiveUserMapper.INSTANCE.activeToDelete(activeUser);
-                            deleteUser.setDeleteAt(LocalDateTime.now());
-                            deleteUserRepository.save(deleteUser);
+    private ResponseEntity<Void> handleUserDeactivation(ActiveUserEntity activeUser) {
+        // 유저 비황성화
+        activeUser.getUser().setIsActive(false);
+        userRepository.save(activeUser.getUser());
 
-                            activeUserRepository.delete(activeUser);
+        // Active에서 Delete로 이동
+        DeleteUserEntity deleteUser = ActiveUserMapper.INSTANCE.activeToDelete(activeUser);
+        deleteUser.setDeleteAt(LocalDateTime.now());
+        deleteUserRepository.save(deleteUser);
 
-                            return ResponseEntity.ok().build();
-                        }).orElse(ResponseEntity.notFound().build());
+        // 이동 후 Active 테이블에서 삭제
+        activeUserRepository.delete(activeUser);
+
+        return ResponseEntity.ok().build();
     }
 }
