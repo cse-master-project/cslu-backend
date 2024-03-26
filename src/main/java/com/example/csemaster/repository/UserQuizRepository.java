@@ -11,6 +11,6 @@ public interface UserQuizRepository extends JpaRepository<UserQuizEntity, Long> 
     @Query(" SELECT new com.example.csemaster.features.quiz.UnApprovalQuizDTO(q.quiz, u.nickname) " +
             "FROM UserQuizEntity q " +
             "JOIN ActiveUserEntity u ON u.userId = q.userId.userId " +
-            "WHERE q.permissionStatus = false")
+            "WHERE q.permissionStatus = 0")
     List<UnApprovalQuizDTO> getAnApprovalQuiz();
 }
