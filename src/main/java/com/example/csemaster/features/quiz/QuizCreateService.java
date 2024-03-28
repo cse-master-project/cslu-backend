@@ -9,9 +9,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.Optional;
 import java.util.Set;
 
@@ -202,5 +206,26 @@ public class QuizCreateService {
         return addUserQuiz(quizId, userId);
     }
 
+    @Transactional
+    public ResponseEntity<?> uploadImage(String userId, Long quizId, String base64String) {
+        return quizRepository.findByQuizIdAndUserId(quizId, userId).map(quiz -> {
+            byte[] decodedBytes = Base64.getDecoder().decode(base64String);
 
+            try {
+                FileOutputStream fos = new FileOutputStream(quizId.toString());
+                fos.write(decodedBytes);
+                fos.close();
+                log.info("file save successful. [quizId: " + quizId + "]");
+
+            } catch (IOException e) {
+                return ResponseEntity.notFound().build();
+            }
+
+            quiz.setHasImage(true);
+            quizRepository.save(quiz);
+
+            return ResponseEntity.ok().build();
+        }).orElse(ResponseEntity.notFound().build());
+
+    }
 }
