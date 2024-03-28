@@ -1,5 +1,6 @@
 package com.example.csemaster.repository;
 
+import com.example.csemaster.dto.response.QuizRejectResponse;
 import com.example.csemaster.entity.QuizEntity;
 import com.example.csemaster.entity.UserQuizEntity;
 import com.example.csemaster.features.quiz.minyoung.UserQuizResponse;
@@ -27,4 +28,9 @@ public interface QuizRepository extends JpaRepository<QuizEntity, Long> {
             "FROM QuizEntity q JOIN UserQuizEntity uq ON q.quizId = uq.userQuizId " +
             "WHERE uq.userId.userId = :userId")
     List<UserQuizResponse> getUserQuiz(@Param("userId") String user);
+
+    @Query("SELECT new com.example.csemaster.dto.response.QuizRejectResponse(q, qr) " +
+            "FROM QuizEntity q JOIN QuizRejectEntity qr ON q.quizId = qr.quizId " +
+            "WHERE qr.quizId = :quizId")
+    List<QuizRejectResponse> getQuizReject(@Param("quizId") Long quizId);
 }

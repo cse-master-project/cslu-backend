@@ -1,5 +1,6 @@
 package com.example.csemaster.features.quiz.minyoung;
 
+import com.example.csemaster.dto.response.QuizRejectResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,5 +18,10 @@ public class NewQuizController {
     @GetMapping()
     public List<UserQuizResponse> getUserQuiz(@RequestParam String userId) {
         return newQuizService.getUserQuiz(userId);
+    }
+
+    @GetMapping("/reject")
+    public List<QuizRejectResponse> getQuizReject(@RequestParam Long quizId) {
+        return newQuizService.getQuizReject(quizId);
     }
 }

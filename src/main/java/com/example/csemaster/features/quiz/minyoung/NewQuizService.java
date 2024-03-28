@@ -1,5 +1,7 @@
 package com.example.csemaster.features.quiz.minyoung;
 
+import com.example.csemaster.dto.response.QuizRejectResponse;
+import com.example.csemaster.entity.QuizEntity;
 import com.example.csemaster.entity.UserEntity;
 import com.example.csemaster.repository.QuizRepository;
 import com.example.csemaster.repository.UserRepository;
@@ -25,5 +27,13 @@ public class NewQuizService {
         List<UserQuizResponse> quiz = quizRepository.getUserQuiz(userId);
 
         return quiz;
+    }
+
+    public List<QuizRejectResponse> getQuizReject(Long quizId) {
+        Optional<QuizEntity> quiz = quizRepository.findById(quizId);
+
+        List<QuizRejectResponse> reject = quizRepository.getQuizReject(quizId);
+
+        return reject;
     }
 }
