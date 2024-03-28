@@ -1,50 +1,38 @@
 package com.example.csemaster.features.login.user;
 
-import com.example.csemaster.jwt.JwtInfo;
-import com.example.csemaster.jwt.JwtProvider;
-import com.example.csemaster.dto.UserDTO;
 import com.example.csemaster.entity.ActiveUserEntity;
+import com.example.csemaster.entity.DeleteUserEntity;
 import com.example.csemaster.entity.UserEntity;
 import com.example.csemaster.entity.UserRefreshTokenEntity;
-import com.example.csemaster.mapper.UserMapper;
-import com.example.csemaster.repository.ActiveUserRepository;
-import com.example.csemaster.repository.UserRefreshTokenRepository;
-import com.example.csemaster.repository.UserRepository;
+import com.example.csemaster.jwt.JwtInfo;
+import com.example.csemaster.jwt.JwtProvider;
+import com.example.csemaster.mapper.ActiveUserMapper;
+import com.example.csemaster.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserLoginService {
     private final UserRepository userRepository;
     private final ActiveUserRepository activeUserRepository;
     private final UserRefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
-
-    @Autowired
-    public UserLoginService(UserRepository userRepository, ActiveUserRepository activeUserRepository, JwtProvider jwtProvider, UserRefreshTokenRepository userRefreshTokenRepository) {
-        this.userRepository = userRepository;
-        this.activeUserRepository = activeUserRepository;
-        this.jwtProvider = jwtProvider;
-        this.refreshTokenRepository = userRefreshTokenRepository;
-    }
-
-    public List<UserDTO> getAllUsers() {
-        List<UserEntity> users = userRepository.findAll();
-        return users.stream()
-                .map(UserMapper.INSTANCE::entityToDTO)
-                .collect(Collectors.toList());
-    }
+    private final UserAccessTokenBlacklistRepository userAccessTokenBlacklistRepository;
+    private final DeleteUserRepository deleteUserRepository;
 
     public String isGoogleAuth(String accessToken) {
         try {
@@ -102,5 +90,61 @@ public class UserLoginService {
         activeUser.setNickname(nickname);
         activeUser.setCreateAt(LocalDateTime.now());
         activeUserRepository.save(activeUser);
+    }
+
+    public ResponseEntity<?> logout(String userId, String accessToken) {
+        // 현재 유효한 엑세스토큰을 블랙 처리 후 리프레시 토큰은 DB에서 삭제
+        UserAccessTokenBlacklistEntity accessTokenBlacklistEntity = new UserAccessTokenBlacklistEntity();
+        accessTokenBlacklistEntity.setUserId(userId);
+        accessTokenBlacklistEntity.setAccessToken(accessToken);
+        userAccessTokenBlacklistRepository.save(accessTokenBlacklistEntity);
+
+        Optional<UserRefreshTokenEntity> refreshToken = refreshTokenRepository.findById(userId);
+        refreshToken.ifPresent(refreshTokenRepository::delete);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Transactional
+    public ResponseEntity<?> deactivateUser(String userId) {
+        return activeUserRepository.findById(userId)
+                        .map(this::handleUserDeactivation)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    private ResponseEntity<Void> handleUserDeactivation(ActiveUserEntity activeUser) {
+        // 유저 비황성화
+        activeUser.getUser().setIsActive(false);
+        userRepository.save(activeUser.getUser());
+
+        // Active에서 Delete로 이동
+        DeleteUserEntity deleteUser = ActiveUserMapper.INSTANCE.activeToDelete(activeUser);
+        deleteUser.setDeleteAt(LocalDateTime.now());
+        deleteUserRepository.save(deleteUser);
+
+        // 이동 후 Active 테이블에서 삭제
+        activeUserRepository.delete(activeUser);
+
+        return ResponseEntity.ok().build();
+    }
+
+    public ResponseEntity<?> getUserInfo(String userId) {
+        return activeUserRepository.findById(userId)
+                .map(activeUser -> ResponseEntity.ok().body(ActiveUserMapper.INSTANCE.toUserInfo(activeUser)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    public ResponseEntity<?> setUserNickname(String userId, String nickname) {
+        try {
+            return activeUserRepository.findById(userId)
+                    .map(activeUser -> {
+                        activeUser.setNickname(nickname);
+                        activeUserRepository.save(activeUser);
+
+                        return ResponseEntity.ok().build();
+                    }).orElse(ResponseEntity.notFound().build());
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 }
