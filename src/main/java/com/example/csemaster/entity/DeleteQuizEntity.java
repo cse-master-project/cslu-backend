@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "quiz")
-public class QuizEntity {
+@Table(name = "deleted_quiz_view")
+public class DeleteQuizEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "quiz_id")
@@ -35,7 +35,4 @@ public class QuizEntity {
 
     @Column(name = "has_image")
     private Boolean hasImage;
-
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
 }

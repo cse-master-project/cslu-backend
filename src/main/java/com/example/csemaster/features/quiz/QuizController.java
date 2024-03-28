@@ -10,6 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -19,7 +21,7 @@ public class QuizController {
     private final QuizCreateService quizCreateService;
 
     @GetMapping("/random")
-    public QuizResponse getQuiz(@RequestParam String subject, String detailSubject) {
+    public QuizResponse getRandomQuiz(@RequestParam String subject, String detailSubject) {
         // 사용자 인증 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();

@@ -5,9 +5,9 @@ import com.example.csemaster.entity.QuizEntity;
 import com.example.csemaster.entity.QuizLogEntity;
 import com.example.csemaster.entity.QuizReportEntity;
 import com.example.csemaster.mapper.QuizMapper;
+import com.example.csemaster.repository.ActiveQuizRepository;
 import com.example.csemaster.repository.QuizLogRepository;
 import com.example.csemaster.repository.QuizReportRepository;
-import com.example.csemaster.repository.QuizRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +17,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class QuizSolverService {
-    private final QuizRepository quizRepository;
+    private final ActiveQuizRepository activeQuizRepository;
     private final QuizLogRepository quizLogRepository;
     private final QuizReportRepository quizReportRepository;
 
     public QuizResponse getQuiz(String userId, String subject, String detailSubject) {
-        List<QuizEntity> quiz = quizRepository.getAnOpenQuiz(userId, subject, detailSubject);
+        List<QuizEntity> quiz = activeQuizRepository.getAnOpenQuiz(userId, subject, detailSubject);
         int randomIndex = (int)(Math.random() * quiz.size());
         return QuizMapper.INSTANCE.entityToResponse(quiz.get(randomIndex));
     }
