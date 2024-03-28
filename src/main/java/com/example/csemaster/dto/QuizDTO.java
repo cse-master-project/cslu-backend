@@ -18,4 +18,6 @@ public class QuizDTO {
     private String subject;
     private String detailSubject;
     private String jsonContent;
+    private Boolean hasImage;
+    private Boolean isDeleted;
 }

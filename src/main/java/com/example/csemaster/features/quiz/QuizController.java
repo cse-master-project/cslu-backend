@@ -5,7 +5,6 @@ import com.example.csemaster.dto.request.QuizReportRequest;
 import com.example.csemaster.dto.request.QuizSolverRequest;
 import com.example.csemaster.dto.response.QuizResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -45,29 +44,19 @@ public class QuizController {
     }
 
     @PostMapping("/default")
-    public ResponseEntity<?> addDefaultQuiz(@RequestBody QuizDTO quizDTO) {
+    public Long addDefaultQuiz(@RequestBody QuizDTO quizDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String managerId = authentication.getName();
 
-        Boolean defaultQuiz = quizCreateService.addQuizAndDefaultQuiz(quizDTO, managerId);
-        if (!defaultQuiz) {
-            return ResponseEntity.badRequest().body("DefaultQuizController - addDefaultQuiz()");
-        }
-
-        return ResponseEntity.ok().body("Quiz has been saved successfully");
+        return quizCreateService.addQuizAndDefaultQuiz(quizDTO, managerId);
     }
 
     @PostMapping("/user")
-    public ResponseEntity<?> addUserQuiz(@RequestBody QuizDTO quizDTO) {
+    public Long addUserQuiz(@RequestBody QuizDTO quizDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
-        Boolean userQuiz = quizCreateService.addQuizAndUserQuiz(quizDTO, userId);
-        if(!userQuiz) {
-            return ResponseEntity.badRequest().body("DefaultQuizController - addUserQuiz()");
-        }
-
-        return ResponseEntity.ok().body("Quiz has been saved successfully");
+        return quizCreateService.addQuizAndUserQuiz(quizDTO, userId);
     }
 
 

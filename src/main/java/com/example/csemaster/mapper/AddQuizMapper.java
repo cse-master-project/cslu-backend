@@ -15,6 +15,8 @@ public interface AddQuizMapper {
     @Mapping(target = "correctRate", ignore = true)
     @Mapping(target = "jsonContent", source = "quizDTO.jsonContent")
     @Mapping(target = "createAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "hasImage", ignore = true)
+    @Mapping(target = "isDeleted", ignore = true)
     QuizEntity toQuizEntity(QuizDTO quizDTO);
 
     @AfterMapping
@@ -25,5 +27,15 @@ public interface AddQuizMapper {
     @AfterMapping
     default void setQuizId(@MappingTarget QuizEntity quizEntity) {
         quizEntity.setQuizId(null);
+    }
+
+    @AfterMapping
+    default void setHasImage(@MappingTarget QuizEntity quizEntity) {
+        quizEntity.setHasImage(false);
+    }
+
+    @AfterMapping
+    default void setIsDeleted(@MappingTarget QuizEntity quizEntity) {
+        quizEntity.setIsDeleted(false);
     }
 }

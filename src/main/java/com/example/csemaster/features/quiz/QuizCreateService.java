@@ -189,21 +189,31 @@ public class QuizCreateService {
     }
 
     @Transactional
-    public Boolean addQuizAndDefaultQuiz(QuizDTO quizDTO, String managerId) {
+    public Long addQuizAndDefaultQuiz(QuizDTO quizDTO, String managerId) {
         // Quiz 테이블에 추가하고 ID 반환
         Long quizId = addQuiz(quizDTO);
 
         // 반환된 ID를 사용하여 DefaultQuiz 추가
-        return addDefaultQuiz(quizId, managerId);
+        if (!addDefaultQuiz(quizId, managerId)) {
+            throw new RuntimeException("QuizCreateService - addDefaultQuiz()");
+        }
+
+        log.info("Quiz has been saved successfully");
+        return quizId;
     }
 
     @Transactional
-    public Boolean addQuizAndUserQuiz(QuizDTO quizDTO, String userId) {
+    public Long addQuizAndUserQuiz(QuizDTO quizDTO, String userId) {
         // Quiz 테이블에 추가하고 ID 반환
         Long quizId = addQuiz(quizDTO);
 
         // 반환된 ID를 사용하여 UserQuiz 추가
-        return addUserQuiz(quizId, userId);
+        if (!addUserQuiz(quizId, userId)) {
+            throw new RuntimeException("QuizCreateService - addUserQuiz()");
+        }
+
+        log.info("Quiz has been saved successfully");
+        return quizId;
     }
 
 
