@@ -1,14 +1,12 @@
 package com.example.csemaster.features.login.user;
 
-import com.example.csemaster.dto.UserDTO;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -21,20 +19,8 @@ public class UserLoginController {
         this.userLoginService = userLoginService;
     }
 
-    @GetMapping("/test")
-    public List<UserDTO> getAllUser() throws Exception {
-        System.out.println("test");
-        return userLoginService.getAllUsers();
-    }
-
-    @GetMapping("/test2")
-    public String test(HttpServletRequest request) {
-        System.out.println("test");
-        return "축하합니다";
-    }
-
     @PostMapping("/auth/google/sign-up")
-    public ResponseEntity<?> signUp(@RequestParam String accessToken, String nickname) {
+    public ResponseEntity<?> signUp(@RequestBody String accessToken, String nickname) {
         String googleId = userLoginService.isGoogleAuth(accessToken);
 
         if (googleId != null) {
@@ -48,7 +34,7 @@ public class UserLoginController {
         }
     }
     @PostMapping("/auth/google")
-    public ResponseEntity<?> googleLogin(@RequestParam String accessToken) {
+    public ResponseEntity<?> googleLogin(@RequestBody String accessToken) {
         // 넘겨받은 액세스 토큰으로 구글 api에 검증 요청
         String googleId = userLoginService.isGoogleAuth(accessToken);
 
@@ -68,5 +54,41 @@ public class UserLoginController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Unauthorized: Google login failed");
         }
+    }
+
+    @PostMapping("/auth/google/logout")
+    public ResponseEntity<?> googleUserLogout() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+        String accessToken = (String) authentication.getCredentials();
+
+        return userLoginService.logout(userId, accessToken);
+    }
+
+    @PostMapping("/deactivate")
+    public ResponseEntity<?> deactivateUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+        String accessToken = (String) authentication.getCredentials();
+
+        // 로그아웃으로 토큰 만료 후 비활성화
+        userLoginService.logout(userId, accessToken);
+        return userLoginService.deactivateUser(userId);
+    }
+
+    @GetMapping("/info")
+    private ResponseEntity<?> getUserInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+
+        return userLoginService.getUserInfo(userId);
+    }
+
+    @PostMapping("/info/nickname")
+    private ResponseEntity<?> setUserNickname(@RequestBody String nickname) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+
+        return userLoginService.setUserNickname(userId, nickname);
     }
 }
