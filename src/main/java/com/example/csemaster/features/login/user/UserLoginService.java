@@ -12,6 +12,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -130,5 +132,19 @@ public class UserLoginService {
         return activeUserRepository.findById(userId)
                 .map(activeUser -> ResponseEntity.ok().body(ActiveUserMapper.INSTANCE.toUserInfo(activeUser)))
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    public ResponseEntity<?> setUserNickname(String userId, String nickname) {
+        try {
+            return activeUserRepository.findById(userId)
+                    .map(activeUser -> {
+                        activeUser.setNickname(nickname);
+                        activeUserRepository.save(activeUser);
+
+                        return ResponseEntity.ok().build();
+                    }).orElse(ResponseEntity.notFound().build());
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 }

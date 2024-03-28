@@ -20,7 +20,7 @@ public class UserLoginController {
     }
 
     @PostMapping("/auth/google/sign-up")
-    public ResponseEntity<?> signUp(@RequestParam String accessToken, String nickname) {
+    public ResponseEntity<?> signUp(@RequestBody String accessToken, String nickname) {
         String googleId = userLoginService.isGoogleAuth(accessToken);
 
         if (googleId != null) {
@@ -34,7 +34,7 @@ public class UserLoginController {
         }
     }
     @PostMapping("/auth/google")
-    public ResponseEntity<?> googleLogin(@RequestParam String accessToken) {
+    public ResponseEntity<?> googleLogin(@RequestBody String accessToken) {
         // 넘겨받은 액세스 토큰으로 구글 api에 검증 요청
         String googleId = userLoginService.isGoogleAuth(accessToken);
 
@@ -82,5 +82,13 @@ public class UserLoginController {
         String userId = authentication.getName();
 
         return userLoginService.getUserInfo(userId);
+    }
+
+    @PostMapping("/info/nickname")
+    private ResponseEntity<?> setUserNickname(@RequestBody String nickname) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+
+        return userLoginService.setUserNickname(userId, nickname);
     }
 }
