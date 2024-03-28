@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/delete")
+@RequestMapping("/quiz")
 public class QuizDeleteController {
     private final QuizDeleteService quizDeleteService;
 
-    @DeleteMapping()
+    @DeleteMapping("/delete")
     public ResponseEntity<?> deleteQuiz(@RequestParam Long quizId) {
-        Boolean deleteQuiz = quizDeleteService.deleteQuiz(quizId);
+        boolean deleteQuiz = quizDeleteService.deleteQuiz(quizId);
 
         if (!deleteQuiz) {
             return ResponseEntity.badRequest().body("QuizDeleteController - deleteQuiz()");

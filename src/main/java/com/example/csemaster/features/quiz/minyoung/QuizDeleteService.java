@@ -20,11 +20,12 @@ public class QuizDeleteService {
         Optional<QuizEntity> quiz = quizRepository.findByQuizId(quizId);
 
         // 존재하는 quiz인지 확인
-        if (!quiz.isPresent()) {
+        if (quiz.isEmpty()) {
             throw new RuntimeException("Incorrect quizId");
         }
 
-        quizRepository.deleteByQuizId(quizId);
+        quiz.get().setIsDeleted(true);
+        quizRepository.save(quiz.get());
 
         log.info("Delete Successfully");
 

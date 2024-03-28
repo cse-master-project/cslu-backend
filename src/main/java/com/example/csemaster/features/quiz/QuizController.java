@@ -73,8 +73,13 @@ public class QuizController {
     @PostMapping("/image")
     public ResponseEntity<?> uploadImage(@RequestBody String base64Image, Long quizId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = authentication.getName();
+        String id = authentication.getName();
 
-        return quizCreateService.uploadImage(userId, quizId, base64Image);
+        // 아이디의 길이로 유저, 매니저 구분
+        if (id.length() <= 20) {
+            return quizCreateService.managerUploadImage(id, quizId, base64Image);
+        } else {
+            return quizCreateService.userUploadImage(id, quizId, base64Image);
+        }
     }
 }

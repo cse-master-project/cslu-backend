@@ -206,26 +206,43 @@ public class QuizCreateService {
         return addUserQuiz(quizId, userId);
     }
 
+    private void saveImage(Long quizId, String base64String) throws IOException {
+        byte[] decodedBytes = Base64.getDecoder().decode(base64String);
+
+        FileOutputStream fos = new FileOutputStream(quizId.toString());
+        fos.write(decodedBytes);
+        fos.close();
+
+        log.info("file save successful. [quizId: " + quizId + "]");
+    }
+
     @Transactional
-    public ResponseEntity<?> uploadImage(String userId, Long quizId, String base64String) {
-        return quizRepository.findByQuizIdAndUserId(quizId, userId).map(quiz -> {
-            byte[] decodedBytes = Base64.getDecoder().decode(base64String);
-
+    public ResponseEntity<?> userUploadImage(String userId, Long quizId, String base64String) {
+        return userQuizRepository.findByQuizIdAndUserId(quizId, userId).map(quiz -> {
             try {
-                FileOutputStream fos = new FileOutputStream(quizId.toString());
-                fos.write(decodedBytes);
-                fos.close();
-                log.info("file save successful. [quizId: " + quizId + "]");
-
+                saveImage(quizId, base64String);
             } catch (IOException e) {
                 return ResponseEntity.notFound().build();
             }
-
-            quiz.setHasImage(true);
-            quizRepository.save(quiz);
+            quiz.getQuiz().setHasImage(true);
+            quizRepository.save(quiz.getQuiz());
 
             return ResponseEntity.ok().build();
         }).orElse(ResponseEntity.notFound().build());
 
+    }
+
+    public ResponseEntity<?> managerUploadImage(String managerId, Long quizId, String base64String) {
+        return defaultQuizRepository.findByQuizIdAndManagerId(quizId, managerId).map(quiz -> {
+            try {
+                saveImage(quizId, base64String);
+            } catch (IOException e) {
+                return ResponseEntity.notFound().build();
+            }
+            quiz.getQuiz().setHasImage(true);
+            quizRepository.save(quiz.getQuiz());
+
+            return ResponseEntity.ok().build();
+        }).orElse(ResponseEntity.notFound().build());
     }
 }
