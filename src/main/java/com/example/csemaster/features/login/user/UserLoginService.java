@@ -125,4 +125,10 @@ public class UserLoginService {
 
         return ResponseEntity.ok().build();
     }
+
+    public ResponseEntity<?> getUserInfo(String userId) {
+        return activeUserRepository.findById(userId)
+                .map(activeUser -> ResponseEntity.ok().body(ActiveUserMapper.INSTANCE.toUserInfo(activeUser)))
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

@@ -1,6 +1,7 @@
 package com.example.csemaster.mapper;
 
 import com.example.csemaster.dto.ActiveUserDTO;
+import com.example.csemaster.dto.response.UserInfoResponse;
 import com.example.csemaster.entity.ActiveUserEntity;
 import com.example.csemaster.entity.DeleteUserEntity;
 import org.mapstruct.Mapper;
@@ -17,4 +18,6 @@ public interface ActiveUserMapper {
 
     @Mapping(target = "deleteAt", ignore = true)
     DeleteUserEntity activeToDelete(ActiveUserEntity activeUser);
+
+    UserInfoResponse toUserInfo(ActiveUserEntity activeUser);
 }
