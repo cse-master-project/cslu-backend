@@ -1,5 +1,6 @@
 package com.example.csemaster.features.quiz;
 
+import com.example.csemaster.dto.QuizRejectDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,8 @@ public class ApprovalQuizController {
     }
 
     @PutMapping("/{id}/reject")
-    public ResponseEntity<?> userQuizReject(@PathVariable("id") Long quizId) {
-        return approvalQuizService.setQuizPermission(quizId, -1);
+    public ResponseEntity<?> userQuizReject(@PathVariable("id") Long quizId, @RequestBody QuizRejectDTO quizRejectDTO) {
+        quizRejectDTO.setQuizId(quizId);
+        return approvalQuizService.setQuizRejection(quizRejectDTO, -1);
     }
 }
