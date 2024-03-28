@@ -206,26 +206,5 @@ public class QuizCreateService {
         return addUserQuiz(quizId, userId);
     }
 
-    @Transactional
-    public ResponseEntity<?> uploadImage(String userId, Long quizId, String base64String) {
-        return quizRepository.findByQuizIdAndUserId(quizId, userId).map(quiz -> {
-            byte[] decodedBytes = Base64.getDecoder().decode(base64String);
 
-            try {
-                FileOutputStream fos = new FileOutputStream(quizId.toString());
-                fos.write(decodedBytes);
-                fos.close();
-                log.info("file save successful. [quizId: " + quizId + "]");
-
-            } catch (IOException e) {
-                return ResponseEntity.notFound().build();
-            }
-
-            quiz.setHasImage(true);
-            quizRepository.save(quiz);
-
-            return ResponseEntity.ok().build();
-        }).orElse(ResponseEntity.notFound().build());
-
-    }
 }

@@ -70,11 +70,5 @@ public class QuizController {
         return ResponseEntity.ok().body("Quiz has been saved successfully");
     }
 
-    @PostMapping("/image")
-    public ResponseEntity<?> uploadImage(@RequestBody String base64Image, Long quizId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = authentication.getName();
 
-        return quizCreateService.uploadImage(userId, quizId, base64Image);
-    }
 }

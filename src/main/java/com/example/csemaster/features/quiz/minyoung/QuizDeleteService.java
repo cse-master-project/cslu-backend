@@ -24,7 +24,7 @@ public class QuizDeleteService {
             throw new RuntimeException("Incorrect quizId");
         }
 
-        quizRepository.deleteByQuizId(quizId);
+        quizRepository.delete(quiz.get());
 
         log.info("Delete Successfully");
 
