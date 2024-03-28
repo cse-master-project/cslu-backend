@@ -18,4 +18,12 @@ public interface ActiveQuizRepository extends JpaRepository<ActiveQuizEntity, Lo
     List<QuizEntity> getAnOpenQuiz(@Param("userId") String userId, @Param("subject") String subject, @Param("detailSubject") String detailSubject);
 
     Page<ActiveQuizEntity> findAllBy(Pageable pageable);
+
+    @Query("SELECT q FROM ActiveQuizEntity q " +
+            "WHERE q NOT IN (SELECT u.quiz FROM UserQuizEntity u)")
+    Page<ActiveQuizEntity> findAllUserQuiz(Pageable pageable);
+
+    @Query("SELECT q FROM ActiveQuizEntity q " +
+            "WHERE q NOT IN (SELECT d.quiz FROM DefaultQuizEntity d)")
+    Page<ActiveQuizEntity> findAllDefaultQuiz(Pageable pageable);
 }

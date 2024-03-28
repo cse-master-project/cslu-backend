@@ -4,12 +4,7 @@ import com.example.csemaster.dto.QuizDTO;
 import com.example.csemaster.dto.request.QuizReportRequest;
 import com.example.csemaster.dto.request.QuizSolverRequest;
 import com.example.csemaster.dto.response.QuizResponse;
-import com.example.csemaster.entity.ActiveQuizEntity;
-import com.example.csemaster.repository.ActiveQuizRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class QuizController {
     private final QuizSolverService quizSolverService;
     private final QuizCreateService quizCreateService;
-    private final ActiveQuizRepository activeQuizRepository;
+
 
     @GetMapping("/random")
     public QuizResponse getRandomQuiz(@RequestParam String subject, String detailSubject) {
@@ -34,11 +29,7 @@ public class QuizController {
         return quizSolverService.getQuiz(userId, subject, detailSubject);
     }
 
-    @GetMapping("/")
-    public Page<ActiveQuizEntity> getQuiz(@ModelAttribute PageRequest pageRequest) {
-        Pageable pageable = PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize());
-        return activeQuizRepository.findAllBy(pageable);
-    }
+
 
 
     @PostMapping("/solver")
