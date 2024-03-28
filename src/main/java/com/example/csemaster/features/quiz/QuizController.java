@@ -34,9 +34,9 @@ public class QuizController {
         return quizSolverService.getQuiz(userId, subject, detailSubject);
     }
 
-    @GetMapping("/{page}")
-    public Page<ActiveQuizEntity> getQuiz(@PathVariable("page") int page, @ModelAttribute PageRequest pageRequest) {
-        Pageable pageable = PageRequest.of(page, pageRequest.getPageSize());
+    @GetMapping("/")
+    public Page<ActiveQuizEntity> getQuiz(@ModelAttribute PageRequest pageRequest) {
+        Pageable pageable = PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize());
         return activeQuizRepository.findAllBy(pageable);
     }
 
