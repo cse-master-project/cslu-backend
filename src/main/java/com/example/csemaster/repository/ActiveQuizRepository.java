@@ -20,10 +20,10 @@ public interface ActiveQuizRepository extends JpaRepository<ActiveQuizEntity, Lo
     Page<ActiveQuizEntity> findAllBy(Pageable pageable);
 
     @Query("SELECT q FROM ActiveQuizEntity q " +
-            "WHERE q NOT IN (SELECT u.quiz FROM UserQuizEntity u)")
+            "WHERE q.quizId NOT IN (SELECT u.userQuizId FROM UserQuizEntity u)")
     Page<ActiveQuizEntity> findAllUserQuiz(Pageable pageable);
 
     @Query("SELECT q FROM ActiveQuizEntity q " +
-            "WHERE q NOT IN (SELECT d.quiz FROM DefaultQuizEntity d)")
+            "WHERE q.quizId NOT IN (SELECT d.defaultQuizId FROM DefaultQuizEntity d)")
     Page<ActiveQuizEntity> findAllDefaultQuiz(Pageable pageable);
 }
