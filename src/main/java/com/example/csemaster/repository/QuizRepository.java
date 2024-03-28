@@ -17,4 +17,6 @@ public interface QuizRepository extends JpaRepository<QuizEntity, Long> {
     List<QuizEntity> getAnOpenQuiz(@Param("userId") String userId, @Param("subject") String subject, @Param("detailSubject") String detailSubject);
 
     Optional<QuizEntity> findByQuizId(Long quizId);
+
+    Optional<QuizEntity> findByQuizIdAndUserId(Long quizId, String userId);
 }

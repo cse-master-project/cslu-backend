@@ -32,4 +32,7 @@ public class QuizEntity {
 
     @Column(name = "quiz_created_at")
     private LocalDateTime createAt;
+
+    @Column(name = "has_image")
+    private Boolean hasImage;
 }
