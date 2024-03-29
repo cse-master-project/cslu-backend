@@ -18,6 +18,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -156,6 +158,12 @@ public class JwtProvider {
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
+    }
+
+    // JWT의 만료 시간을 반환하는 메소드
+    public Date getExpirationDateFromToken(String token) {
+        Claims claims = parseClaims(token);
+        return claims.getExpiration();
     }
 
     // refreshToken 검증 메서드

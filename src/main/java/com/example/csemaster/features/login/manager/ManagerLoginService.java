@@ -1,40 +1,39 @@
 package com.example.csemaster.features.login.manager;
 
 import com.example.csemaster.dto.ManagerLoginDTO;
+import com.example.csemaster.dto.ManagerLogoutDTO;
 import com.example.csemaster.entity.ManagerRefreshTokenEntity;
 import com.example.csemaster.jwt.*;
+import com.example.csemaster.mapper.ManagerLogoutMapper;
 import com.example.csemaster.mapper.RefreshTokenMapper;
+import com.example.csemaster.repository.ManagerAccessTokenBlacklistRepository;
 import com.example.csemaster.repository.ManagerRepository;
 import com.example.csemaster.repository.ManagerRefreshTokenRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Optional;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ManagerLoginService {
-    private final ManagerRepository managerRepository;
     private final RefreshTokenMapper refreshTokenMapper;
-
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtProvider jwtProvider;
-
     private final ManagerRefreshTokenRepository managerRefreshTokenRepository;
-
-    @Autowired
-    public ManagerLoginService(ManagerRepository managerRepository, AuthenticationManagerBuilder authenticationManagerBuilder, JwtProvider jwtProvider, ManagerRefreshTokenRepository managerRefreshTokenRepository, RefreshTokenMapper refreshTokenMapper) {
-        this.managerRepository = managerRepository;
-        this.authenticationManagerBuilder = authenticationManagerBuilder;
-        this.jwtProvider = jwtProvider;
-        this.managerRefreshTokenRepository = managerRefreshTokenRepository;
-        this.refreshTokenMapper = refreshTokenMapper;
-    }
+    private final ManagerLogoutMapper managerLogoutMapper;
+    private final ManagerAccessTokenBlacklistRepository managerAccessTokenBlacklistRepository;
 
     @Transactional
     public JwtInfo login(ManagerLoginDTO managerLoginDto) {
@@ -55,6 +54,26 @@ public class ManagerLoginService {
 
         log.info("로그인 성공");
         return jwtInfo;
+    }
+
+    public ResponseEntity<?> logout(ManagerLogoutDTO managerLogoutDTO) {
+        // 현재 유효한 액세스 토큰 블랙리스트에 추가
+        ManagerAccessTokenBlacklistEntity accessTokenBlacklistEntity = managerLogoutMapper.toBlacklistEntity(managerLogoutDTO);
+        managerAccessTokenBlacklistRepository.save(accessTokenBlacklistEntity);
+
+        // 리프레시 토큰 삭제
+        Optional<ManagerRefreshTokenEntity> refreshToken = managerRefreshTokenRepository.findById(managerLogoutDTO.getManagerId());
+        refreshToken.ifPresent(managerRefreshTokenRepository::delete);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Transactional
+    @Scheduled(fixedRate = 60000) // 매 60초마다 실행
+    public void cleanExpiredTokens() {
+        // 현재 시간 기준으로 만료된 토큰 삭제 로직 구현
+        Date now = new Date();
+        managerAccessTokenBlacklistRepository.deleteByExpirationTimeBefore(now);
     }
 
     @Transactional
@@ -84,26 +103,4 @@ public class ManagerLoginService {
 
         return newJwtInfo;
     }
-
-    // db 연결 테스트용
-    /*public String login(ManagerLoginDto managerLoginDto) {
-        Optional<ManagerModel> existingManager = managerRepository.findById(managerLoginDto.getManagerId());
-
-        if (existingManager.isPresent()) {
-            ManagerModel manager = existingManager.get();
-            String managerPw = manager.getManagerPw();
-
-            if (managerPw.equals(managerLoginDto.getManagerPw())) {
-                log.info("로그인 성공");
-                return "로그인";
-            } else {
-                log.error("비밀번호 불일치");
-                return "로그인 실패";
-            }
-
-        } else {
-            log.error("존재하지 않는 사용자");
-            return "로그인 실패";
-        }
-    }*/
 }

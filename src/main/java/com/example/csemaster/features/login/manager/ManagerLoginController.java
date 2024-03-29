@@ -1,29 +1,33 @@
 package com.example.csemaster.features.login.manager;
 
 import com.example.csemaster.dto.ManagerLoginDTO;
+import com.example.csemaster.dto.ManagerLogoutDTO;
 import com.example.csemaster.jwt.JwtInfo;
+import com.example.csemaster.jwt.JwtProvider;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/manager")
 public class ManagerLoginController {
     private final ManagerLoginService managerLoginService;
-    @Autowired
-    public ManagerLoginController(ManagerLoginService managerLoginService) {
-        this.managerLoginService = managerLoginService;
-    }
-
-    // db 연결 테스트용
-    /*@PostMapping("/login")
-    public String login(@RequestBody ManagerLoginDto managerLoginDto) { return managerLoginService.login(managerLoginDto); }*/
+    private final JwtProvider jwtProvider;
 
     @PostMapping("/login")
     public String login(@RequestBody ManagerLoginDTO managerLoginDto, HttpServletResponse response) {
@@ -35,6 +39,25 @@ public class ManagerLoginController {
         response.setHeader("Refresh-Token", jwtInfo.getRefreshToken());
 
         return "로그인";
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request, ManagerLogoutDTO managerLogoutDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authToken = request.getHeader("Authorization");
+        if (authToken != null && authToken.startsWith("Bearer ")) {
+            String accessToken = authToken.substring(7);
+
+            Date expirationTime = jwtProvider.getExpirationDateFromToken(accessToken);
+
+            managerLogoutDTO.setManagerId(authentication.getName());
+            managerLogoutDTO.setAccessToken(accessToken);
+            managerLogoutDTO.setExpirationTime(expirationTime);
+
+            return managerLoginService.logout(managerLogoutDTO);
+        }
+
+        return ResponseEntity.badRequest().build();
     }
 
     @PostMapping("/refresh")
