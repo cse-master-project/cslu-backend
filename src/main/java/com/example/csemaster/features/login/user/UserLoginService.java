@@ -1,9 +1,6 @@
 package com.example.csemaster.features.login.user;
 
-import com.example.csemaster.entity.ActiveUserEntity;
-import com.example.csemaster.entity.DeleteUserEntity;
-import com.example.csemaster.entity.UserEntity;
-import com.example.csemaster.entity.UserRefreshTokenEntity;
+import com.example.csemaster.entity.*;
 import com.example.csemaster.jwt.JwtInfo;
 import com.example.csemaster.jwt.JwtProvider;
 import com.example.csemaster.mapper.ActiveUserMapper;
@@ -31,7 +28,7 @@ public class UserLoginService {
     private final ActiveUserRepository activeUserRepository;
     private final UserRefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
-    private final UserAccessTokenBlacklistRepository userAccessTokenBlacklistRepository;
+    private final AccessTokenBlackListRepository accessTokenBlackListRepository;
     private final DeleteUserRepository deleteUserRepository;
 
     public String isGoogleAuth(String accessToken) {
@@ -94,10 +91,10 @@ public class UserLoginService {
 
     public ResponseEntity<?> logout(String userId, String accessToken) {
         // 현재 유효한 엑세스토큰을 블랙 처리 후 리프레시 토큰은 DB에서 삭제
-        UserAccessTokenBlacklistEntity accessTokenBlacklistEntity = new UserAccessTokenBlacklistEntity();
-        accessTokenBlacklistEntity.setUserId(userId);
-        accessTokenBlacklistEntity.setAccessToken(accessToken);
-        userAccessTokenBlacklistRepository.save(accessTokenBlacklistEntity);
+        AccessTokenBlackListEntity accessTokenBlackList = new AccessTokenBlackListEntity();
+        accessTokenBlackList.setAccessToken(accessToken);
+        accessTokenBlackList.setBlackAt(LocalDateTime.now());
+        accessTokenBlackListRepository.save(accessTokenBlackList);
 
         Optional<UserRefreshTokenEntity> refreshToken = refreshTokenRepository.findById(userId);
         refreshToken.ifPresent(refreshTokenRepository::delete);

@@ -32,6 +32,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/auth/google").permitAll()
                         .requestMatchers("/api/manager/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasRole("USER")
+                        .requestMatchers("/api/quiz/**").authenticated()
                         .anyRequest().permitAll())
 
                 // 인증과정에서 JWT 검증을 수행하는 기본 필터와 사용자 정의 필터 추가

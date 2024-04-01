@@ -1,7 +1,9 @@
 package com.example.csemaster.jwt;
 
+import com.example.csemaster.entity.AccessTokenBlackListEntity;
 import com.example.csemaster.entity.ManagerRefreshTokenEntity;
 import com.example.csemaster.entity.UserRefreshTokenEntity;
+import com.example.csemaster.repository.AccessTokenBlackListRepository;
 import com.example.csemaster.repository.ManagerRefreshTokenRepository;
 import com.example.csemaster.repository.UserRefreshTokenRepository;
 import io.jsonwebtoken.*;
@@ -43,13 +45,16 @@ public class JwtProvider {
 
     private final ManagerRefreshTokenRepository managerRefreshTokenRepository;
     private final UserRefreshTokenRepository userRefreshTokenRepository;
+    private final AccessTokenBlackListRepository accessTokenBlackListRepository;
 
     public JwtProvider(@Value("${jwt.secret}") String key,
                        ManagerRefreshTokenRepository managerRefreshTokenRepository,
-                       UserRefreshTokenRepository userRefreshTokenRepository, ManagerRefreshTokenRepository managerRefreshTokenRepository1, UserRefreshTokenRepository userRefreshTokenRepository1) {
+                       UserRefreshTokenRepository userRefreshTokenRepository, ManagerRefreshTokenRepository managerRefreshTokenRepository1, UserRefreshTokenRepository userRefreshTokenRepository1,
+                       AccessTokenBlackListRepository accessTokenBlackListRepository) {
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(key));
         this.managerRefreshTokenRepository = managerRefreshTokenRepository1;
         this.userRefreshTokenRepository = userRefreshTokenRepository1;
+        this.accessTokenBlackListRepository = accessTokenBlackListRepository;
     }
 
     // manager 정보를 가지고 AccessToken, RefreshToken을 생성하는 메서드
@@ -132,7 +137,14 @@ public class JwtProvider {
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token);
-            return true;
+
+            AccessTokenBlackListEntity blackList = accessTokenBlackListRepository.findByAccessToken(token);
+            if (blackList != null) {
+                throw new ExpiredJwtException(null, null, "");
+            } else {
+                return true;
+            }
+
         } catch (SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT Token");
         } catch (ExpiredJwtException e) {

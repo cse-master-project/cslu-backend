@@ -206,10 +206,23 @@ public class QuizCreateService {
         return addUserQuiz(quizId, userId);
     }
 
+    private String getFileExtension(String[] strings, Long quizId) {
+        if (strings[0].toLowerCase().contains("png")) {
+            return quizId.toString() + ".png";
+        } else if (strings[0].toLowerCase().contains("jpeg") || strings[0].toLowerCase().contains("jpg")) {
+            return quizId.toString() + ".jpg";
+        } else {
+            throw new IllegalArgumentException("지원하지 않는 파일 형식");
+        }
+    }
+
     private void saveImage(Long quizId, String base64String) throws IOException {
+        String[] strings = base64String.split(",");
+        String filename = getFileExtension(strings, quizId);
+
         byte[] decodedBytes = Base64.getDecoder().decode(base64String);
 
-        FileOutputStream fos = new FileOutputStream(quizId.toString());
+        FileOutputStream fos = new FileOutputStream(filename);
         fos.write(decodedBytes);
         fos.close();
 

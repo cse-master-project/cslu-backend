@@ -1,7 +1,6 @@
 package com.example.csemaster.repository;
 
 import com.example.csemaster.entity.ActiveQuizEntity;
-import com.example.csemaster.entity.QuizEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,7 +14,7 @@ public interface ActiveQuizRepository extends JpaRepository<ActiveQuizEntity, Lo
             "FROM ActiveQuizEntity q " +
             "LEFT OUTER JOIN QuizLogEntity l ON q.quizId = l.quizId AND l.userId = :userId " +
             "WHERE q.subject = :subject AND q.detailSubject = :detailSubject")
-    List<QuizEntity> getAnOpenQuiz(@Param("userId") String userId, @Param("subject") String subject, @Param("detailSubject") String detailSubject);
+    List<ActiveQuizEntity> getAnOpenQuiz(@Param("userId") String userId, @Param("subject") String subject, @Param("detailSubject") String detailSubject);
 
     Page<ActiveQuizEntity> findAllBy(Pageable pageable);
 

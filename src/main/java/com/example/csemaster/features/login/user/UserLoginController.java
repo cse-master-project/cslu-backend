@@ -1,5 +1,6 @@
 package com.example.csemaster.features.login.user;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -57,19 +58,29 @@ public class UserLoginController {
     }
 
     @PostMapping("/auth/google/logout")
-    public ResponseEntity<?> googleUserLogout() {
+    public ResponseEntity<?> googleUserLogout(HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
-        String accessToken = (String) authentication.getCredentials();
+        String accessToken = extractAccessTokenFromHeader(request);
+        System.out.println(accessToken);
 
         return userLoginService.logout(userId, accessToken);
     }
 
+    private String extractAccessTokenFromHeader(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7); // "Bearer "를 제외한 토큰 부분만 추출합니다.
+        }
+        return null;
+    }
+
     @PostMapping("/deactivate")
-    public ResponseEntity<?> deactivateUser() {
+    public ResponseEntity<?> deactivateUser(HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
-        String accessToken = (String) authentication.getCredentials();
+        String accessToken = extractAccessTokenFromHeader(request);
+        System.out.println(accessToken);
 
         // 로그아웃으로 토큰 만료 후 비활성화
         userLoginService.logout(userId, accessToken);
