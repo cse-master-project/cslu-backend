@@ -2,8 +2,7 @@ package com.example.csemaster.repository;
 
 import com.example.csemaster.dto.response.QuizRejectResponse;
 import com.example.csemaster.entity.QuizEntity;
-import com.example.csemaster.entity.UserQuizEntity;
-import com.example.csemaster.features.quiz.minyoung.UserQuizResponse;
+import com.example.csemaster.dto.response.UserQuizResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

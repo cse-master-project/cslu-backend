@@ -1,6 +1,8 @@
-package com.example.csemaster.features.quiz.minyoung;
+package com.example.csemaster.features.quiz;
 
+import com.example.csemaster.dto.response.QuizReportResponse;
 import com.example.csemaster.entity.QuizReportEntity;
+import com.example.csemaster.mapper.QuizReportMapper;
 import com.example.csemaster.repository.QuizReportRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

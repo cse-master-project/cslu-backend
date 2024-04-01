@@ -1,4 +1,4 @@
-package com.example.csemaster.features.quiz.minyoung;
+package com.example.csemaster.dto.response;
 
 import com.example.csemaster.entity.QuizEntity;
 import com.example.csemaster.entity.UserEntity;

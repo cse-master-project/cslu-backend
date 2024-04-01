@@ -1,6 +1,7 @@
-package com.example.csemaster.features.quiz.minyoung;
+package com.example.csemaster.mapper;
 
 import com.example.csemaster.entity.QuizReportEntity;
+import com.example.csemaster.dto.response.QuizReportResponse;
 import org.mapstruct.Mapper;
 
 import java.util.List;

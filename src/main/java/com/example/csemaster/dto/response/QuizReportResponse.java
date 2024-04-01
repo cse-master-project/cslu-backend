@@ -1,4 +1,4 @@
-package com.example.csemaster.features.quiz.minyoung;
+package com.example.csemaster.dto.response;
 
 import lombok.Data;
 
