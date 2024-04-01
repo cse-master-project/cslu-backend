@@ -21,7 +21,6 @@ import java.util.List;
 public class QuizSearchController {
     private final QuizSearchService quizSearchService;
     private final QuizSolverService quizSolverService;
-    private final NewQuizService newQuizService;
 
     @GetMapping("/")
     public Page<ActiveQuizEntity> getAllQuiz(@ModelAttribute PageRequest pageRequest) {
