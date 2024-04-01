@@ -14,7 +14,7 @@ public interface QuizRepository extends JpaRepository<QuizEntity, Long> {
     Optional<QuizEntity> findByQuizId(Long quizId);
 
     // SELECT q.*, uq.user_quiz_id, uq.permission_status FROM quiz q INNER JOIN user_quiz uq ON q.quiz_id = uq.user_quiz_id WHERE uq.user_id_for_user_quiz = ? ;
-    @Query("SELECT new com.example.csemaster.features.quiz.minyoung.UserQuizResponse(q, uq) " +
+    @Query("SELECT new com.example.csemaster.dto.response.UserQuizResponse(q, uq) " +
             "FROM QuizEntity q JOIN UserQuizEntity uq ON q.quizId = uq.userQuizId " +
             "WHERE uq.userId.userId = :userId")
     List<UserQuizResponse> getUserQuiz(@Param("userId") String user);
