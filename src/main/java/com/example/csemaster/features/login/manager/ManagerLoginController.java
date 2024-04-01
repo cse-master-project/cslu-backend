@@ -30,15 +30,11 @@ public class ManagerLoginController {
     private final JwtProvider jwtProvider;
 
     @PostMapping("/login")
-    public String login(@RequestBody ManagerLoginDTO managerLoginDto, HttpServletResponse response) {
-        // return managerLoginService.login(managerLoginDto);
-
+    public JwtInfo login(@RequestBody ManagerLoginDTO managerLoginDto) {
         JwtInfo jwtInfo = managerLoginService.login(managerLoginDto);
 
-        response.setHeader("Authorization", "Bearer " + jwtInfo.getAccessToken());
-        response.setHeader("Refresh-Token", jwtInfo.getRefreshToken());
-
-        return "로그인";
+        log.info("로그인");
+        return jwtInfo;
     }
 
     @PostMapping("/logout")
