@@ -216,5 +216,56 @@ public class QuizCreateService {
         return quizId;
     }
 
+    private String getFileExtension(String[] strings, Long quizId) {
+        if (strings[0].toLowerCase().contains("png")) {
+            return quizId.toString() + ".png";
+        } else if (strings[0].toLowerCase().contains("jpeg") || strings[0].toLowerCase().contains("jpg")) {
+            return quizId.toString() + ".jpg";
+        } else {
+            throw new IllegalArgumentException("지원하지 않는 파일 형식");
+        }
+    }
 
+    private void saveImage(Long quizId, String base64String) throws IOException {
+        String[] strings = base64String.split(",");
+        String filename = getFileExtension(strings, quizId);
+
+        byte[] decodedBytes = Base64.getDecoder().decode(base64String);
+
+        FileOutputStream fos = new FileOutputStream(filename);
+        fos.write(decodedBytes);
+        fos.close();
+
+        log.info("file save successful. [quizId: " + quizId + "]");
+    }
+
+    @Transactional
+    public ResponseEntity<?> userUploadImage(String userId, Long quizId, String base64String) {
+        return userQuizRepository.findByQuizIdAndUserId(quizId, userId).map(quiz -> {
+            try {
+                saveImage(quizId, base64String);
+            } catch (IOException e) {
+                return ResponseEntity.notFound().build();
+            }
+            quiz.getQuiz().setHasImage(true);
+            quizRepository.save(quiz.getQuiz());
+
+            return ResponseEntity.ok().build();
+        }).orElse(ResponseEntity.notFound().build());
+
+    }
+
+    public ResponseEntity<?> managerUploadImage(String managerId, Long quizId, String base64String) {
+        return defaultQuizRepository.findByQuizIdAndManagerId(quizId, managerId).map(quiz -> {
+            try {
+                saveImage(quizId, base64String);
+            } catch (IOException e) {
+                return ResponseEntity.notFound().build();
+            }
+            quiz.getQuiz().setHasImage(true);
+            quizRepository.save(quiz.getQuiz());
+
+            return ResponseEntity.ok().build();
+        }).orElse(ResponseEntity.notFound().build());
+    }
 }

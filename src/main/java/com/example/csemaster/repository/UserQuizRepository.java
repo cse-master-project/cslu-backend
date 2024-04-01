@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserQuizRepository extends JpaRepository<UserQuizEntity, Long> {
     @Query(" SELECT new com.example.csemaster.features.quiz.UnApprovalQuizDTO(q.quiz, u.nickname) " +
@@ -13,4 +14,8 @@ public interface UserQuizRepository extends JpaRepository<UserQuizEntity, Long> 
             "JOIN ActiveUserEntity u ON u.userId = q.userId.userId " +
             "WHERE q.permissionStatus = 0")
     List<UnApprovalQuizDTO> getAnApprovalQuiz();
+
+    @Query("SELECT q FROM UserQuizEntity q " +
+            "WHERE q.userQuizId = :quizId AND q.userId.userId = :userId")
+    Optional<UserQuizEntity> findByQuizIdAndUserId(Long quizId, String userId);
 }
