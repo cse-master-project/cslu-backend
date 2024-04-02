@@ -11,6 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
+@IdClass(DetailSubjectId.class)
 @Table(name = "detail_subject")
 public class DetailSubjectEntity {
     @Id
@@ -18,7 +19,7 @@ public class DetailSubjectEntity {
     private Long subjectId;
 
     @OneToOne
-    @JoinColumn(name = "subject_id_for_detail_subject", referencedColumnName = "subject_id")
+    @JoinColumn(name = "subject_id_for_detail_subject", referencedColumnName = "subject_id", insertable = false, updatable = false)
     private SubjectEntity subjectEntity;
 
     @Id
