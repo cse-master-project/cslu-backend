@@ -16,5 +16,7 @@ public class ScheduleService {
     @Scheduled(cron = "0 0 0/1 * * *")
     public void removeBlackToken() {
         accessTokenBlackListRepository.deleteAll(accessTokenBlackListRepository.findExpiredToken());
+        log.info("Remove expired token");
     }
+
 }
