@@ -2,6 +2,7 @@ package com.example.csemaster.features.quiz;
 
 import com.example.csemaster.dto.DetailSubjectDTO;
 import com.example.csemaster.dto.DetailSubjectUpdateDTO;
+import com.example.csemaster.dto.response.SubjectDTO;
 import com.example.csemaster.dto.response.SubjectResponse;
 import com.example.csemaster.dto.SubjectUpdateDTO;
 import com.example.csemaster.entity.SubjectEntity;
@@ -39,8 +40,8 @@ public class QuizSubjectService {
         }).collect(Collectors.toList());
     }
 
-    public ResponseEntity<?> addSubject(String subject) {
-        Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subject);
+    public ResponseEntity<?> addSubject(SubjectDTO subjectDTO) {
+        Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subjectDTO.getSubject());
 
         if (subjectEntity.isPresent()) {
             throw new RuntimeException("subject is already present.");
@@ -48,14 +49,14 @@ public class QuizSubjectService {
 
         SubjectEntity newSubjectEntity = new SubjectEntity();
         newSubjectEntity.setSubjectId(null);
-        newSubjectEntity.setSubject(subject);
+        newSubjectEntity.setSubject(subjectDTO.getSubject());
         quizSubjectRepository.save(newSubjectEntity);
 
         return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<?> addDetailSubject(DetailSubjectDTO detailSubjectDTO) {
-        Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findById(detailSubjectDTO.getSubjectId());
+        Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(detailSubjectDTO.getSubject());
 
         if (subjectEntity.isEmpty()) {
             throw new RuntimeException("subject isn't present.");
@@ -77,7 +78,7 @@ public class QuizSubjectService {
     }
 
     public ResponseEntity<?> updateSubject(SubjectUpdateDTO subjectUpdateDTO) {
-        Optional<SubjectEntity> subject = quizSubjectRepository.findById(subjectUpdateDTO.getSubjectId());
+        Optional<SubjectEntity> subject = quizSubjectRepository.findBySubject(subjectUpdateDTO.getSubject());
 
         // subject가 존재하는지 확인
         if (subject.isEmpty()) {
@@ -99,7 +100,7 @@ public class QuizSubjectService {
 
     @Transactional
     public ResponseEntity<?> updateDetailSubject(DetailSubjectUpdateDTO updateDTO) {
-        Optional<SubjectEntity> subject = quizSubjectRepository.findById(updateDTO.getSubjectId());
+        Optional<SubjectEntity> subject = quizSubjectRepository.findBySubject(updateDTO.getSubject());
         if (subject.isEmpty()) {
             throw new RuntimeException("subject isn't present.");
         }
@@ -109,36 +110,45 @@ public class QuizSubjectService {
             throw new RuntimeException("detailSubject isn't present.");
         }
 
+        String oldDetail = detailSubject.get().getDetailSubject();
+        String newDetail = updateDTO.getNewDetailSubject();
+        if (newDetail.equals(oldDetail)) {
+            throw new RuntimeException("Be the same before and after correction");
+        }
+
         // detailSubject 삭제
-        deleteDetailSubject(subject.get().getSubjectId(), updateDTO.getDetailSubject());
+        DetailSubjectDTO detailSubjectDTO = new DetailSubjectDTO();
+        detailSubjectDTO.setSubject(updateDTO.getSubject());
+        detailSubjectDTO.setDetailSubject(updateDTO.getDetailSubject());
+        deleteDetailSubject(detailSubjectDTO);
 
         // 새로운 detailSubject 추가
-        DetailSubjectDTO detailSubjectDTO = new DetailSubjectDTO();
-        detailSubjectDTO.setSubjectId(updateDTO.getSubjectId());
-        detailSubjectDTO.setDetailSubject(updateDTO.getNewDetailSubject());
-        addDetailSubject(detailSubjectDTO);
+        DetailSubjectDTO newDetailSubjectDTO = new DetailSubjectDTO();
+        newDetailSubjectDTO.setSubject(updateDTO.getSubject());
+        newDetailSubjectDTO.setDetailSubject(updateDTO.getNewDetailSubject());
+        addDetailSubject(newDetailSubjectDTO);
 
         return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<?> deleteSubject(Long subjectId) {
-        Optional<SubjectEntity> subject = quizSubjectRepository.findById(subjectId);
-        if (subject.isEmpty()) {
+    public ResponseEntity<?> deleteSubject(SubjectDTO subjectDTO) {
+        Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subjectDTO.getSubject());
+        if (subjectEntity.isEmpty()) {
             throw new RuntimeException("subject isn't present.");
         }
 
-        quizSubjectRepository.delete(subject.get());
+        quizSubjectRepository.delete(subjectEntity.get());
 
         return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<?> deleteDetailSubject(Long subjectId, String detailSubject) {
-        Optional<SubjectEntity> subject = quizSubjectRepository.findById(subjectId);
-        if (subject.isEmpty()) {
+    public ResponseEntity<?> deleteDetailSubject(DetailSubjectDTO detailSubjectDTO) {
+        Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(detailSubjectDTO.getSubject());
+        if (subjectEntity.isEmpty()) {
             throw new RuntimeException("subject isn't present.");
         }
 
-        Optional<DetailSubjectEntity> detail = quizDetailSubjectRepository.findBySubjectIdAndDetailSubject(subject.get().getSubjectId(), detailSubject);
+        Optional<DetailSubjectEntity> detail = quizDetailSubjectRepository.findBySubjectIdAndDetailSubject(subjectEntity.get().getSubjectId(), detailSubjectDTO.getDetailSubject());
         if (detail.isEmpty()) {
             throw new RuntimeException("detailSubject isn't present.");
         }

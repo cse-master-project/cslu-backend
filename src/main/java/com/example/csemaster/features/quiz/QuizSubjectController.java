@@ -3,6 +3,7 @@ package com.example.csemaster.features.quiz;
 import com.example.csemaster.dto.DetailSubjectDTO;
 import com.example.csemaster.dto.DetailSubjectUpdateDTO;
 import com.example.csemaster.dto.SubjectUpdateDTO;
+import com.example.csemaster.dto.response.SubjectDTO;
 import com.example.csemaster.dto.response.SubjectResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +25,8 @@ public class QuizSubjectController {
     }
 
     @PostMapping("/subject")
-    public ResponseEntity<?> addSubject(@RequestParam String subject) {
-        return quizSubjectService.addSubject(subject);
+    public ResponseEntity<?> addSubject(@RequestBody @Valid SubjectDTO subjectDTO) {
+        return quizSubjectService.addSubject(subjectDTO);
     }
 
     @PostMapping("/detail")
@@ -44,13 +45,13 @@ public class QuizSubjectController {
     }
 
     @DeleteMapping("/delete/subject")
-    public ResponseEntity<?> deleteSubject(@RequestParam Long subjectId) {
-        return quizSubjectService.deleteSubject(subjectId);
+    public ResponseEntity<?> deleteSubject(@RequestBody @Valid SubjectDTO subjectDTO) {
+        return quizSubjectService.deleteSubject(subjectDTO);
     }
 
     @DeleteMapping("/delete/detail")
-    public ResponseEntity<?> deleteDetailSubject(@RequestParam Long subjectId, String detail) {
-        return quizSubjectService.deleteDetailSubject(subjectId, detail);
+    public ResponseEntity<?> deleteDetailSubject(@RequestBody @Valid DetailSubjectDTO detailSubjectDTO) {
+        return quizSubjectService.deleteDetailSubject(detailSubjectDTO);
     }
 
 }

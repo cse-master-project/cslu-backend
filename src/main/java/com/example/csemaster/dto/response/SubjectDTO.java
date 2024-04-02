@@ -1,12 +1,10 @@
-package com.example.csemaster.dto;
+package com.example.csemaster.dto.response;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class SubjectUpdateDTO {
+public class SubjectDTO {
     @NotBlank
     private String subject;
-    @NotBlank
-    private String newSubject;
 }
