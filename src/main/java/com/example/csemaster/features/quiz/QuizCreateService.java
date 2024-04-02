@@ -2,7 +2,6 @@ package com.example.csemaster.features.quiz;
 
 import com.example.csemaster.dto.QuizDTO;
 import com.example.csemaster.entity.*;
-import com.example.csemaster.jwt.JwtProvider;
 import com.example.csemaster.mapper.AddQuizMapper;
 import com.example.csemaster.repository.*;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,7 +22,6 @@ import java.util.Set;
 @Slf4j
 @RequiredArgsConstructor
 public class QuizCreateService {
-    private final JwtProvider jwtProvider;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final AddQuizMapper addQuizMapper;
     private final QuizRepository quizRepository;
@@ -31,6 +29,8 @@ public class QuizCreateService {
     private final DefaultQuizRepository defaultQuizRepository;
     private final UserRepository userRepository;
     private final UserQuizRepository userQuizRepository;
+    private final QuizSubjectRepository quizSubjectRepository;
+    private final QuizDetailSubjectRepository quizDetailSubjectRepository;
 
     // jsonContent 형식 검사
     public boolean isValidJsonContent(String jsonContent) {
@@ -43,6 +43,7 @@ public class QuizCreateService {
 
             String typeValue = rootNode.path("type").asText();
             String quizValue = rootNode.path("quiz").asText();
+            String commentaryValue = rootNode.path("commentary").asText();
             JsonNode answerNode = rootNode.path("answer");
             String answerValue = rootNode.path("answer").asText();
             JsonNode optionNode = rootNode.path("option");
@@ -56,6 +57,11 @@ public class QuizCreateService {
 
             // 'quiz' 필드가 빈 문자열이 아닌지 확인
             if (quizValue.isEmpty()) {
+                return false;
+            }
+
+            // 'commentary' 필드가 빈 문자열이 아닌지 확인
+            if (commentaryValue.isEmpty()) {
                 return false;
             }
 
@@ -126,6 +132,17 @@ public class QuizCreateService {
     }
 
     public Long addQuiz(QuizDTO quizDTO) {
+        // subject, detailSubject 확인
+        Optional<SubjectEntity> subject = quizSubjectRepository.findBySubject(quizDTO.getSubject());
+        if (subject.isEmpty()) {
+            throw new RuntimeException("subject isn't present.");
+        }
+
+        Optional<DetailSubjectEntity> detailSubject = quizDetailSubjectRepository.findBySubjectIdAndDetailSubject(subject.get().getSubjectId(), quizDTO.getDetailSubject());
+        if (detailSubject.isEmpty()) {
+            throw new RuntimeException("detailSubject isn't present.");
+        }
+
         // jsonContent 형식 검사
         if (!isValidJsonContent(quizDTO.getJsonContent())) {
             throw new RuntimeException("Incorrect jsonContent");

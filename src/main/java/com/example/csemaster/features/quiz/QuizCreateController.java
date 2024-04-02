@@ -3,6 +3,7 @@ package com.example.csemaster.features.quiz;
 import com.example.csemaster.dto.QuizDTO;
 import com.example.csemaster.dto.request.QuizImageRequest;
 import com.example.csemaster.dto.request.QuizReportRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -27,7 +28,7 @@ public class QuizCreateController {
     }
 
     @PostMapping("/default")
-    public Long addDefaultQuiz(@RequestBody QuizDTO quizDTO) {
+    public Long addDefaultQuiz(@RequestBody @Valid QuizDTO quizDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String managerId = authentication.getName();
 
@@ -35,7 +36,7 @@ public class QuizCreateController {
     }
 
     @PostMapping("/user")
-    public Long addUserQuiz(@RequestBody QuizDTO quizDTO) {
+    public Long addUserQuiz(@RequestBody @Valid QuizDTO quizDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
