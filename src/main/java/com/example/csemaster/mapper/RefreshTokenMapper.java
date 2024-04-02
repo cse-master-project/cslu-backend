@@ -10,7 +10,7 @@ import org.mapstruct.Mapping;
 public interface RefreshTokenMapper {
     @Mapping(target = "managerId", source = "managerLoginDto.managerId")
     @Mapping(target = "refreshToken", source = "jwtInfo.refreshToken")
-    @Mapping(target = "issuedAt", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "expirationTime", expression = "java(java.time.LocalDateTime.now().plusHours(1))")
+    @Mapping(target = "issuedAt", source = "jwtInfo.refreshIseAt")
+    @Mapping(target = "expirationTime", source = "jwtInfo.refreshExpAt")
     ManagerRefreshTokenEntity toRefreshTokenEntity(ManagerLoginDTO managerLoginDto, JwtInfo jwtInfo);
 }

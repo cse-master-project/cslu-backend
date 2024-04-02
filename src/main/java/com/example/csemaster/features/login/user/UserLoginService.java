@@ -1,6 +1,7 @@
 package com.example.csemaster.features.login.user;
 
 import com.example.csemaster.entity.*;
+import com.example.csemaster.features.login.LoginUtil;
 import com.example.csemaster.jwt.JwtInfo;
 import com.example.csemaster.jwt.JwtProvider;
 import com.example.csemaster.mapper.ActiveUserMapper;
@@ -67,7 +68,7 @@ public class UserLoginService {
 
         UserRefreshTokenEntity refreshToken = new UserRefreshTokenEntity();
         refreshToken.setUserId(userId);
-        refreshToken.setRefreshToken(token.getRefreshToken());
+        refreshToken.setRefreshToken(LoginUtil.hashString(token.getRefreshToken()));
         refreshTokenRepository.save(refreshToken);
 
         return token;
@@ -92,7 +93,7 @@ public class UserLoginService {
     public ResponseEntity<?> logout(String userId, String accessToken) {
         // 현재 유효한 엑세스토큰을 블랙 처리 후 리프레시 토큰은 DB에서 삭제
         AccessTokenBlackListEntity accessTokenBlackList = new AccessTokenBlackListEntity();
-        accessTokenBlackList.setAccessToken(accessToken);
+        accessTokenBlackList.setAccessToken(LoginUtil.hashString(accessToken));
         accessTokenBlackList.setBlackAt(LocalDateTime.now());
         accessTokenBlackListRepository.save(accessTokenBlackList);
 

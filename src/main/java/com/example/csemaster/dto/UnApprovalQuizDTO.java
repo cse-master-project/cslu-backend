@@ -1,4 +1,4 @@
-package com.example.csemaster.features.quiz;
+package com.example.csemaster.dto;
 
 import com.example.csemaster.entity.QuizEntity;
 import lombok.Getter;

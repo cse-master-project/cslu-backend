@@ -1,10 +1,12 @@
-package com.example.csemaster.features.quiz;
+package com.example.csemaster.features.quiz.controller;
 
 import com.example.csemaster.dto.request.QuizSolverRequest;
 import com.example.csemaster.dto.response.QuizRejectResponse;
 import com.example.csemaster.dto.response.QuizResponse;
 import com.example.csemaster.entity.ActiveQuizEntity;
 import com.example.csemaster.dto.response.UserQuizResponse;
+import com.example.csemaster.features.quiz.service.QuizSearchService;
+import com.example.csemaster.features.quiz.service.QuizSolverService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

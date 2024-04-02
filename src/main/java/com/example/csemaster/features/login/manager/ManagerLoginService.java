@@ -1,28 +1,24 @@
 package com.example.csemaster.features.login.manager;
 
 import com.example.csemaster.dto.ManagerLoginDTO;
-import com.example.csemaster.dto.ManagerLogoutDTO;
+import com.example.csemaster.entity.AccessTokenBlackListEntity;
 import com.example.csemaster.entity.ManagerRefreshTokenEntity;
-import com.example.csemaster.jwt.*;
-import com.example.csemaster.mapper.ManagerLogoutMapper;
+import com.example.csemaster.features.login.LoginUtil;
+import com.example.csemaster.jwt.JwtInfo;
+import com.example.csemaster.jwt.JwtProvider;
 import com.example.csemaster.mapper.RefreshTokenMapper;
-import com.example.csemaster.repository.ManagerAccessTokenBlacklistRepository;
-import com.example.csemaster.repository.ManagerRepository;
+import com.example.csemaster.repository.AccessTokenBlackListRepository;
 import com.example.csemaster.repository.ManagerRefreshTokenRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -32,8 +28,14 @@ public class ManagerLoginService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtProvider jwtProvider;
     private final ManagerRefreshTokenRepository managerRefreshTokenRepository;
-    private final ManagerLogoutMapper managerLogoutMapper;
-    private final ManagerAccessTokenBlacklistRepository managerAccessTokenBlacklistRepository;
+    private final AccessTokenBlackListRepository accessTokenBlackListRepository;
+
+    private void saveRefreshToken(ManagerLoginDTO managerLoginDto, JwtInfo jwtInfo) {
+        // 토큰 해쉬 후 저장
+        ManagerRefreshTokenEntity refreshToken = refreshTokenMapper.toRefreshTokenEntity(managerLoginDto, jwtInfo);
+        refreshToken.setRefreshToken(LoginUtil.hashString(refreshToken.getRefreshToken()));
+        managerRefreshTokenRepository.save(refreshToken);
+    }
 
     @Transactional
     public JwtInfo login(ManagerLoginDTO managerLoginDto) {
@@ -48,32 +50,28 @@ public class ManagerLoginService {
         // 3. 인증 정보를 기반으로 JWT 토큰 생성
         JwtInfo jwtInfo = jwtProvider.generateToken(authentication);
 
-        // 4. 토큰 정보를 RefreshTokenEntity에 저장
-        ManagerRefreshTokenEntity managerRefreshTokenEntity = refreshTokenMapper.toRefreshTokenEntity(managerLoginDto, jwtInfo);
-        managerRefreshTokenRepository.save(managerRefreshTokenEntity);
+        // 4. 토큰 정보를 RefreshTokenEntity 에 저장
+        saveRefreshToken(managerLoginDto, jwtInfo);
 
-        log.info("로그인 성공");
+        log.info("로그인 성공 [ID:" + managerLoginDto.getManagerId() + "]");
         return jwtInfo;
     }
 
-    public ResponseEntity<?> logout(ManagerLogoutDTO managerLogoutDTO) {
+    @Transactional
+    public ResponseEntity<?> logout(String managerId, String accessToken) {
         // 현재 유효한 액세스 토큰 블랙리스트에 추가
-        ManagerAccessTokenBlacklistEntity accessTokenBlacklistEntity = managerLogoutMapper.toBlacklistEntity(managerLogoutDTO);
-        managerAccessTokenBlacklistRepository.save(accessTokenBlacklistEntity);
+        AccessTokenBlackListEntity accessTokenBlackList = new AccessTokenBlackListEntity();
+        accessTokenBlackList.setAccessToken(LoginUtil.hashString(accessToken));
+        accessTokenBlackList.setBlackAt(LocalDateTime.now());
+
+        accessTokenBlackListRepository.save(accessTokenBlackList);
 
         // 리프레시 토큰 삭제
-        Optional<ManagerRefreshTokenEntity> refreshToken = managerRefreshTokenRepository.findById(managerLogoutDTO.getManagerId());
-        refreshToken.ifPresent(managerRefreshTokenRepository::delete);
-
-        return ResponseEntity.ok().build();
-    }
-
-    @Transactional
-    @Scheduled(fixedRate = 60000) // 매 60초마다 실행
-    public void cleanExpiredTokens() {
-        // 현재 시간 기준으로 만료된 토큰 삭제 로직 구현
-        Date now = new Date();
-        managerAccessTokenBlacklistRepository.deleteByExpirationTimeBefore(now);
+        return managerRefreshTokenRepository.findById(managerId)
+            .map(token -> {
+                managerRefreshTokenRepository.delete(token);
+                return ResponseEntity.ok().build();
+            }).orElse(ResponseEntity.notFound().build());
     }
 
     @Transactional

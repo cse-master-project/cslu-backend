@@ -1,5 +1,6 @@
 package com.example.csemaster.features.login.user;
 
+import com.example.csemaster.features.login.LoginUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ public class UserLoginController {
         String googleId = userLoginService.isGoogleAuth(accessToken);
 
         if (googleId != null) {
-            // 구글id로 DB 검색 후, 등록된 유저인 경우 토큰 발급
+            // 구글 id 로 DB 검색 후, 등록된 유저인 경우 토큰 발급
             String userId = userLoginService.getUserId(googleId);
 
             if (userId != null) {
@@ -61,26 +62,16 @@ public class UserLoginController {
     public ResponseEntity<?> googleUserLogout(HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
-        String accessToken = extractAccessTokenFromHeader(request);
-        System.out.println(accessToken);
+        String accessToken = LoginUtil.extractAccessTokenFromHeader(request);
 
         return userLoginService.logout(userId, accessToken);
-    }
-
-    private String extractAccessTokenFromHeader(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader("Authorization");
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            return authorizationHeader.substring(7); // "Bearer "를 제외한 토큰 부분만 추출합니다.
-        }
-        return null;
     }
 
     @PostMapping("/deactivate")
     public ResponseEntity<?> deactivateUser(HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
-        String accessToken = extractAccessTokenFromHeader(request);
-        System.out.println(accessToken);
+        String accessToken = LoginUtil.extractAccessTokenFromHeader(request);
 
         // 로그아웃으로 토큰 만료 후 비활성화
         userLoginService.logout(userId, accessToken);

@@ -1,8 +1,8 @@
 package com.example.csemaster.jwt;
 
-import com.example.csemaster.entity.AccessTokenBlackListEntity;
 import com.example.csemaster.entity.ManagerRefreshTokenEntity;
 import com.example.csemaster.entity.UserRefreshTokenEntity;
+import com.example.csemaster.features.login.LoginUtil;
 import com.example.csemaster.repository.AccessTokenBlackListRepository;
 import com.example.csemaster.repository.ManagerRefreshTokenRepository;
 import com.example.csemaster.repository.UserRefreshTokenRepository;
@@ -59,22 +59,29 @@ public class JwtProvider {
         this.accessTokenBlackListRepository = accessTokenBlackListRepository;
     }
 
+    private LocalDateTime fromDate(Date t) {
+        return t.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+    }
+
     // manager 정보를 가지고 AccessToken, RefreshToken을 생성하는 메서드
     public JwtInfo generateToken(Authentication authentication) {
-
-        long now = (new Date()).getTime();
+        Date now = new Date();
+        long nowMils = now.getTime();
 
         // Access Token 생성
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("auth", MemberRole.ADMIN.getValue())
-                .setExpiration(new Date(now + ADMIN_ACCESS_TOKEN_EXPIRE_TIME))
+                .setExpiration(new Date(nowMils + ADMIN_ACCESS_TOKEN_EXPIRE_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
+        Date refreshExp = new Date(nowMils + ADMIN_REFRESH_TOKEN_EXPIRE_TIME);
         // Refresh Token 생성
         String refreshToken = Jwts.builder()
-                .setExpiration(new Date(now + ADMIN_REFRESH_TOKEN_EXPIRE_TIME))
+                .setExpiration(refreshExp)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
@@ -82,27 +89,32 @@ public class JwtProvider {
                 .grantType("Bearer")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .refreshIseAt(fromDate(now))
+                .refreshExpAt(fromDate(refreshExp))
                 .build();
     }
 
     // 유저의 userId를 받아 엑세스토큰을 생성하는 메소드
     public JwtInfo generateToken(String userId) {
+        Date now = new Date();
         // 권한 가져오기
-        long now = (new Date()).getTime();
+        long nowMils = (new Date()).getTime();
 
         // 엑세스 토큰 발급 (만료 기간 1시간)
         String accessToken = Jwts.builder()
                 .setSubject(userId)
-                .setIssuedAt(new Date(now))
-                .setExpiration(new Date(now + USER_ACCESS_TOKEN_EXPIRE_TIME))
+                .setIssuedAt(now)
+                .setExpiration(new Date(nowMils + USER_ACCESS_TOKEN_EXPIRE_TIME))
                 .claim("auth", MemberRole.USER.getValue())
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
         System.out.println(MemberRole.USER);
+
+        Date refreshExp = new Date(nowMils + USER_REFRESH_TOKEN_EXPIRE_TIME);
         // 리프레시 토큰 발급 (만료 기간 7일)
         String refreshToken = Jwts.builder()
                 .setSubject(userId)
-                .setExpiration(new Date(now + USER_REFRESH_TOKEN_EXPIRE_TIME))
+                .setExpiration(refreshExp)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
@@ -110,6 +122,8 @@ public class JwtProvider {
                 .grantType("Bearer")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .refreshIseAt(fromDate(now))
+                .refreshExpAt(fromDate(refreshExp))
                 .build();
     }
 
@@ -139,13 +153,8 @@ public class JwtProvider {
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token);
-
-            AccessTokenBlackListEntity blackList = accessTokenBlackListRepository.findByAccessToken(token);
-            if (blackList != null) {
-                throw new ExpiredJwtException(null, null, "");
-            } else {
-                return true;
-            }
+            // 블랙되었는지 확인, 검색된게 없으면 유효한 토큰
+            return accessTokenBlackListRepository.findByAccessToken(LoginUtil.hashString(token)).isEmpty();
 
         } catch (SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT Token");
@@ -159,7 +168,7 @@ public class JwtProvider {
         return false;
     }
 
-    // accessToken의 클레임 추출
+    // access token 의 클레임 추출
     private Claims parseClaims(String accessToken) {
         try {
             return Jwts.parserBuilder()

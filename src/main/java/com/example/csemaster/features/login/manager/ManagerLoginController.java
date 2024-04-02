@@ -1,25 +1,20 @@
 package com.example.csemaster.features.login.manager;
 
 import com.example.csemaster.dto.ManagerLoginDTO;
-import com.example.csemaster.dto.ManagerLogoutDTO;
 import com.example.csemaster.jwt.JwtInfo;
 import com.example.csemaster.jwt.JwtProvider;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
-import java.util.Date;
+import static com.example.csemaster.features.login.LoginUtil.extractAccessTokenFromHeader;
 
 @Slf4j
 @RestController
@@ -38,22 +33,11 @@ public class ManagerLoginController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request, ManagerLogoutDTO managerLogoutDTO) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String authToken = request.getHeader("Authorization");
-        if (authToken != null && authToken.startsWith("Bearer ")) {
-            String accessToken = authToken.substring(7);
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String managerId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String accessToken = extractAccessTokenFromHeader(request);
 
-            Date expirationTime = jwtProvider.getExpirationDateFromToken(accessToken);
-
-            managerLogoutDTO.setManagerId(authentication.getName());
-            managerLogoutDTO.setAccessToken(accessToken);
-            managerLogoutDTO.setExpirationTime(expirationTime);
-
-            return managerLoginService.logout(managerLogoutDTO);
-        }
-
-        return ResponseEntity.badRequest().build();
+        return managerLoginService.logout(managerId, accessToken);
     }
 
     @PostMapping("/refresh")

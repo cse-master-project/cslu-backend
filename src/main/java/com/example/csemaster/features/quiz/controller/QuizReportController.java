@@ -1,6 +1,7 @@
-package com.example.csemaster.features.quiz;
+package com.example.csemaster.features.quiz.controller;
 
 import com.example.csemaster.dto.response.QuizReportResponse;
+import com.example.csemaster.features.quiz.service.QuizReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

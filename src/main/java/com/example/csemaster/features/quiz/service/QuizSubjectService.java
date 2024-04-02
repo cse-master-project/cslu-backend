@@ -1,4 +1,4 @@
-package com.example.csemaster.features.quiz;
+package com.example.csemaster.features.quiz.service;
 
 import com.example.csemaster.dto.response.SubjectResponse;
 import com.example.csemaster.entity.SubjectEntity;

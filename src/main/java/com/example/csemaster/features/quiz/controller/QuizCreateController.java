@@ -1,8 +1,10 @@
-package com.example.csemaster.features.quiz;
+package com.example.csemaster.features.quiz.controller;
 
 import com.example.csemaster.dto.QuizDTO;
 import com.example.csemaster.dto.request.QuizImageRequest;
 import com.example.csemaster.dto.request.QuizReportRequest;
+import com.example.csemaster.features.quiz.service.QuizCreateService;
+import com.example.csemaster.features.quiz.service.QuizSolverService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

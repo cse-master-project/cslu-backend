@@ -1,7 +1,8 @@
-package com.example.csemaster.features.quiz;
+package com.example.csemaster.features.quiz.service;
 
 import com.example.csemaster.dto.QuizRejectDTO;
 import com.example.csemaster.entity.QuizRejectEntity;
+import com.example.csemaster.dto.UnApprovalQuizDTO;
 import com.example.csemaster.mapper.QuizRejectMapper;
 import com.example.csemaster.repository.QuizRejectRepository;
 import com.example.csemaster.repository.UserQuizRepository;
