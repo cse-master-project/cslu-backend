@@ -41,24 +41,20 @@ public class QuizSearchService {
         return activeQuizRepository.findAllDefaultQuiz(pageable);
     }
 
-    public List<UserQuizResponse> getUserQuiz(String userId) {
+    public List<UserQuizResponse> getMyQuiz(String userId) {
         Optional<UserEntity> user = userRepository.findById(userId);
 
         // userId가 존재하는지 확인
-        if (!user.isPresent()) {
+        if (user.isEmpty()) {
             throw new RuntimeException("User not found with the provided ID.");
         }
 
-        List<UserQuizResponse> quiz = quizRepository.getUserQuiz(userId);
-
-        return quiz;
+        return quizRepository.getUserQuiz(userId);
     }
 
     public List<QuizRejectResponse> getQuizReject(Long quizId) {
         Optional<QuizEntity> quiz = quizRepository.findById(quizId);
 
-        List<QuizRejectResponse> reject = quizRepository.getQuizReject(quizId);
-
-        return reject;
+        return quizRepository.getQuizReject(quizId);
     }
 }

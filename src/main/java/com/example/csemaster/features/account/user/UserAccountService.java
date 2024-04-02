@@ -1,7 +1,7 @@
-package com.example.csemaster.features.login.user;
+package com.example.csemaster.features.account.user;
 
 import com.example.csemaster.entity.*;
-import com.example.csemaster.features.login.LoginUtil;
+import com.example.csemaster.features.account.TokenUtils;
 import com.example.csemaster.jwt.JwtInfo;
 import com.example.csemaster.jwt.JwtProvider;
 import com.example.csemaster.mapper.ActiveUserMapper;
@@ -10,8 +10,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +22,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class UserLoginService {
+public class UserAccountService {
     private final UserRepository userRepository;
     private final ActiveUserRepository activeUserRepository;
     private final UserRefreshTokenRepository refreshTokenRepository;
@@ -68,7 +66,7 @@ public class UserLoginService {
 
         UserRefreshTokenEntity refreshToken = new UserRefreshTokenEntity();
         refreshToken.setUserId(userId);
-        refreshToken.setRefreshToken(LoginUtil.hashString(token.getRefreshToken()));
+        refreshToken.setRefreshToken(TokenUtils.hashString(token.getRefreshToken()));
         refreshTokenRepository.save(refreshToken);
 
         return token;
@@ -93,7 +91,7 @@ public class UserLoginService {
     public ResponseEntity<?> logout(String userId, String accessToken) {
         // 현재 유효한 엑세스토큰을 블랙 처리 후 리프레시 토큰은 DB에서 삭제
         AccessTokenBlackListEntity accessTokenBlackList = new AccessTokenBlackListEntity();
-        accessTokenBlackList.setAccessToken(LoginUtil.hashString(accessToken));
+        accessTokenBlackList.setAccessToken(TokenUtils.hashString(accessToken));
         accessTokenBlackList.setBlackAt(LocalDateTime.now());
         accessTokenBlackListRepository.save(accessTokenBlackList);
 
@@ -124,25 +122,5 @@ public class UserLoginService {
         activeUserRepository.delete(activeUser);
 
         return ResponseEntity.ok().build();
-    }
-
-    public ResponseEntity<?> getUserInfo(String userId) {
-        return activeUserRepository.findById(userId)
-                .map(activeUser -> ResponseEntity.ok().body(ActiveUserMapper.INSTANCE.toUserInfo(activeUser)))
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    public ResponseEntity<?> setUserNickname(String userId, String nickname) {
-        try {
-            return activeUserRepository.findById(userId)
-                    .map(activeUser -> {
-                        activeUser.setNickname(nickname);
-                        activeUserRepository.save(activeUser);
-
-                        return ResponseEntity.ok().build();
-                    }).orElse(ResponseEntity.notFound().build());
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
     }
 }

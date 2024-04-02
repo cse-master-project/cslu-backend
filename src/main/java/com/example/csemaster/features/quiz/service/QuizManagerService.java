@@ -1,6 +1,5 @@
 package com.example.csemaster.features.quiz.service;
 
-import com.example.csemaster.dto.QuizUpdateDTO;
 import com.example.csemaster.entity.QuizEntity;
 import com.example.csemaster.repository.QuizRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,23 +34,23 @@ public class QuizManagerService {
         return true;
     }
 
-    public boolean updateQuiz(QuizUpdateDTO quizUpdateDTO) {
-        Optional<QuizEntity> quiz = quizRepository.findByQuizId(quizUpdateDTO.getQuizId());
+    public boolean updateQuiz(Long quizId, String newJsonContent) {
+        Optional<QuizEntity> quiz = quizRepository.findByQuizId(quizId);
 
         // 존재하는 quizId인지 확인
-        if (!quiz.isPresent()) {
+        if (quiz.isEmpty()) {
             throw new RuntimeException("Incorrect quizId");
         }
 
         // 수정 전후가 같은지 확인
         String jsonContent = quiz.get().getJsonContent();
-        String newJsonContent = quizUpdateDTO.getNewJsonContent();
+
         if (newJsonContent.equals(jsonContent)) {
             throw new RuntimeException("Be the same before and after correction");
         }
 
         // 수정한 jsonContent 형식 확인
-        Boolean checkNewJsonContent = quizCreateService.isValidJsonContent(newJsonContent);
+        boolean checkNewJsonContent = quizCreateService.isValidJsonContent(newJsonContent);
         if (!checkNewJsonContent) {
             throw new RuntimeException("Incorrect jsonContent");
         }

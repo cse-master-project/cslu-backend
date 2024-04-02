@@ -2,7 +2,7 @@ package com.example.csemaster.jwt;
 
 import com.example.csemaster.entity.ManagerRefreshTokenEntity;
 import com.example.csemaster.entity.UserRefreshTokenEntity;
-import com.example.csemaster.features.login.LoginUtil;
+import com.example.csemaster.features.account.TokenUtils;
 import com.example.csemaster.repository.AccessTokenBlackListRepository;
 import com.example.csemaster.repository.ManagerRefreshTokenRepository;
 import com.example.csemaster.repository.UserRefreshTokenRepository;
@@ -154,7 +154,7 @@ public class JwtProvider {
                     .build()
                     .parseClaimsJws(token);
             // 블랙되었는지 확인, 검색된게 없으면 유효한 토큰
-            return accessTokenBlackListRepository.findByAccessToken(LoginUtil.hashString(token)).isEmpty();
+            return accessTokenBlackListRepository.findByAccessToken(TokenUtils.hashString(token)).isEmpty();
 
         } catch (SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT Token");

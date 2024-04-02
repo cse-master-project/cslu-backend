@@ -1,9 +1,9 @@
-package com.example.csemaster.features.login;
+package com.example.csemaster.features.account;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-public class LoginUtil {
+public class TokenUtils {
     public static String extractAccessTokenFromHeader(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {

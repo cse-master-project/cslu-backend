@@ -1,9 +1,9 @@
-package com.example.csemaster.features.login.manager;
+package com.example.csemaster.features.account.manager;
 
 import com.example.csemaster.dto.ManagerLoginDTO;
 import com.example.csemaster.entity.AccessTokenBlackListEntity;
 import com.example.csemaster.entity.ManagerRefreshTokenEntity;
-import com.example.csemaster.features.login.LoginUtil;
+import com.example.csemaster.features.account.TokenUtils;
 import com.example.csemaster.jwt.JwtInfo;
 import com.example.csemaster.jwt.JwtProvider;
 import com.example.csemaster.mapper.RefreshTokenMapper;
@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ManagerLoginService {
+public class ManagerAccountService {
     private final RefreshTokenMapper refreshTokenMapper;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtProvider jwtProvider;
@@ -33,7 +33,7 @@ public class ManagerLoginService {
     private void saveRefreshToken(ManagerLoginDTO managerLoginDto, JwtInfo jwtInfo) {
         // 토큰 해쉬 후 저장
         ManagerRefreshTokenEntity refreshToken = refreshTokenMapper.toRefreshTokenEntity(managerLoginDto, jwtInfo);
-        refreshToken.setRefreshToken(LoginUtil.hashString(refreshToken.getRefreshToken()));
+        refreshToken.setRefreshToken(TokenUtils.hashString(refreshToken.getRefreshToken()));
         managerRefreshTokenRepository.save(refreshToken);
     }
 
@@ -61,7 +61,7 @@ public class ManagerLoginService {
     public ResponseEntity<?> logout(String managerId, String accessToken) {
         // 현재 유효한 액세스 토큰 블랙리스트에 추가
         AccessTokenBlackListEntity accessTokenBlackList = new AccessTokenBlackListEntity();
-        accessTokenBlackList.setAccessToken(LoginUtil.hashString(accessToken));
+        accessTokenBlackList.setAccessToken(TokenUtils.hashString(accessToken));
         accessTokenBlackList.setBlackAt(LocalDateTime.now());
 
         accessTokenBlackListRepository.save(accessTokenBlackList);

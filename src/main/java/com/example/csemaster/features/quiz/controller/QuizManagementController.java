@@ -1,10 +1,9 @@
 package com.example.csemaster.features.quiz.controller;
 
 import com.example.csemaster.dto.QuizRejectDTO;
-import com.example.csemaster.dto.QuizUpdateDTO;
+import com.example.csemaster.dto.UnApprovalQuizDTO;
 import com.example.csemaster.features.quiz.service.ApprovalQuizService;
 import com.example.csemaster.features.quiz.service.QuizManagerService;
-import com.example.csemaster.dto.UnApprovalQuizDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,8 +12,8 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/quiz-manager")
-public class QuizManagerController {
+@RequestMapping("/api/quiz")
+public class QuizManagementController {
 
     private final QuizManagerService quizManagerService;
     private final ApprovalQuizService approvalQuizService;
@@ -35,9 +34,9 @@ public class QuizManagerController {
         return approvalQuizService.setQuizRejection(quizRejectDTO, -1);
     }
 
-    @PatchMapping("/update")
-    public ResponseEntity<?> updateQuiz(@RequestBody QuizUpdateDTO quizUpdateDTO) {
-        Boolean updateJsonContent = quizManagerService.updateQuiz(quizUpdateDTO);
+    @PatchMapping("/{quizId}")
+    public ResponseEntity<?> updateQuiz(@PathVariable Long quizId, @RequestBody String newJsonContent) {
+        boolean updateJsonContent = quizManagerService.updateQuiz(quizId, newJsonContent);
         if(!updateJsonContent) {
             return ResponseEntity.badRequest().body("QuizUpdateController - updateQuiz()");
         }
@@ -45,8 +44,8 @@ public class QuizManagerController {
         return ResponseEntity.ok().body("Update Successfully");
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteQuiz(@RequestParam Long quizId) {
+    @DeleteMapping("/{quizId}")
+    public ResponseEntity<?> deleteQuiz(@PathVariable Long quizId) {
         boolean deleteQuiz = quizManagerService.deleteQuiz(quizId);
 
         if (!deleteQuiz) {

@@ -19,7 +19,7 @@ public class QuizReportService {
         Optional<QuizReportEntity> quizReport = quizReportRepository.findByQuizReportId(quizReportId);
 
         // quizReportId가 존재하는지 확인
-        if (!quizReport.isPresent()) {
+        if (quizReport.isEmpty()) {
             throw new RuntimeException("Incorrect quizReportId");
         }
 
@@ -29,5 +29,9 @@ public class QuizReportService {
     public List<QuizReportResponse> allQuizReport() {
         List<QuizReportEntity> quizReports = quizReportRepository.findAll();
         return quizReportMapper.toQuizReportResponseList(quizReports);
+    }
+
+    public List<QuizReportResponse> getAllReportForQuiz(Long quizId) {
+        return quizReportRepository.findByQuizId(quizId);
     }
 }
