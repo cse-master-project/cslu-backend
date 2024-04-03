@@ -1,9 +1,10 @@
-package com.example.csemaster.features.quiz;
+package com.example.csemaster.features.quiz.controller;
 
 import com.example.csemaster.dto.DetailSubjectDTO;
 import com.example.csemaster.dto.DetailSubjectUpdateDTO;
 import com.example.csemaster.dto.SubjectUpdateDTO;
 import com.example.csemaster.dto.response.SubjectResponse;
+import com.example.csemaster.features.quiz.service.QuizSubjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

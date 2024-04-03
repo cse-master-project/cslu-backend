@@ -1,5 +1,6 @@
 package com.example.csemaster.features.account.user;
 
+import com.example.csemaster.dto.response.QuizStatsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -28,5 +29,12 @@ public class UserProfileController {
         String userId = authentication.getName();
 
         return userProfileService.setUserNickname(userId, nickname);
+    }
+
+    @GetMapping("/quiz-results")
+    public ResponseEntity<QuizStatsResponse> getStatistics() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+        return ResponseEntity.ok().body(userProfileService.getUserQuizResult(userId));
     }
 }
