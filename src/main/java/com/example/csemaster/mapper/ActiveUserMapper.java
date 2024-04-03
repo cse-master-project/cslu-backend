@@ -17,6 +17,7 @@ public interface ActiveUserMapper {
     ActiveUserDTO entityToDTO(ActiveUserEntity activeUser);
 
     @Mapping(target = "deleteAt", ignore = true)
+    @Mapping(target = "user", ignore = true)
     DeleteUserEntity activeToDelete(ActiveUserEntity activeUser);
 
     UserInfoResponse toUserInfo(ActiveUserEntity activeUser);

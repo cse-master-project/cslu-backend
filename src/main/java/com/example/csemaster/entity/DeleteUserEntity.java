@@ -16,15 +16,15 @@ public class DeleteUserEntity {
     private String userId;
 
     @OneToOne
-    @JoinColumn(name = "user_id_for_delete", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id_for_delete", referencedColumnName = "user_id", insertable = false, updatable = false)
     private UserEntity user;
 
-    @Column(name = "delete_google_id")
+    @Column(name = "deleted_google_id")
     private String googleId;
 
-    @Column(name = "delete_nickname")
+    @Column(name = "deleted_nickname")
     private String nickname;
 
-    @Column(name = "delete_at")
+    @Column(name = "deleted_at")
     private LocalDateTime deleteAt;
 }

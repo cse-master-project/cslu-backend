@@ -101,7 +101,6 @@ public class UserAccountService {
         return ResponseEntity.ok().build();
     }
 
-    @Transactional
     public ResponseEntity<?> deactivateUser(String userId) {
         return activeUserRepository.findById(userId)
                         .map(this::handleUserDeactivation)
