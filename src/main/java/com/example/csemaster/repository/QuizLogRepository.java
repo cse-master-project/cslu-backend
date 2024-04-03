@@ -13,12 +13,6 @@ public interface QuizLogRepository extends JpaRepository<QuizLogEntity, QuizLogP
             "WHERE userId = :userId AND quizId = :quizId")
     Integer getMaxTryCnt(String userId, Long quizId);
 
-//    @Query("SELECT new com.example.csemaster.dto.QuizResultDTO(l.quizId, q.subject, l.answerStatus) " +
-//            "FROM QuizLogEntity l JOIN QuizEntity q ON l.quizId = q.quizId " +
-//            "WHERE l.userId = :userId " +
-//            "GROUP BY l.quizId")
-//    List<QuizResultDTO> findAllByUserId1(String userId);
-
     @Query("SELECT new com.example.csemaster.dto.QuizResultDTO(l.quizId, MAX(l.tryCnt), l.quiz.subject, l.answerStatus)" +
             "FROM QuizLogEntity l " +
             "WHERE l.userId = :userId " +

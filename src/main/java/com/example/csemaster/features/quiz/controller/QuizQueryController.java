@@ -1,12 +1,14 @@
 package com.example.csemaster.features.quiz.controller;
 
 import com.example.csemaster.dto.request.QuizSolverRequest;
-import com.example.csemaster.dto.response.*;
+import com.example.csemaster.dto.response.QuizRejectResponse;
+import com.example.csemaster.dto.response.QuizReportResponse;
+import com.example.csemaster.dto.response.QuizResponse;
+import com.example.csemaster.dto.response.UserQuizResponse;
 import com.example.csemaster.entity.ActiveQuizEntity;
 import com.example.csemaster.features.quiz.service.QuizReportService;
 import com.example.csemaster.features.quiz.service.QuizSearchService;
 import com.example.csemaster.features.quiz.service.QuizSolverService;
-import com.example.csemaster.features.quiz.service.QuizSubjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,14 +25,7 @@ import java.util.List;
 public class QuizQueryController {
     private final QuizSearchService quizSearchService;
     private final QuizSolverService quizSolverService;
-    private final QuizSubjectService quizSubjectService;
     private final QuizReportService quizReportService;
-
-    // 전체 카테고리 조회
-    @GetMapping("/subjects")
-    public List<SubjectResponse> getAllSubject() {
-        return quizSubjectService.getAllSubject();
-    }
 
     // 모든 활성화된 문제 조회
     @GetMapping("/")
@@ -59,6 +54,11 @@ public class QuizQueryController {
 
         // 무작위로 하나의 문제를 반환
         return quizSolverService.getQuiz(userId, subject, detailSubject);
+    }
+
+    @GetMapping("/{quizId}/image")
+    public ResponseEntity<?> getQuizImage(@PathVariable Long quizId) {
+        return quizSolverService.getQuizImage(quizId);
     }
 
     // 문제 푼 결과 저장

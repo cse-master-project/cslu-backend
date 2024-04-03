@@ -28,12 +28,12 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 엔드포인트별 권한 설정
-                .authorizeHttpRequests(authz -> authz
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/auth/google").permitAll()
                         .requestMatchers("/api/manager/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasRole("USER")
                         .requestMatchers("/api/quiz/**").authenticated()
-                        .anyRequest().permitAll())
+                        .anyRequest().denyAll())
 
                 // 인증과정에서 JWT 검증을 수행하는 기본 필터와 사용자 정의 필터 추가
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider),
