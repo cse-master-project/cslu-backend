@@ -17,23 +17,28 @@ public class QuizManagementController {
 
     private final QuizManagerService quizManagerService;
     private final ApprovalQuizService approvalQuizService;
+
+    // 미승인 문제 조회
     @GetMapping("/unapproved")
     public List<UnApprovalQuizDTO> getUnApproval() {
         return approvalQuizService.getUnApprovalQuiz();
     }
 
     // 0 : 대기, 1 : 승인, -1 : 거절
+    // 문제 승인
     @PutMapping("/{id}/approve")
     public ResponseEntity<?> userQuizApprove(@PathVariable("id") Long quizId) {
         return approvalQuizService.setQuizPermission(quizId, 1);
     }
 
+    // 문제 반려
     @PutMapping("/{id}/reject")
     public ResponseEntity<?> userQuizReject(@PathVariable("id") Long quizId, @RequestBody QuizRejectDTO quizRejectDTO) {
         quizRejectDTO.setQuizId(quizId);
         return approvalQuizService.setQuizRejection(quizRejectDTO, -1);
     }
 
+    // 문제 수정
     @PatchMapping("/{quizId}")
     public ResponseEntity<?> updateQuiz(@PathVariable Long quizId, @RequestBody String newJsonContent) {
         boolean updateJsonContent = quizManagerService.updateQuiz(quizId, newJsonContent);
@@ -44,6 +49,7 @@ public class QuizManagementController {
         return ResponseEntity.ok().body("Update Successfully");
     }
 
+    // 문제 삭제
     @DeleteMapping("/{quizId}")
     public ResponseEntity<?> deleteQuiz(@PathVariable Long quizId) {
         boolean deleteQuiz = quizManagerService.deleteQuiz(quizId);

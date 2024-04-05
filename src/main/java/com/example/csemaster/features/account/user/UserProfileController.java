@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserProfileController {
     private final UserProfileService userProfileService;
 
+    // 사용자 정보 조회
     @GetMapping("/info")
     private ResponseEntity<?> getUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -23,7 +24,8 @@ public class UserProfileController {
         return userProfileService.getUserInfo(userId);
     }
 
-    @PostMapping("/info/nickname")
+    // 사용자 닉네임 설정
+    @PutMapping("/info/nickname")
     private ResponseEntity<?> setUserNickname(@RequestBody String nickname) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
@@ -31,6 +33,7 @@ public class UserProfileController {
         return userProfileService.setUserNickname(userId, nickname);
     }
 
+    // 사용자 문제 풀이 통계
     @GetMapping("/quiz-results")
     public ResponseEntity<QuizStatsResponse> getStatistics() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

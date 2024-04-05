@@ -24,6 +24,7 @@ public class ManagerAccountController {
     private final ManagerAccountService managerAccountService;
     private final JwtProvider jwtProvider;
 
+    // 관리자 로그인
     @PostMapping("/login")
     public JwtInfo login(@RequestBody ManagerLoginDTO managerLoginDto) {
         JwtInfo jwtInfo = managerAccountService.login(managerLoginDto);
@@ -32,6 +33,7 @@ public class ManagerAccountController {
         return jwtInfo;
     }
 
+    // 관리자 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
         String managerId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -40,6 +42,7 @@ public class ManagerAccountController {
         return managerAccountService.logout(managerId, accessToken);
     }
 
+    // 관리자 토큰 재발급
     @PostMapping("/refresh")
     public String refreshToken(HttpServletRequest request, HttpServletResponse response) {
         JwtInfo jwtInfo = managerAccountService.refreshToken(request.getHeader("Refresh-Token"));

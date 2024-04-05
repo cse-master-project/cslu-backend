@@ -14,42 +14,51 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/quiz-subject")
+@RequestMapping("/quiz/subject")
 public class QuizSubjectController {
 
     private final QuizSubjectService quizSubjectService;
 
+    // 카테고리 조회
     @GetMapping()
     public List<SubjectResponse> getAllSubject() {
         return quizSubjectService.getAllSubject();
     }
 
-    @PostMapping("/subject")
+    // 카테고리 추가
+    @PostMapping()
     public ResponseEntity<?> addSubject(@RequestParam String subject) {
         return quizSubjectService.addSubject(subject);
     }
 
+
+    // 서브 카테고리 추가
     @PostMapping("/detail")
     public ResponseEntity<?> addDetailSubject(@RequestBody @Valid DetailSubjectDTO detailSubjectDTO) {
         return quizSubjectService.addDetailSubject(detailSubjectDTO);
     }
 
-    @PatchMapping("/update/subject")
+    // 카테고리 수정
+    @PatchMapping()
     public ResponseEntity<?> updateSubject(@RequestBody @Valid SubjectUpdateDTO subjectUpdateDTO) {
         return quizSubjectService.updateSubject(subjectUpdateDTO);
     }
 
-    @PostMapping("/update/detail")
+    // 서브 카테고리 수정
+    @PatchMapping("/detail")
     public ResponseEntity<?> updateDetailSubject(@RequestBody @Valid DetailSubjectUpdateDTO updateDTO) {
         return quizSubjectService.updateDetailSubject(updateDTO);
     }
 
-    @DeleteMapping("/delete/subject")
+    // 카테고리 삭제
+    @DeleteMapping()
     public ResponseEntity<?> deleteSubject(@RequestParam Long subjectId) {
         return quizSubjectService.deleteSubject(subjectId);
     }
 
-    @DeleteMapping("/delete/detail")
+
+    // 서브 카테고리 삭제
+    @DeleteMapping("/detail")
     public ResponseEntity<?> deleteDetailSubject(@RequestParam Long subjectId, String detail) {
         return quizSubjectService.deleteDetailSubject(subjectId, detail);
     }

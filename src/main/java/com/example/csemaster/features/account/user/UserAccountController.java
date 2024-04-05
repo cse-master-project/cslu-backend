@@ -22,6 +22,7 @@ public class UserAccountController {
         this.userAccountService = userAccountService;
     }
 
+    // 사용자 회원 가입
     @PostMapping("/auth/google/sign-up")
     public ResponseEntity<?> signUp(@RequestBody String accessToken, String nickname) {
         String googleId = userAccountService.isGoogleAuth(accessToken);
@@ -36,6 +37,8 @@ public class UserAccountController {
                     .body("Unauthorized: Google login failed");
         }
     }
+
+    // 사용자 로그인
     @PostMapping("/auth/google/login")
     public ResponseEntity<?> googleLogin(@RequestBody String accessToken) {
         // 넘겨받은 액세스 토큰으로 구글 api에 검증 요청
@@ -59,6 +62,7 @@ public class UserAccountController {
         }
     }
 
+    // 사용자 로그아웃
     @PostMapping("/auth/google/logout")
     public ResponseEntity<?> googleUserLogout(HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -68,6 +72,7 @@ public class UserAccountController {
         return userAccountService.logout(userId, accessToken);
     }
 
+    // 사용자 회원 탈퇴
     @PostMapping("/deactivate")
     @Transactional
     public ResponseEntity<?> deactivateUser(HttpServletRequest request) {

@@ -19,7 +19,7 @@ public class QuizCreateController {
     private final QuizSolverService quizSolverService;
     private final QuizCreateService quizCreateService;
 
-
+    // 문제 신고
     @PostMapping("/report")
     public ResponseEntity<?> quizReport(@RequestBody QuizReportRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -28,6 +28,7 @@ public class QuizCreateController {
         return quizSolverService.saveQuizReport(userId, request.getQuizId(), request.getContent());
     }
 
+    // 기본 문제 추가
     @PostMapping("/default")
     public Long addDefaultQuiz(@RequestBody QuizDTO quizDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -36,6 +37,7 @@ public class QuizCreateController {
         return quizCreateService.addQuizAndDefaultQuiz(quizDTO, managerId);
     }
 
+    // 사용자 문제 추가
     @PostMapping("/user")
     public Long addUserQuiz(@RequestBody QuizDTO quizDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -44,6 +46,7 @@ public class QuizCreateController {
         return quizCreateService.addQuizAndUserQuiz(quizDTO, userId);
     }
 
+    // 이미지 추가
     @PostMapping("/image")
     public ResponseEntity<?> uploadImage(@RequestBody QuizImageRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
