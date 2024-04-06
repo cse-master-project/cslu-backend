@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data
 public class DetailSubjectDTO {
-    @NotNull
-    private Long subjectId;
+    @NotBlank
+    private String subject;
     @NotBlank
     private String detailSubject;
 }
