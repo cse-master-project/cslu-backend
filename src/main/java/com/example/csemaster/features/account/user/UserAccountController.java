@@ -1,7 +1,10 @@
 package com.example.csemaster.features.account.user;
 
 import com.example.csemaster.features.account.TokenUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,18 +14,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "UserAccount", description = "사용자 계정 관련 기능")
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/user")
 public class UserAccountController {
     private final UserAccountService userAccountService;
 
-    @Autowired
-    public UserAccountController(UserAccountService userAccountService) {
-        this.userAccountService = userAccountService;
-    }
-
     // 사용자 회원 가입
+    @Operation(
+            summary = "사용자 회원 가입",
+            description = "구글 액세스 토큰과 닉네임을 받아서 회원 가입 후 토큰 발급"
+    )
     @PostMapping("/auth/google/sign-up")
     public ResponseEntity<?> signUp(@RequestBody String accessToken, String nickname) {
         String googleId = userAccountService.isGoogleAuth(accessToken);
@@ -39,6 +43,10 @@ public class UserAccountController {
     }
 
     // 사용자 로그인
+    @Operation(
+            summary = "사용자 로그인",
+            description = "액세스 토큰을 받아서 토큰 발급"
+    )
     @PostMapping("/auth/google/login")
     public ResponseEntity<?> googleLogin(@RequestBody String accessToken) {
         // 넘겨받은 액세스 토큰으로 구글 api에 검증 요청
@@ -63,6 +71,10 @@ public class UserAccountController {
     }
 
     // 사용자 로그아웃
+    @Operation(
+            summary = "사용자 로그아웃",
+            description = "사용자 아이디, 액세스 토큰을 블랙리스트에 추가"
+    )
     @PostMapping("/auth/google/logout")
     public ResponseEntity<?> googleUserLogout(HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -73,6 +85,10 @@ public class UserAccountController {
     }
 
     // 사용자 회원 탈퇴
+    @Operation(
+            summary = "사용자 회원 탈퇴",
+            description = "로그아웃 처리 후 계정 비활성화"
+    )
     @PostMapping("/deactivate")
     @Transactional
     public ResponseEntity<?> deactivateUser(HttpServletRequest request) {

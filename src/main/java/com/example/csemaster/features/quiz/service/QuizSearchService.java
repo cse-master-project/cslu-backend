@@ -53,8 +53,6 @@ public class QuizSearchService {
     }
 
     public List<QuizRejectResponse> getQuizReject(Long quizId) {
-        Optional<QuizEntity> quiz = quizRepository.findById(quizId);
-
         return quizRepository.getQuizReject(quizId);
     }
 }

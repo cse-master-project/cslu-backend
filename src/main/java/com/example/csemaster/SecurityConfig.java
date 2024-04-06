@@ -27,12 +27,14 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 // 엔드포인트별 권한 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/auth/google").permitAll()
                         .requestMatchers("/api/manager/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasRole("USER")
                         .requestMatchers("/api/quiz/**").authenticated()
+                        .requestMatchers("/v3/**", "/swagger-ui/**").permitAll()
                         .anyRequest().denyAll())
 
                 // 인증과정에서 JWT 검증을 수행하는 기본 필터와 사용자 정의 필터 추가

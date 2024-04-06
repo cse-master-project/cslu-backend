@@ -21,6 +21,7 @@ public class UserProfileService {
     private final ActiveUserRepository activeUserRepository;
     private final QuizLogRepository quizLogRepository;
     private final QuizSubjectRepository quizSubjectRepository;
+
     public ResponseEntity<?> getUserInfo(String userId) {
         return activeUserRepository.findById(userId)
                 .map(activeUser -> ResponseEntity.ok().body(ActiveUserMapper.INSTANCE.toUserInfo(activeUser)))
