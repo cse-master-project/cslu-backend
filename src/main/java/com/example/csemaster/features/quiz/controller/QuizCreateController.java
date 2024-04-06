@@ -7,6 +7,7 @@ import com.example.csemaster.features.quiz.service.QuizCreateService;
 import com.example.csemaster.features.quiz.service.QuizSolverService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -40,7 +41,7 @@ public class QuizCreateController {
             description = "카테고리, 서브 카테고리, 문제를 받아서 문제를 추가<br>관리자 아이디를 추출하여 기본 문제로 분류"
     )
     @PostMapping("/default")
-    public Long addDefaultQuiz(@RequestBody QuizDTO quizDTO) {
+    public Long addDefaultQuiz(@RequestBody @Valid QuizDTO quizDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String managerId = authentication.getName();
 
@@ -53,7 +54,7 @@ public class QuizCreateController {
             description = "카테고리, 서브 카테고리, 문제를 받아서 문제를 추가<br>사용자 아이디를 추출하여 사용자 문제로 분류"
     )
     @PostMapping("/user")
-    public Long addUserQuiz(@RequestBody QuizDTO quizDTO) {
+    public Long addUserQuiz(@RequestBody @Valid QuizDTO quizDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
