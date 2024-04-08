@@ -2,7 +2,7 @@ package com.example.csemaster.features.quiz.service;
 
 import com.example.csemaster.dto.DetailSubjectDTO;
 import com.example.csemaster.dto.DetailSubjectUpdateDTO;
-import com.example.csemaster.dto.response.SubjectDTO;
+import com.example.csemaster.dto.SubjectDTO;
 import com.example.csemaster.dto.response.SubjectResponse;
 import com.example.csemaster.dto.SubjectUpdateDTO;
 import com.example.csemaster.entity.SubjectEntity;

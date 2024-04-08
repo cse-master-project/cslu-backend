@@ -2,6 +2,7 @@ package com.example.csemaster.features.quiz.controller;
 
 import com.example.csemaster.dto.DetailSubjectDTO;
 import com.example.csemaster.dto.DetailSubjectUpdateDTO;
+import com.example.csemaster.dto.SubjectDTO;
 import com.example.csemaster.dto.SubjectUpdateDTO;
 import com.example.csemaster.dto.response.SubjectResponse;
 import com.example.csemaster.features.quiz.service.QuizSubjectService;
@@ -38,8 +39,8 @@ public class QuizSubjectController {
             description = "새 카테고리를 받아서 추가"
     )
     @PostMapping()
-    public ResponseEntity<?> addSubject(@RequestParam String subject) {
-        return quizSubjectService.addSubject(subject);
+    public ResponseEntity<?> addSubject(@RequestBody @Valid SubjectDTO subjectDTO) {
+        return quizSubjectService.addSubject(subjectDTO);
     }
 
 
@@ -79,8 +80,8 @@ public class QuizSubjectController {
             description = "카테고리를 받아서 삭제"
     )
     @DeleteMapping()
-    public ResponseEntity<?> deleteSubject(@RequestParam Long subjectId) {
-        return quizSubjectService.deleteSubject(subjectId);
+    public ResponseEntity<?> deleteSubject(@RequestBody @Valid SubjectDTO subjectDTO) {
+        return quizSubjectService.deleteSubject(subjectDTO);
     }
 
 
@@ -90,8 +91,8 @@ public class QuizSubjectController {
             description = "삭제할 서브 카테고리의 메인 카테고리와 서브 카테고리를 받아서 삭제"
     )
     @DeleteMapping("/detail")
-    public ResponseEntity<?> deleteDetailSubject(@RequestParam Long subjectId, String detail) {
-        return quizSubjectService.deleteDetailSubject(subjectId, detail);
+    public ResponseEntity<?> deleteDetailSubject(@RequestParam DetailSubjectDTO detailSubjectDTO) {
+        return quizSubjectService.deleteDetailSubject(detailSubjectDTO);
     }
 
 }

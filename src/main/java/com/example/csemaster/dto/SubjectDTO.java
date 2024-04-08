@@ -1,4 +1,4 @@
-package com.example.csemaster.dto.response;
+package com.example.csemaster.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
