@@ -30,7 +30,8 @@ public class SecurityConfig {
 
                 // 엔드포인트별 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/user/auth/google").permitAll()
+                        .requestMatchers("/api/user/auth/google/login").permitAll()
+                        .requestMatchers("/api/user/auth/google/sign-up").permitAll()
                         .requestMatchers("/api/manager/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasRole("USER")
                         .requestMatchers("/api/quiz/**").authenticated()

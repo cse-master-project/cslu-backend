@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -67,13 +66,15 @@ public class UserAccountService {
         UserRefreshTokenEntity refreshToken = new UserRefreshTokenEntity();
         refreshToken.setUserId(userId);
         refreshToken.setRefreshToken(TokenUtils.hashString(token.getRefreshToken()));
+        refreshToken.setIssueAt(token.getRefreshIseAt());
+        refreshToken.setExpAt(token.getRefreshExpAt());
+
         refreshTokenRepository.save(refreshToken);
 
         return token;
     }
 
-    @Transactional
-    public void createUser(String googleId, String nickname) {
+    public String createUser(String googleId, String nickname) {
         UserEntity user = new UserEntity();
         UUID uuid = UUID.randomUUID();
         user.setUserId(uuid.toString());
@@ -86,6 +87,8 @@ public class UserAccountService {
         activeUser.setNickname(nickname);
         activeUser.setCreateAt(LocalDateTime.now());
         activeUserRepository.save(activeUser);
+
+        return user.getUserId();
     }
 
     public ResponseEntity<?> logout(String userId, String accessToken) {
