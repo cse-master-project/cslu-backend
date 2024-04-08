@@ -64,7 +64,7 @@ public class QuizCreateController {
     // 이미지 추가
     @Operation(
             summary = "이미지 추가",
-            description = ""
+            description = "문제 생성시 이미지는 별도로 전송, 리턴받은 문제 아이디로 요청함."
     )
     @PostMapping("/image")
     public ResponseEntity<?> uploadImage(@RequestBody QuizImageRequest request) {

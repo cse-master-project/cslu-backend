@@ -108,10 +108,9 @@ public class QuizQueryController {
         return quizSearchService.getMyQuiz(userId);
     }
 
-    // 해당 유저가 만든 퀴즈 중 거절된 퀴즈만 조회
+    // 문제의 승인 여부 확인
     @Operation(
-            summary = "",
-            description = ""
+            summary = "사용자 문제의 승인 여부 조회"
     )
     @GetMapping("/my/reject")
     public List<QuizRejectResponse> getQuizReject(@RequestParam Long quizId) {
