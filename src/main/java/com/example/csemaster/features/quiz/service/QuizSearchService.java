@@ -3,7 +3,6 @@ package com.example.csemaster.features.quiz.service;
 import com.example.csemaster.dto.response.QuizRejectResponse;
 import com.example.csemaster.dto.response.UserQuizResponse;
 import com.example.csemaster.entity.ActiveQuizEntity;
-import com.example.csemaster.entity.QuizEntity;
 import com.example.csemaster.entity.UserEntity;
 import com.example.csemaster.repository.ActiveQuizRepository;
 import com.example.csemaster.repository.QuizRepository;
@@ -11,7 +10,6 @@ import com.example.csemaster.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -26,18 +24,15 @@ public class QuizSearchService {
     private final UserRepository userRepository;
     private final QuizRepository quizRepository;
 
-    public Page<ActiveQuizEntity> getQuiz(PageRequest pageRequest) {
-        Pageable pageable = PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize());
+    public Page<ActiveQuizEntity> getQuiz(Pageable pageable) {
         return activeQuizRepository.findAllBy(pageable);
     }
 
-    public Page<ActiveQuizEntity> getUserQuiz(PageRequest pageRequest) {
-        Pageable pageable = PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize());
+    public Page<ActiveQuizEntity> getUserQuiz(Pageable pageable) {
         return activeQuizRepository.findAllUserQuiz(pageable);
     }
 
-    public Page<ActiveQuizEntity> getDefaultQuiz(PageRequest pageRequest) {
-        Pageable pageable = PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize());
+    public Page<ActiveQuizEntity> getDefaultQuiz(Pageable pageable) {
         return activeQuizRepository.findAllDefaultQuiz(pageable);
     }
 

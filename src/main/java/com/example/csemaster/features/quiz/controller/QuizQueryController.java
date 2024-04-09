@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,9 +35,9 @@ public class QuizQueryController {
             summary = "문제 전체 조회",
             description = "활성화 상태인 문제 전체를 조회"
     )
-    @GetMapping("/")
-    public Page<ActiveQuizEntity> getAllQuiz(@ModelAttribute PageRequest pageRequest) {
-        return quizSearchService.getQuiz(pageRequest);
+    @GetMapping("")
+    public Page<ActiveQuizEntity> getAllQuiz(Pageable pageable) {
+        return quizSearchService.getQuiz(pageable);
     }
 
     // 현재 활성화된 유저 문제만 조회
@@ -46,8 +46,8 @@ public class QuizQueryController {
             description = "활성화 상태인 사용자 문제 전체를 조회"
     )
     @GetMapping("/user")
-    public Page<ActiveQuizEntity> getUserQuiz(@ModelAttribute PageRequest pageRequest) {
-        return quizSearchService.getUserQuiz(pageRequest);
+    public Page<ActiveQuizEntity> getUserQuiz(Pageable pageable) {
+        return quizSearchService.getUserQuiz(pageable);
     }
 
     // 현재 활성화된 기본 문제만 조회
@@ -56,8 +56,8 @@ public class QuizQueryController {
             description = "활성화 상태인 기본 문제 전체를 조회"
     )
     @GetMapping("/default")
-    public Page<ActiveQuizEntity> getDefaultQuiz(@ModelAttribute PageRequest pageRequest) {
-        return quizSearchService.getDefaultQuiz(pageRequest);
+    public Page<ActiveQuizEntity> getDefaultQuiz(Pageable pageable) {
+        return quizSearchService.getDefaultQuiz(pageable);
     }
 
     // 지정한 카테고리에 맞게 무작위로 하나의 문제 제공
