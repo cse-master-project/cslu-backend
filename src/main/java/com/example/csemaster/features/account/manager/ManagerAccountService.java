@@ -2,6 +2,8 @@ package com.example.csemaster.features.account.manager;
 
 import com.example.csemaster.dto.ManagerLoginDTO;
 import com.example.csemaster.entity.AccessTokenBlackListEntity;
+import com.example.csemaster.entity.ActiveUserEntity;
+import com.example.csemaster.entity.ManagerEntity;
 import com.example.csemaster.entity.ManagerRefreshTokenEntity;
 import com.example.csemaster.features.account.TokenUtils;
 import com.example.csemaster.jwt.JwtInfo;
@@ -9,6 +11,7 @@ import com.example.csemaster.jwt.JwtProvider;
 import com.example.csemaster.mapper.RefreshTokenMapper;
 import com.example.csemaster.repository.AccessTokenBlackListRepository;
 import com.example.csemaster.repository.ManagerRefreshTokenRepository;
+import com.example.csemaster.repository.ManagerRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,13 +22,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ManagerAccountService {
     private final RefreshTokenMapper refreshTokenMapper;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final ManagerRepository managerRepository;
     private final JwtProvider jwtProvider;
     private final ManagerRefreshTokenRepository managerRefreshTokenRepository;
     private final AccessTokenBlackListRepository accessTokenBlackListRepository;
@@ -39,18 +43,19 @@ public class ManagerAccountService {
 
     @Transactional
     public JwtInfo login(ManagerLoginDTO managerLoginDto) {
-        // 1. managerLoginDto를 기반으로 Authentication 객체 생성
-        // 이때 authentication은 인증 여부를 확인하는 authenticated 값이 false
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(managerLoginDto.getManagerId(), managerLoginDto.getManagerPw());
+        // 1. managerLoginDto를 기반으로 객체 생성 및 검증
+        Optional<ManagerEntity> manager = managerRepository.findById(managerLoginDto.getManagerId());
+        if (manager.isEmpty()) {
+            return null;
+        }
+        if (!managerLoginDto.getManagerPw().equals(manager.get().getManagerPw())) {
+            return null;
+        }
 
-        // 2. 실제 검증. authenticate() 메서드를 통해 요청된 ManagerModel에 대한 검증 진행
-        // authenticate 메서드가 실행될 때 UserDetailsService에서 만든 loadUserByUsername 메서드 실행
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        // 2. 인증 정보를 기반으로 JWT 토큰 생성
+        JwtInfo jwtInfo = jwtProvider.generateToken(managerLoginDto.getManagerId());
 
-        // 3. 인증 정보를 기반으로 JWT 토큰 생성
-        JwtInfo jwtInfo = jwtProvider.generateToken(authentication);
-
-        // 4. 토큰 정보를 RefreshTokenEntity 에 저장
+        // 3. 토큰 정보를 RefreshTokenEntity 에 저장
         saveRefreshToken(managerLoginDto, jwtInfo);
 
         log.info("로그인 성공 [ID:" + managerLoginDto.getManagerId() + "]");
@@ -85,7 +90,7 @@ public class ManagerAccountService {
         Authentication authentication = jwtProvider.getAuthentication(refreshToken);
 
         // 3. 새로운 액세스 토큰과 리프레시 토큰 생성
-        JwtInfo newJwtInfo = jwtProvider.generateToken(authentication);
+        JwtInfo newJwtInfo = jwtProvider.generateToken(authentication.getName());
 
         // 4. 새로운 리프레시 토큰으로 RefreshTokenEntity 업데이트
         ManagerRefreshTokenEntity managerRefreshTokenEntity = managerRefreshTokenRepository.findById(authentication.getName())

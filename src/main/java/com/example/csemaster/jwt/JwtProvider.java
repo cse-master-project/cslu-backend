@@ -65,66 +65,66 @@ public class JwtProvider {
                 .toLocalDateTime();
     }
 
-    // manager 정보를 가지고 AccessToken, RefreshToken을 생성하는 메서드
-    public JwtInfo generateToken(Authentication authentication) {
-        Date now = new Date();
-        long nowMils = now.getTime();
-
-        // Access Token 생성
-        String accessToken = Jwts.builder()
-                .setSubject(authentication.getName())
-                .claim("auth", MemberRole.ADMIN.getValue())
-                .setExpiration(new Date(nowMils + ADMIN_ACCESS_TOKEN_EXPIRE_TIME))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-
-        Date refreshExp = new Date(nowMils + ADMIN_REFRESH_TOKEN_EXPIRE_TIME);
-        // Refresh Token 생성
-        String refreshToken = Jwts.builder()
-                .setExpiration(refreshExp)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-
-        return JwtInfo.builder()
-                .grantType("Bearer")
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .refreshIseAt(fromDate(now))
-                .refreshExpAt(fromDate(refreshExp))
-                .build();
-    }
-
-    // 유저의 userId를 받아 엑세스토큰을 생성하는 메소드
-    public JwtInfo generateToken(String userId) {
+    // id를 받아 엑세스토큰을 생성하는 메소드
+    public JwtInfo generateToken(String id) {
         Date now = new Date();
         // 권한 가져오기
         long nowMils = (new Date()).getTime();
 
-        // 엑세스 토큰 발급 (만료 기간 1시간)
-        String accessToken = Jwts.builder()
-                .setSubject(userId)
-                .setIssuedAt(now)
-                .setExpiration(new Date(nowMils + USER_ACCESS_TOKEN_EXPIRE_TIME))
-                .claim("auth", MemberRole.USER.getValue())
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-        System.out.println(MemberRole.USER);
+        // id의 길이로 관리자와 사용자 구분
+        if (id.length() <= 20) {
+            // 관리자
+            // Access Token 생성
+            String accessToken = Jwts.builder()
+                    .setSubject(id)
+                    .claim("auth", MemberRole.ADMIN.getValue())
+                    .setExpiration(new Date(nowMils + ADMIN_ACCESS_TOKEN_EXPIRE_TIME))
+                    .signWith(key, SignatureAlgorithm.HS256)
+                    .compact();
 
-        Date refreshExp = new Date(nowMils + USER_REFRESH_TOKEN_EXPIRE_TIME);
-        // 리프레시 토큰 발급 (만료 기간 7일)
-        String refreshToken = Jwts.builder()
-                .setSubject(userId)
-                .setExpiration(refreshExp)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
+            Date refreshExp = new Date(nowMils + ADMIN_REFRESH_TOKEN_EXPIRE_TIME);
+            // Refresh Token 생성
+            String refreshToken = Jwts.builder()
+                    .setExpiration(refreshExp)
+                    .signWith(key, SignatureAlgorithm.HS256)
+                    .compact();
 
-        return JwtInfo.builder()
-                .grantType("Bearer")
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .refreshIseAt(fromDate(now))
-                .refreshExpAt(fromDate(refreshExp))
-                .build();
+            return JwtInfo.builder()
+                    .grantType("Bearer")
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .refreshIseAt(fromDate(now))
+                    .refreshExpAt(fromDate(refreshExp))
+                    .build();
+        } else {
+            // 사용자
+            // 엑세스 토큰 발급 (만료 기간 1시간)
+            String accessToken = Jwts.builder()
+                    .setSubject(id)
+                    .setIssuedAt(now)
+                    .setExpiration(new Date(nowMils + USER_ACCESS_TOKEN_EXPIRE_TIME))
+                    .claim("auth", MemberRole.USER.getValue())
+                    .signWith(key, SignatureAlgorithm.HS256)
+                    .compact();
+            System.out.println(MemberRole.USER);
+
+            Date refreshExp = new Date(nowMils + USER_REFRESH_TOKEN_EXPIRE_TIME);
+            // 리프레시 토큰 발급 (만료 기간 7일)
+            String refreshToken = Jwts.builder()
+                    .setSubject(id)
+                    .setExpiration(refreshExp)
+                    .signWith(key, SignatureAlgorithm.HS256)
+                    .compact();
+
+            return JwtInfo.builder()
+                    .grantType("Bearer")
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .refreshIseAt(fromDate(now))
+                    .refreshExpAt(fromDate(refreshExp))
+                    .build();
+        }
+
     }
 
     // 토큰에서 인증정보를 추출하는 메소드
@@ -178,12 +178,6 @@ public class JwtProvider {
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
-    }
-
-    // JWT의 만료 시간을 반환하는 메소드
-    public Date getExpirationDateFromToken(String token) {
-        Claims claims = parseClaims(token);
-        return claims.getExpiration();
     }
 
     // refreshToken 검증 메서드

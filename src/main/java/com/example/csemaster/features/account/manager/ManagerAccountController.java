@@ -31,11 +31,14 @@ public class ManagerAccountController {
             description = "관리자 아이디, 비밀번호를 받아서 토큰 발급"
     )
     @PostMapping("/login")
-    public JwtInfo login(@RequestBody ManagerLoginDTO managerLoginDto) {
+    public ResponseEntity<?> login(@RequestBody ManagerLoginDTO managerLoginDto) {
         JwtInfo jwtInfo = managerAccountService.login(managerLoginDto);
 
-        log.info("로그인");
-        return jwtInfo;
+        if (jwtInfo == null) {
+            return ResponseEntity.badRequest().body("아이디나 비밀번호가 잘못됨");
+        }
+
+        return ResponseEntity.ok(jwtInfo);
     }
 
     // 관리자 로그아웃
