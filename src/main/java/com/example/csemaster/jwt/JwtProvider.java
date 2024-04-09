@@ -78,6 +78,7 @@ public class JwtProvider {
             String accessToken = Jwts.builder()
                     .setSubject(id)
                     .claim("auth", MemberRole.ADMIN.getValue())
+                    .setIssuedAt(now)
                     .setExpiration(new Date(nowMils + ADMIN_ACCESS_TOKEN_EXPIRE_TIME))
                     .signWith(key, SignatureAlgorithm.HS256)
                     .compact();
@@ -85,6 +86,7 @@ public class JwtProvider {
             Date refreshExp = new Date(nowMils + ADMIN_REFRESH_TOKEN_EXPIRE_TIME);
             // Refresh Token 생성
             String refreshToken = Jwts.builder()
+                    .setSubject(id)
                     .setExpiration(refreshExp)
                     .signWith(key, SignatureAlgorithm.HS256)
                     .compact();
@@ -127,7 +129,7 @@ public class JwtProvider {
 
     }
 
-    // 토큰에서 인증정보를 추출하는 메소드
+    // 액세스 토큰에서 인증정보를 추출하는 메소드
     public Authentication getAuthentication(String accessToken) {
         Claims claims = parseClaims(accessToken);
 
@@ -143,6 +145,12 @@ public class JwtProvider {
         // 클레임에서 userId(managerId), 권한 추출 후 인증 객체로 반환
         UserDetails principal = new User(claims.getSubject(), "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+    }
+
+    // 리프레시 토큰에서 인증 정보를 추출하는 메소드
+    public String getIdFromRefreshToken(String refreshToken) {
+        Claims claims = parseClaims(refreshToken);
+        return claims.getSubject();
     }
 
     // 토큰 정보를 검증하는 메서드
@@ -167,13 +175,13 @@ public class JwtProvider {
         return false;
     }
 
-    // access token 의 클레임 추출
-    private Claims parseClaims(String accessToken) {
+    // token 의 클레임 추출
+    private Claims parseClaims(String token) {
         try {
             return Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
-                    .parseClaimsJws(accessToken)
+                    .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();

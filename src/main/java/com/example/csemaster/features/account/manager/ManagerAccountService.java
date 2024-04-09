@@ -46,9 +46,11 @@ public class ManagerAccountService {
         // 1. managerLoginDto를 기반으로 객체 생성 및 검증
         Optional<ManagerEntity> manager = managerRepository.findById(managerLoginDto.getManagerId());
         if (manager.isEmpty()) {
+            log.error("존재하지 않는 ID");
             return null;
         }
         if (!managerLoginDto.getManagerPw().equals(manager.get().getManagerPw())) {
+            log.error("PW 불일치");
             return null;
         }
 
@@ -81,19 +83,25 @@ public class ManagerAccountService {
 
     @Transactional
     public JwtInfo refreshToken(String refreshToken) {
+        System.out.println(jwtProvider.validateRefreshToken(refreshToken));
         // 1. 리프레시 토큰 검증
         if (!jwtProvider.validateRefreshToken(refreshToken)) {
-            throw new RuntimeException("Invalid refresh token");
+            log.error("유효하지 않은 토큰");
+            return null;
         }
 
         // 2. 리프레시 토큰으로부터 사용자 정보 추출
-        Authentication authentication = jwtProvider.getAuthentication(refreshToken);
+        String managerId = jwtProvider.getIdFromRefreshToken(refreshToken);
+        if (managerId == null || managerId.isEmpty()) {
+            log.error("토큰으로부터 관리자 정보 추출 실패");
+            return null;
+        }
 
         // 3. 새로운 액세스 토큰과 리프레시 토큰 생성
-        JwtInfo newJwtInfo = jwtProvider.generateToken(authentication.getName());
+        JwtInfo newJwtInfo = jwtProvider.generateToken(managerId);
 
         // 4. 새로운 리프레시 토큰으로 RefreshTokenEntity 업데이트
-        ManagerRefreshTokenEntity managerRefreshTokenEntity = managerRefreshTokenRepository.findById(authentication.getName())
+        ManagerRefreshTokenEntity managerRefreshTokenEntity = managerRefreshTokenRepository.findById(managerId)
                 .orElseThrow(() -> new RuntimeException("Refresh token entity not found"));
 
         managerRefreshTokenEntity.setRefreshToken(newJwtInfo.getRefreshToken());

@@ -60,12 +60,13 @@ public class ManagerAccountController {
             description = "관리자의 리프레시 토큰을 추출하여 액세스 토큰 및 리프레시 토큰 재발급"
     )
     @PostMapping("/refresh")
-    public String refreshToken(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
         JwtInfo jwtInfo = managerAccountService.refreshToken(request.getHeader("Refresh-Token"));
 
-        response.setHeader("Authorization", "Bearer " + jwtInfo.getAccessToken());
-        response.setHeader("Refresh-Token", jwtInfo.getRefreshToken());
+        if (jwtInfo == null) {
+            return ResponseEntity.badRequest().body("유효하지 않은 토큰");
+        }
 
-        return "액세스 토큰 & 리프레시 토큰 재발급";
+        return ResponseEntity.ok(jwtInfo);
     }
 }
