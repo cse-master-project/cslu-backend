@@ -18,7 +18,7 @@ import java.util.List;
 @Tag(name = "QuizSubject", description = "카테고리 관련 기능")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/quiz/subject")
+@RequestMapping("/api/quiz/subject")
 public class QuizSubjectController {
 
     private final QuizSubjectService quizSubjectService;
