@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "QuizManageMent", description = "문제 관리 관련 기능<br> 0: 대기, 1: 승인, -1: 거절")
+@Tag(name = "QuizManagement", description = "문제 관리 관련 기능<br> 0: 대기, 1: 승인, -1: 거절")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/quiz")
