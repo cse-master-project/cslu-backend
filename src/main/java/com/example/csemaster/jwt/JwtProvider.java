@@ -145,6 +145,13 @@ public class JwtProvider {
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
+    // 토큰에서 id만 추출
+    public String getSubject(String refreshToken) {
+        Claims claims = parseClaims(refreshToken);
+
+        return claims.getSubject();
+    }
+
     // 토큰 정보를 검증하는 메서드
     public boolean validateToken(String token) {
         try {
