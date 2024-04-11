@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,7 +27,11 @@ public class UserQuizEntity {
     @Column(name = "permission_status")
     private Integer permissionStatus;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id_for_user_quiz")
     private UserEntity userId;
+
+    /*@ManyToOne
+    @JoinColumn(name = "quiz_id")
+    private QuizEntity quizzes;*/
 }

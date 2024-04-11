@@ -27,12 +27,21 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 // 엔드포인트별 권한 설정
-                .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/user/auth/google").permitAll()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/user/auth/google/login").permitAll()
+                        .requestMatchers("/api/user/auth/google/sign-up").permitAll()
+                        .requestMatchers("/api/user/auth/refresh").permitAll()
+                        .requestMatchers("/api/manager/login").permitAll()
+                        .requestMatchers("/api/manager/refresh").permitAll()
+
                         .requestMatchers("/api/manager/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasRole("USER")
-                        .anyRequest().permitAll())
+                        .requestMatchers("/api/quiz/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/management/**").hasRole("ADMIN")
+                        .requestMatchers("/v3/**", "/swagger-ui/**").permitAll()
+                        .anyRequest().denyAll())
 
                 // 인증과정에서 JWT 검증을 수행하는 기본 필터와 사용자 정의 필터 추가
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider),

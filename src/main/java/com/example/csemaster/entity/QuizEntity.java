@@ -35,4 +35,7 @@ public class QuizEntity {
 
     @Column(name = "has_image")
     private Boolean hasImage;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 }
