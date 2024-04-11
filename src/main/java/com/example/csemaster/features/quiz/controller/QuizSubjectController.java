@@ -18,7 +18,7 @@ import java.util.List;
 @Tag(name = "QuizSubject", description = "카테고리 관련 기능")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/quiz/subject")
+@RequestMapping("/api/quiz/subject")
 public class QuizSubjectController {
 
     private final QuizSubjectService quizSubjectService;
@@ -91,7 +91,7 @@ public class QuizSubjectController {
             description = "삭제할 서브 카테고리의 메인 카테고리와 서브 카테고리를 받아서 삭제"
     )
     @DeleteMapping("/detail")
-    public ResponseEntity<?> deleteDetailSubject(@RequestParam DetailSubjectDTO detailSubjectDTO) {
+    public ResponseEntity<?> deleteDetailSubject(@RequestBody DetailSubjectDTO detailSubjectDTO) {
         return quizSubjectService.deleteDetailSubject(detailSubjectDTO);
     }
 

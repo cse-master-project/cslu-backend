@@ -33,7 +33,9 @@ public class QuizReportService {
     }
 
     public List<QuizReportResponse> getAllReportForQuiz(Long quizId) {
-        return quizReportRepository.findByQuizId(quizId).stream().map(QuizReportMapper.INSTANCE::toQuizReportResponse)
+        return quizReportRepository.findByQuizId(quizId)
+                .stream()
+                .map(QuizReportMapper.INSTANCE::toQuizReportResponse)
                 .collect(Collectors.toList());
     }
 }
