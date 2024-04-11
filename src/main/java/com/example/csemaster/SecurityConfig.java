@@ -30,13 +30,16 @@ public class SecurityConfig {
 
                 // 엔드포인트별 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/user/auth/google").permitAll()
                         .requestMatchers("/api/user/auth/google/login").permitAll()
                         .requestMatchers("/api/user/auth/google/sign-up").permitAll()
+                        .requestMatchers("/api/user/auth/refresh").permitAll()
                         .requestMatchers("/api/manager/login").permitAll()
+                        .requestMatchers("/api/manager/refresh").permitAll()
+
                         .requestMatchers("/api/manager/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasRole("USER")
                         .requestMatchers("/api/quiz/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/management/**").hasRole("ADMIN")
                         .requestMatchers("/v3/**", "/swagger-ui/**").permitAll()
                         .anyRequest().denyAll())
 

@@ -16,7 +16,7 @@ public class UserRefreshTokenEntity {
     private String userId;
 
     @OneToOne
-    @JoinColumn(name = "user_id_for_r_t", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id_for_r_t", referencedColumnName = "user_id", insertable = false, updatable = false)
     private UserEntity user;
 
     @Column(name="user_refresh_token")

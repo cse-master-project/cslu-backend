@@ -12,7 +12,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "QuizCreate", description = "문제 생성 관련 기능")
 @RestController
@@ -28,10 +32,9 @@ public class QuizCreateController {
             description = "신고 사유를 받아서 문제를 신고"
     )
     @PostMapping("/report")
-    public ResponseEntity<?> quizReport(@RequestBody QuizReportRequest request) {
+    public ResponseEntity<?> quizReport(@Validated @RequestBody QuizReportRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
-
         return quizSolverService.saveQuizReport(userId, request.getQuizId(), request.getContent());
     }
 

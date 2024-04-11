@@ -150,6 +150,7 @@ public class JwtProvider {
     // 리프레시 토큰에서 인증 정보를 추출하는 메소드
     public String getIdFromRefreshToken(String refreshToken) {
         Claims claims = parseClaims(refreshToken);
+
         return claims.getSubject();
     }
 
