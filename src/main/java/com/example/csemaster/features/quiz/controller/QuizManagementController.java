@@ -1,6 +1,5 @@
 package com.example.csemaster.features.quiz.controller;
 
-import com.example.csemaster.dto.QuizRejectDTO;
 import com.example.csemaster.dto.UnApprovalQuizDTO;
 import com.example.csemaster.features.quiz.service.ApprovalQuizService;
 import com.example.csemaster.features.quiz.service.QuizManagerService;
@@ -48,9 +47,8 @@ public class QuizManagementController {
             description = "문제 아이디를 받아서 문제를 반려(-1)로 처리 후 반려 사유 저장"
     )
     @PutMapping("/{id}/reject")
-    public ResponseEntity<?> userQuizReject(@PathVariable("id") Long quizId, @RequestBody QuizRejectDTO quizRejectDTO) {
-        quizRejectDTO.setQuizId(quizId);
-        return approvalQuizService.setQuizRejection(quizRejectDTO, -1);
+    public ResponseEntity<?> userQuizReject(@PathVariable("id") Long quizId, @RequestBody String reason) {
+        return approvalQuizService.setQuizRejection(quizId, reason, -1);
     }
 
     // 문제 수정
