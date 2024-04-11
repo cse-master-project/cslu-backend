@@ -9,7 +9,9 @@ import com.example.csemaster.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -124,5 +126,31 @@ public class UserAccountService {
         activeUserRepository.delete(activeUser);
 
         return ResponseEntity.ok().build();
+    }
+
+    @Transactional
+    public ResponseEntity<?> refreshToken(String refreshToken) {
+        // 1. 리프레시 토큰 검증
+        if (jwtProvider.validateRefreshToken(refreshToken)) {
+            // 2. 리프레시 토큰으로부터 사용자 정보 추출
+            String userId = jwtProvider.getSubject(refreshToken);
+            // 유저인지 매니저인지 구분
+            if (userId.length() == 36) {
+                // 3. 새로운 액세스 토큰과 리프레시 토큰 생성
+                JwtInfo newJwtInfo = jwtProvider.generateToken(userId);
+
+                return refreshTokenRepository.findById(userId)
+                        .map(token -> {
+                            token.setRefreshToken(newJwtInfo.getRefreshToken());
+                            token.setIssueAt(newJwtInfo.getRefreshIseAt());
+                            token.setExpAt(newJwtInfo.getRefreshExpAt());
+                            return ResponseEntity.ok().body(newJwtInfo);
+                        }).orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid User Type");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+        }
     }
 }

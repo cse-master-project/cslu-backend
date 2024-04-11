@@ -74,6 +74,15 @@ public class UserAccountController {
         }
     }
 
+    @Operation(
+            summary = "사용자 토큰 재발급",
+            description = "사용자의 액세스 토큰과 리프레시 토큰 재발급"
+    )
+    @PostMapping("/auth/refresh")
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+        return userAccountService.refreshToken(request.getHeader("Refresh-Token"));
+    }
+
     // 사용자 로그아웃
     @Operation(
             summary = "사용자 로그아웃",
