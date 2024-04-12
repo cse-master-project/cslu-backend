@@ -33,10 +33,10 @@ import java.util.stream.Collectors;
 public class JwtProvider {
     private final Key key;
 
-    @Value("${THIRTY_MINUTES}")
+    @Value("${ADMIN_ACCESS_TOKEN_EXPIRE_TIME}")
     private long ADMIN_ACCESS_TOKEN_EXPIRE_TIME; // 30분
 
-    @Value("${ONE_HOUR}")
+    @Value("${ADMIN_REFRESH_TOKEN_EXPIRE_TIME}")
     private long ADMIN_REFRESH_TOKEN_EXPIRE_TIME; // 1시간
 
     @Value("${ACCESS_TOKEN_EXPIRE_TIME}")
