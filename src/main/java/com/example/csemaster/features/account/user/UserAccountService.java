@@ -133,7 +133,7 @@ public class UserAccountService {
         // 1. 리프레시 토큰 검증
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             // 2. 리프레시 토큰으로부터 사용자 정보 추출
-            String userId = jwtProvider.getSubject(refreshToken);
+            String userId = jwtProvider.getIdFromRefreshToken(refreshToken);
             // 유저인지 매니저인지 구분
             if (userId.length() == 36) {
                 // 3. 새로운 액세스 토큰과 리프레시 토큰 생성
