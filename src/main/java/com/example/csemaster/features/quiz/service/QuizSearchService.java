@@ -3,6 +3,7 @@ package com.example.csemaster.features.quiz.service;
 import com.example.csemaster.dto.response.QuizRejectResponse;
 import com.example.csemaster.dto.response.UserQuizResponse;
 import com.example.csemaster.entity.ActiveQuizEntity;
+import com.example.csemaster.entity.QuizEntity;
 import com.example.csemaster.entity.UserEntity;
 import com.example.csemaster.repository.ActiveQuizRepository;
 import com.example.csemaster.repository.QuizRepository;
@@ -50,4 +51,6 @@ public class QuizSearchService {
     public List<QuizRejectResponse> getQuizReject(Long quizId) {
         return quizRepository.getQuizReject(quizId);
     }
+
+    public Optional<QuizEntity> getQuizById(Long quizId) { return quizRepository.findByQuizId(quizId); }
 }
