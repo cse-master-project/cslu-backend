@@ -1,8 +1,10 @@
 package com.example.csemaster.features.account.user;
 
+import com.example.csemaster.dto.NickNameDTO;
 import com.example.csemaster.dto.response.QuizStatsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -37,11 +39,11 @@ public class UserProfileController {
             description = "사용자의 (새) 닉네임을 받아서 설정"
     )
     @PutMapping("/info/nickname")
-    private ResponseEntity<?> setUserNickname(@RequestBody String nickname) {
+    private ResponseEntity<?> setUserNickname(@RequestBody @Valid NickNameDTO nickNameDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
-        return userProfileService.setUserNickname(userId, nickname);
+        return userProfileService.setUserNickname(userId, nickNameDTO);
     }
 
     // 사용자 문제 풀이 통계

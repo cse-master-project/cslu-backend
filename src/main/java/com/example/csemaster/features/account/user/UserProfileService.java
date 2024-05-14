@@ -1,5 +1,6 @@
 package com.example.csemaster.features.account.user;
 
+import com.example.csemaster.dto.NickNameDTO;
 import com.example.csemaster.dto.QuizResultDTO;
 import com.example.csemaster.dto.response.QuizStatsResponse;
 import com.example.csemaster.mapper.ActiveUserMapper;
@@ -28,11 +29,11 @@ public class UserProfileService {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    public ResponseEntity<?> setUserNickname(String userId, String nickname) {
+    public ResponseEntity<?> setUserNickname(String userId, NickNameDTO nickNameDTO) {
         try {
             return activeUserRepository.findById(userId)
                     .map(activeUser -> {
-                        activeUser.setNickname(nickname);
+                        activeUser.setNickname(nickNameDTO.getNickname());
                         activeUserRepository.save(activeUser);
 
                         return ResponseEntity.ok().build();
