@@ -50,7 +50,7 @@ public class QuizManagerService {
         }
 
         // 수정한 jsonContent 형식 확인
-        boolean checkNewJsonContent = quizCreateService.isValidJsonContent(newJsonContent);
+        boolean checkNewJsonContent = quizCreateService.isValidJsonContent(quiz.get().getQuizType(), newJsonContent);
         if (!checkNewJsonContent) {
             throw new RuntimeException("Incorrect jsonContent");
         }

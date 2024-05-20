@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class NickNameDTO {
+public class NicknameDTO {
     @NotBlank
     String nickname;
 }
