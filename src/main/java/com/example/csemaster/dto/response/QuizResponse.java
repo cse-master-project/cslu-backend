@@ -14,6 +14,7 @@ public class QuizResponse {
 
     private String subject;
     private String detailSubject;
+    private Integer quizType;
     // private double correctRate;
     private String jsonContent;
     private Boolean hasImage;

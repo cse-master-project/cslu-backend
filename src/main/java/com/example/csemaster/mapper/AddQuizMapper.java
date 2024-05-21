@@ -12,6 +12,7 @@ public interface AddQuizMapper {
     @Mapping(target = "quizId", ignore = true)
     @Mapping(target = "subject", source = "quizDTO.subject")
     @Mapping(target = "detailSubject", source = "quizDTO.detailSubject")
+    @Mapping(target = "quizType", source = "quizDTO.quizType")
     @Mapping(target = "correctRate", ignore = true)
     @Mapping(target = "jsonContent", source = "quizDTO.jsonContent")
     @Mapping(target = "createAt", expression = "java(java.time.LocalDateTime.now())")
