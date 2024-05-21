@@ -129,17 +129,17 @@ public class QuizCreateService {
         // subject, detailSubject 확인
         Optional<SubjectEntity> subject = quizSubjectRepository.findBySubject(quizDTO.getSubject());
         if (subject.isEmpty()) {
-            throw new RuntimeException("subject isn't present.");
+            throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
         }
 
         Optional<DetailSubjectEntity> detailSubject = quizDetailSubjectRepository.findBySubjectIdAndDetailSubject(subject.get().getSubjectId(), quizDTO.getDetailSubject());
         if (detailSubject.isEmpty()) {
-            throw new RuntimeException("detailSubject isn't present.");
+            throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
         }
 
         // jsonContent 형식 검사
         if (!isValidJsonContent(quizDTO.getQuizType(), quizDTO.getJsonContent())) {
-            throw new RuntimeException("Incorrect jsonContent");
+            throw new CustomException(ExceptionEnum.INCORRECT_QUIZ_CONTENT);
         }
 
         // Quiz 테이블에 추가
@@ -154,14 +154,15 @@ public class QuizCreateService {
     public Boolean addDefaultQuiz(Long quizId, String managerId) {
         // managerId를 사용하여 ManagerEntity 조회
         Optional<ManagerEntity> managerEntityOptional = managerRepository.findById(managerId);
-        if (!managerEntityOptional.isPresent()) {
-            throw new RuntimeException("Manager not found with id: " + managerId);
+        if (managerEntityOptional.isEmpty()) {
+            throw new CustomException(ExceptionEnum.INVALID_IDENTIFIER);
         }
 
         // quizId가 존재하는지 확인
         Optional<QuizEntity> quizEntity = quizRepository.findByQuizId(quizId);
-        if (!quizEntity.isPresent()) {
-            throw new RuntimeException("Incorrect quizId");
+        if (quizEntity.isEmpty()) {
+            // 무결설 문제라서 500 반환
+            throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
         }
 
         // Default Quiz 테이블에 추가
@@ -178,14 +179,14 @@ public class QuizCreateService {
     public Boolean addUserQuiz(Long quizId, String userId) {
         // userId를 사용하여 UserEntity 조회
         Optional<UserEntity> userEntity = userRepository.findById(userId);
-        if (!userEntity.isPresent()) {
-            throw new RuntimeException("Manager not found with id: " + quizId);
+        if (userEntity.isEmpty()) {
+            throw new CustomException(ExceptionEnum.INVALID_IDENTIFIER);
         }
 
         // quizId가 존재하는지 확인
         Optional<QuizEntity> quizEntity = quizRepository.findByQuizId(quizId);
-        if (!quizEntity.isPresent()) {
-            throw new RuntimeException("Incorrect quizId");
+        if (quizEntity.isEmpty()) {
+            throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
         }
 
         // User Quiz 테이블에 추가
