@@ -2,9 +2,7 @@ package com.example.csemaster.features.quiz.service;
 
 import com.example.csemaster.dto.response.QuizRejectResponse;
 import com.example.csemaster.dto.response.UserQuizResponse;
-import com.example.csemaster.entity.ActiveQuizEntity;
-import com.example.csemaster.entity.QuizEntity;
-import com.example.csemaster.entity.UserEntity;
+import com.example.csemaster.entity.*;
 import com.example.csemaster.repository.ActiveQuizRepository;
 import com.example.csemaster.repository.QuizRepository;
 import com.example.csemaster.repository.UserRepository;
@@ -26,31 +24,57 @@ public class QuizSearchService {
     private final QuizRepository quizRepository;
 
     public Page<ActiveQuizEntity> getQuiz(Pageable pageable) {
-        return activeQuizRepository.findAllBy(pageable);
+        try {
+            return activeQuizRepository.findAllBy(pageable);
+        } catch (Exception e) {
+            throw new CustomException(ExceptionEnum.RUNTIME_EXCEPTION);
+        }
     }
 
     public Page<ActiveQuizEntity> getUserQuiz(Pageable pageable) {
-        return activeQuizRepository.findAllUserQuiz(pageable);
+        try {
+            return activeQuizRepository.findAllUserQuiz(pageable);
+        } catch (CustomException e) {
+            throw new CustomException(ExceptionEnum.RUNTIME_EXCEPTION);
+        }
     }
 
     public Page<ActiveQuizEntity> getDefaultQuiz(Pageable pageable) {
-        return activeQuizRepository.findAllDefaultQuiz(pageable);
+        try {
+            return activeQuizRepository.findAllDefaultQuiz(pageable);
+        } catch (CustomException e) {
+            throw new CustomException(ExceptionEnum.RUNTIME_EXCEPTION);
+        }
     }
 
     public List<UserQuizResponse> getMyQuiz(String userId) {
-        Optional<UserEntity> user = userRepository.findById(userId);
+        try {
+            Optional<UserEntity> user = userRepository.findById(userId);
 
-        // userId가 존재하는지 확인
-        if (user.isEmpty()) {
-            throw new RuntimeException("User not found with the provided ID.");
+            // userId가 존재하는지 확인
+            if (user.isEmpty()) {
+                throw new CustomException(ExceptionEnum.INVALID_IDENTIFIER);
+            }
+
+            return quizRepository.getUserQuiz(userId);
+        } catch (CustomException e) {
+            throw new CustomException(ExceptionEnum.RUNTIME_EXCEPTION);
         }
-
-        return quizRepository.getUserQuiz(userId);
     }
 
     public List<QuizRejectResponse> getQuizReject(Long quizId) {
-        return quizRepository.getQuizReject(quizId);
+        try {
+            return quizRepository.getQuizReject(quizId);
+        } catch (CustomException e) {
+            throw new CustomException(ExceptionEnum.RUNTIME_EXCEPTION);
+        }
     }
 
-    public Optional<QuizEntity> getQuizById(Long quizId) { return quizRepository.findByQuizId(quizId); }
+    public Optional<QuizEntity> getQuizById(Long quizId) {
+        try {
+            return quizRepository.findByQuizId(quizId);
+        } catch (CustomException e) {
+            throw new CustomException(ExceptionEnum.RUNTIME_EXCEPTION);
+        }
+    }
 }

@@ -12,6 +12,7 @@ public enum ExceptionEnum {
     RUNTIME_EXCEPTION(HttpStatus.BAD_REQUEST, "runtime error"),
     ACCESS_DENIED_EXCEPTION(HttpStatus.UNAUTHORIZED, "access denied"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "server error"),
+
     // JWT Exception
     INVALID_JWT(HttpStatus.UNAUTHORIZED, "Invalid token"),
     EXPIRED_JWT(HttpStatus.UNAUTHORIZED, "Expired token"),
@@ -22,9 +23,13 @@ public enum ExceptionEnum {
     // Custom Exception
     NOT_FOUND_SUBJECT(HttpStatus.NOT_FOUND, "not found subject","It's a subject that's not on the list"),
     NOT_FOUND_DETAIL_SUBJECT(HttpStatus.NOT_FOUND, "not found detail subject", "It's a detail subject that's not on the list"),
-    INCORRECT_QUIZ_CONTENT(HttpStatus.BAD_REQUEST, "incorrect quiz content", "Type condition of json content in quiz not met"),
+    DUPLICATE_SUBJECT(HttpStatus.BAD_REQUEST, "existing subject", "It's a subject that already exists"),
+    DUPLICATE_DETAIL_SUBJECT(HttpStatus.BAD_REQUEST, "existing detail subject", "It's a detail subject that already exists"),
 
-    INVALID_IDENTIFIER(HttpStatus.UNAUTHORIZED, "invalid identifier", "Requestor's identifier is invalid");
+    NOT_FOUND_ID(HttpStatus.NOT_FOUND, "not found ID", "It's a ID that does not exist in the database"),
+    INCORRECT_QUIZ_CONTENT(HttpStatus.BAD_REQUEST, "incorrect quiz content", "Type condition of json content in quiz not met"),
+    INVALID_IDENTIFIER(HttpStatus.UNAUTHORIZED, "invalid identifier", "Requestor's identifier is invalid"),
+    NO_CHANGE(HttpStatus.BAD_REQUEST, "no changes", "There is no change"),;
 
 
     private final HttpStatus status;

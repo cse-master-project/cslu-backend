@@ -161,7 +161,7 @@ public class QuizCreateService {
         // quizId가 존재하는지 확인
         Optional<QuizEntity> quizEntity = quizRepository.findByQuizId(quizId);
         if (quizEntity.isEmpty()) {
-            // 무결설 문제라서 500 반환
+            // 무결성 문제라서 500 반환
             throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
         }
 
