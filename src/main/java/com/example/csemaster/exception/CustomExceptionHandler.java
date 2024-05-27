@@ -1,8 +1,6 @@
-package com.example.csemaster;
+package com.example.csemaster.exception;
 
-import com.example.csemaster.entity.CustomException;
 import com.example.csemaster.entity.ExceptionEntity;
-import com.example.csemaster.entity.ExceptionEnum;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

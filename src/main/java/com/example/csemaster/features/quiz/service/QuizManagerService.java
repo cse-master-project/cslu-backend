@@ -1,7 +1,7 @@
 package com.example.csemaster.features.quiz.service;
 
-import com.example.csemaster.entity.CustomException;
-import com.example.csemaster.entity.ExceptionEnum;
+import com.example.csemaster.exception.CustomException;
+import com.example.csemaster.exception.ExceptionEnum;
 import com.example.csemaster.entity.QuizEntity;
 import com.example.csemaster.repository.QuizRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,53 +23,46 @@ public class QuizManagerService {
     @Transactional
     public ResponseEntity<?> deleteQuiz(Long quizId) {
         Optional<QuizEntity> quiz = quizRepository.findByQuizId(quizId);
-        try {
-            // 존재하는 quiz인지 확인
-            if (quiz.isEmpty()) {
-                throw new CustomException(ExceptionEnum.NOT_FOUND_ID);
-            }
 
-            quiz.get().setIsDeleted(true);
-            quizRepository.save(quiz.get());
-
-            log.info("Delete Successfully");
-
-            return ResponseEntity.ok().body("Delete Successfully");
-        } catch (Exception e) {
-            throw new CustomException(ExceptionEnum.RUNTIME_EXCEPTION);
+        // 존재하는 quiz인지 확인
+        if (quiz.isEmpty()) {
+            throw new CustomException(ExceptionEnum.NOT_FOUND_ID);
         }
+
+        quiz.get().setIsDeleted(true);
+        quizRepository.save(quiz.get());
+
+        log.info("Delete Successfully");
+
+        return ResponseEntity.ok().body("Delete Successfully");
     }
 
     public ResponseEntity<?> updateQuiz(Long quizId, String newJsonContent) {
-        try {
-            Optional<QuizEntity> quiz = quizRepository.findByQuizId(quizId);
+        Optional<QuizEntity> quiz = quizRepository.findByQuizId(quizId);
 
-            // 존재하는 quizId인지 확인
-            if (quiz.isEmpty()) {
-                throw new CustomException(ExceptionEnum.NOT_FOUND_ID);
-            }
-
-            // 수정 전후가 같은지 확인
-            String jsonContent = quiz.get().getJsonContent();
-            if (newJsonContent.equals(jsonContent)) {
-                throw new CustomException(ExceptionEnum.NO_CHANGE);
-            }
-
-            // 수정한 jsonContent 형식 확인
-            boolean checkNewJsonContent = quizCreateService.isValidJsonContent(quiz.get().getQuizType(), newJsonContent);
-            if (!checkNewJsonContent) {
-                throw new CustomException(ExceptionEnum.INCORRECT_QUIZ_CONTENT);
-            }
-
-            // 수정한 jsonContent 저장
-            quiz.get().setJsonContent(newJsonContent);
-            quizRepository.save(quiz.get());
-
-            log.info("jsonContent 수정 완료");
-
-            return ResponseEntity.ok().body("Update Successfully");
-        } catch (Exception e) {
-            throw new CustomException(ExceptionEnum.RUNTIME_EXCEPTION);
+        // 존재하는 quizId인지 확인
+        if (quiz.isEmpty()) {
+            throw new CustomException(ExceptionEnum.NOT_FOUND_ID);
         }
+
+        // 수정 전후가 같은지 확인
+        String jsonContent = quiz.get().getJsonContent();
+        if (newJsonContent.equals(jsonContent)) {
+            throw new CustomException(ExceptionEnum.NO_CHANGE);
+        }
+
+        // 수정한 jsonContent 형식 확인
+        boolean checkNewJsonContent = quizCreateService.isValidJsonContent(quiz.get().getQuizType(), newJsonContent);
+        if (!checkNewJsonContent) {
+            throw new CustomException(ExceptionEnum.INCORRECT_QUIZ_CONTENT);
+        }
+
+        // 수정한 jsonContent 저장
+        quiz.get().setJsonContent(newJsonContent);
+        quizRepository.save(quiz.get());
+
+        log.info("jsonContent 수정 완료");
+
+        return ResponseEntity.ok().body("Update Successfully");
     }
 }

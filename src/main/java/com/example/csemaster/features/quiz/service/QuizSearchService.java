@@ -3,6 +3,8 @@ package com.example.csemaster.features.quiz.service;
 import com.example.csemaster.dto.response.QuizRejectResponse;
 import com.example.csemaster.dto.response.UserQuizResponse;
 import com.example.csemaster.entity.*;
+import com.example.csemaster.exception.CustomException;
+import com.example.csemaster.exception.ExceptionEnum;
 import com.example.csemaster.repository.ActiveQuizRepository;
 import com.example.csemaster.repository.QuizRepository;
 import com.example.csemaster.repository.UserRepository;

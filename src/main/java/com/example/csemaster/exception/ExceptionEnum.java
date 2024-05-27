@@ -1,4 +1,4 @@
-package com.example.csemaster.entity;
+package com.example.csemaster.exception;
 
 
 import lombok.Getter;
@@ -29,7 +29,11 @@ public enum ExceptionEnum {
     NOT_FOUND_ID(HttpStatus.NOT_FOUND, "not found ID", "It's a ID that does not exist in the database"),
     INCORRECT_QUIZ_CONTENT(HttpStatus.BAD_REQUEST, "incorrect quiz content", "Type condition of json content in quiz not met"),
     INVALID_IDENTIFIER(HttpStatus.UNAUTHORIZED, "invalid identifier", "Requestor's identifier is invalid"),
-    NO_CHANGE(HttpStatus.BAD_REQUEST, "no changes", "There is no change"),;
+    NO_CHANGE(HttpStatus.BAD_REQUEST, "no changes", "There is no change"),
+
+    INVALID_JSON(HttpStatus.BAD_REQUEST, "invalid json", "Json parsing failed"),
+    NULL_VALUE(HttpStatus.BAD_REQUEST, "null value", "There is a value with a null"),
+    UNSUPPORTED_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "unsupported file extension", "This extension is not supported");
 
 
     private final HttpStatus status;

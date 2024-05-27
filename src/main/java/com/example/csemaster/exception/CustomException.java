@@ -1,4 +1,4 @@
-package com.example.csemaster.entity;
+package com.example.csemaster.exception;
 
 import lombok.Getter;
 
