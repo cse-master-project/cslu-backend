@@ -13,8 +13,8 @@ public interface ActiveQuizRepository extends JpaRepository<ActiveQuizEntity, Lo
     @Query("SELECT q " +
             "FROM ActiveQuizEntity q " +
             "LEFT OUTER JOIN QuizLogEntity l ON q.quizId = l.quizId AND l.userId = :userId " +
-            "WHERE q.subject = :subject AND q.detailSubject = :detailSubject AND l.quizId IS NULL ")
-    List<ActiveQuizEntity> getAnOpenQuiz(@Param("userId") String userId, @Param("subject") String subject, @Param("detailSubject") String detailSubject);
+            "WHERE q.subject = :subject AND q.detailSubject IN :detailSubject AND l.quizId IS NULL ")
+    List<ActiveQuizEntity> getAnOpenQuiz(@Param("userId") String userId, @Param("subject") String subject, @Param("detailSubject") List<String> detailSubject);
 
     Page<ActiveQuizEntity> findAllBy(Pageable pageable);
 

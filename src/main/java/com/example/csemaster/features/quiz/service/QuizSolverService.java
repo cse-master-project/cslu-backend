@@ -1,13 +1,11 @@
 package com.example.csemaster.features.quiz.service;
 
 import com.example.csemaster.dto.response.QuizResponse;
-import com.example.csemaster.entity.ActiveQuizEntity;
-import com.example.csemaster.entity.QuizLogEntity;
-import com.example.csemaster.entity.QuizReportEntity;
+import com.example.csemaster.entity.*;
+import com.example.csemaster.exception.CustomException;
+import com.example.csemaster.exception.ExceptionEnum;
 import com.example.csemaster.mapper.QuizMapper;
-import com.example.csemaster.repository.ActiveQuizRepository;
-import com.example.csemaster.repository.QuizLogRepository;
-import com.example.csemaster.repository.QuizReportRepository;
+import com.example.csemaster.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,11 +25,32 @@ public class QuizSolverService {
     private final ActiveQuizRepository activeQuizRepository;
     private final QuizLogRepository quizLogRepository;
     private final QuizReportRepository quizReportRepository;
+    private final QuizSubjectRepository quizSubjectRepository;
 
-    public QuizResponse getQuiz(String userId, String subject, String detailSubject) {
+    public QuizResponse getQuiz(String userId, String subject, List<String> detailSubject) {
+        // 유저가 요청한 subject 와 detailSubject 가 유효한지 검증
+        Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subject);
+        if (subjectEntity.isPresent()) {
+            List<String> dbDetailSubject = subjectEntity.get().getDetailSubjects().stream().map(DetailSubjectEntity::getDetailSubject).toList();
+
+            // 합집합 후에도 db에 있는 내용과 같다면 요소의 개수가 같음
+            // 개수가 서로 다르다면 유효하지 않은 detailSubject 가 있다는 의미
+            Set<String> set = new HashSet<>(detailSubject);
+            set.addAll(dbDetailSubject);
+
+            if (set.size() != dbDetailSubject.size()) throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
+        } else {
+            throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
+        }
+
+        // 유저가 풀지 않은 문제이면서 지정한 과목과 목차에 해당하는 문제를 한 개 제공
         List<ActiveQuizEntity> quiz = activeQuizRepository.getAnOpenQuiz(userId, subject, detailSubject);
-        int randomIndex = (int)(Math.random() * quiz.size());
-        return QuizMapper.INSTANCE.entityToResponse(quiz.get(randomIndex));
+        if (!quiz.isEmpty()) {
+            int randomIndex = (int)(Math.random() * quiz.size());
+            return QuizMapper.INSTANCE.entityToResponse(quiz.get(randomIndex));
+        } else {
+            return new QuizResponse();
+        }
     }
 
     public ResponseEntity<?> saveQuizResult(String userId, Long quizId, Boolean isCorrect) {

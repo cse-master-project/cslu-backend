@@ -23,14 +23,14 @@ public class CustomExceptionHandler {
                         .errorDescription(e.getError().getDescription())
                         .build());
     }
-    @ExceptionHandler({RuntimeException.class})
-    public ResponseEntity<ExceptionEntity> exceptionHandler(HttpServletRequest request, final RuntimeException e) {
-        log.error(e.getMessage());
-        return ResponseEntity
-                .status(ExceptionEnum.RUNTIME_EXCEPTION.getStatus())
-                .body(ExceptionEntity.builder()
-                        .errorType(ExceptionEnum.RUNTIME_EXCEPTION.getError())
-                        .errorDescription(e.getMessage())
-                        .build());
-    }
+//    @ExceptionHandler({RuntimeException.class})
+//    public ResponseEntity<ExceptionEntity> exceptionHandler(HttpServletRequest request, final RuntimeException e) {
+//        log.error(e.getMessage());
+//        return ResponseEntity
+//                .status(ExceptionEnum.RUNTIME_EXCEPTION.getStatus())
+//                .body(ExceptionEntity.builder()
+//                        .errorType(ExceptionEnum.RUNTIME_EXCEPTION.getError())
+//                        .errorDescription(e.getMessage())
+//                        .build());
+//    }
 }
