@@ -33,8 +33,9 @@ public enum ExceptionEnum {
 
     INVALID_JSON(HttpStatus.BAD_REQUEST, "invalid json", "Json parsing failed"),
     NULL_VALUE(HttpStatus.BAD_REQUEST, "null value", "There is a value with a null"),
-    UNSUPPORTED_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "unsupported file extension", "This extension is not supported");
+    UNSUPPORTED_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "unsupported file extension", "This extension is not supported"),
 
+    ARGS_NOT_VALID(HttpStatus.BAD_REQUEST, "method argument not valid", "Input value is not valid");
 
     private final HttpStatus status;
     private final String error;
