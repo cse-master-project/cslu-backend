@@ -215,6 +215,7 @@ public class QuizCreateService {
     }
 
     private String getFileExtension(String[] strings, Long quizId) {
+        System.out.println(strings[0].toLowerCase());
         if (strings[0].toLowerCase().contains("png")) {
             return quizId.toString() + ".png";
         } else if (strings[0].toLowerCase().contains("jpeg") || strings[0].toLowerCase().contains("jpg")) {
@@ -229,7 +230,7 @@ public class QuizCreateService {
             String[] strings = base64String.split(",");
             String filename = getFileExtension(strings, quizId);
 
-            byte[] decodedBytes = Base64.getDecoder().decode(base64String);
+            byte[] decodedBytes = Base64.getDecoder().decode(strings[1]);
 
             FileOutputStream fos = new FileOutputStream(filename);
             fos.write(decodedBytes);

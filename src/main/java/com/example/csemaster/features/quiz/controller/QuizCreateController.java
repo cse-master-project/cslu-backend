@@ -73,7 +73,6 @@ public class QuizCreateController {
     public void uploadImage(@RequestBody QuizImageRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String id = authentication.getName();
-        System.out.println(id);
 
         // 아이디의 길이로 유저, 매니저 구분
         if (id.length() <= 20) {

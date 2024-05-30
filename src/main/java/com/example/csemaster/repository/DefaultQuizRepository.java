@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface DefaultQuizRepository extends JpaRepository<DefaultQuizEntity, Long> {
     @Query("SELECT q FROM DefaultQuizEntity q " +
-            "WHERE q.defaultQuizId = :quizId AND q.managerId = :managerId")
+            "WHERE q.defaultQuizId = :quizId AND q.managerId.managerId = :managerId")
     Optional<DefaultQuizEntity> findByQuizIdAndManagerId(Long quizId, String managerId);
 }
