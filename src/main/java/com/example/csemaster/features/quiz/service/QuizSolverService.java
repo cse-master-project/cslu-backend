@@ -7,6 +7,7 @@ import com.example.csemaster.exception.ExceptionEnum;
 import com.example.csemaster.mapper.QuizMapper;
 import com.example.csemaster.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class QuizSolverService {
     private final ActiveQuizRepository activeQuizRepository;
@@ -95,19 +97,19 @@ public class QuizSolverService {
 
     public ResponseEntity<?> getQuizImage(Long quizId) {
         try {
-            BufferedImage image = ImageIO.read(new File(String.valueOf(quizId)));
+            BufferedImage image = ImageIO.read(new File("/quiz-img/", quizId +".jpg"));
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-            // 확장자를 모르기 때문에 무조건 안전한 png 로 사용
-            ImageIO.write(image, "png", baos);
+            ImageIO.write(image, "jpg", baos);
             byte[] imageData = baos.toByteArray();
 
             String base64Image = Base64.getEncoder().encodeToString(imageData);
 
             return ResponseEntity.ok().body(base64Image);
         } catch (IOException e) {
-            return ResponseEntity.badRequest().build();
+            log.error(e.toString());
+            throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
         }
     }
 }

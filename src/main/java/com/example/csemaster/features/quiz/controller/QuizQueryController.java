@@ -90,7 +90,7 @@ public class QuizQueryController {
             description = "문제 아이디를 받아서 해당하는 문제의 이미지를 조회"
     )
     @GetMapping("/{quizId}/image")
-    public ResponseEntity<?> getQuizImage(@PathVariable Long quizId) {
+    public ResponseEntity<?> getQuizImage(@PathVariable("quizId") Long quizId) {
         return quizSolverService.getQuizImage(quizId);
     }
 

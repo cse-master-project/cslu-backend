@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
@@ -228,7 +229,12 @@ public class QuizCreateService {
     private void saveImage(Long quizId, String base64String) {
         try {
             String[] strings = base64String.split(",");
-            String filename = getFileExtension(strings, quizId);
+            String filename = quizId + ".jpg";  // 무조건 jpg 로 저장
+
+            File directory = new File("quiz-img");
+            if (!directory.exists()) {
+                directory.mkdirs(); // 폴더가 존재하지 않는다면 생성
+            }
 
             byte[] decodedBytes = Base64.getDecoder().decode(strings[1]);
 

@@ -39,9 +39,9 @@ public class CustomExceptionHandler {
     public ResponseEntity<ExceptionEntity> exceptionHandler(HttpServletRequest request, final MethodArgumentNotValidException e) {
         log.error(e.getMessage());
         return ResponseEntity
-                .status(ExceptionEnum.RUNTIME_EXCEPTION.getStatus())
+                .status(ExceptionEnum.ARGS_NOT_VALID.getStatus())
                 .body(ExceptionEntity.builder()
-                        .errorType(ExceptionEnum.RUNTIME_EXCEPTION.getError())
+                        .errorType(ExceptionEnum.ARGS_NOT_VALID.getError())
                         .errorDescription(e.getMessage())
                         .build());
     }
