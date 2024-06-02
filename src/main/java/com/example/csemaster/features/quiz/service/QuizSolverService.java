@@ -51,7 +51,7 @@ public class QuizSolverService {
             int randomIndex = (int)(Math.random() * quiz.size());
             return QuizMapper.INSTANCE.entityToResponse(quiz.get(randomIndex));
         } else {
-            return new QuizResponse();
+            throw new CustomException(ExceptionEnum.DONE_QUIZ);
         }
     }
 
