@@ -45,6 +45,7 @@ public class QuizSearchService {
         try {
             return activeQuizRepository.findAllDefaultQuiz(pageable);
         } catch (CustomException e) {
+            log.error(e.getMessage());
             throw new CustomException(ExceptionEnum.RUNTIME_EXCEPTION);
         }
     }
