@@ -30,8 +30,4 @@ public class UserQuizEntity {
     @ManyToOne
     @JoinColumn(name = "user_id_for_user_quiz")
     private UserEntity userId;
-
-    /*@ManyToOne
-    @JoinColumn(name = "quiz_id")
-    private QuizEntity quizzes;*/
 }

@@ -24,6 +24,9 @@ public class ActiveQuizEntity {
     @Column(name = "detail_subject")
     private String detailSubject;
 
+    @Column(name = "quiz_type")
+    private Integer quizType;
+
     @Column(name = "quiz_correct_rate")
     private double correctRate;
 

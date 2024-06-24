@@ -12,6 +12,7 @@ public class UnApprovalQuizDTO {
     private Long quizId;
     private String subject;
     private String detailSubject;
+    private Integer quizType;
     private String jsonContent;
     private LocalDateTime createAt;
     private String userNickname;
@@ -20,6 +21,7 @@ public class UnApprovalQuizDTO {
         this.quizId = quiz.getQuizId();
         this.subject = quiz.getSubject();
         this.detailSubject = quiz.getDetailSubject();
+        this.quizType = quiz.getQuizType();
         this.jsonContent = quiz.getJsonContent();
         this.createAt = quiz.getCreateAt();
         this.userNickname = nickname;

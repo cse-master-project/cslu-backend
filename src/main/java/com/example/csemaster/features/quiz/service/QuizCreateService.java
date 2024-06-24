@@ -33,13 +33,12 @@ public class QuizCreateService {
     private final QuizDetailSubjectRepository quizDetailSubjectRepository;
 
     // jsonContent 형식 검사
-    public boolean isValidJsonContent(String jsonContent) {
+    public boolean isValidJsonContent(Integer quizType, String jsonContent) {
         try {
+            /* 1. 4지선다 / 2. 단답식 / 3. 선 긋기 / 4. O/X / 5. 빈칸 채우기 */
+
             // 전체 JSON 파싱
             JsonNode rootNode = objectMapper.readTree(jsonContent);
-
-            /* 1. 4지선다 / 2. 단답식 / 3. 선 긋기 / 4. O/X / 5. 빈칸 채우기 */
-            Set<String> allowedTypes = Set.of("1", "2", "3", "4", "5");
 
             String typeValue = rootNode.path("type").asText();
             String quizValue = rootNode.path("quiz").asText();
@@ -49,11 +48,6 @@ public class QuizCreateService {
             JsonNode optionNode = rootNode.path("option");
             JsonNode leftOptionNode = rootNode.path("left_option");
             JsonNode rightOptionNode = rootNode.path("right_option");
-
-            // 'type' 필드가 1~5 값을 가졌는지 확인
-            if (!allowedTypes.contains(typeValue)) {
-                return false;
-            }
 
             // 'quiz' 필드가 빈 문자열이 아닌지 확인
             if (quizValue.isEmpty()) {
@@ -66,7 +60,7 @@ public class QuizCreateService {
             }
 
             // 1. 4지선다
-            if ("1".equals(typeValue)) {
+            if (quizType.equals(1)) {
                 Set<String> answerTypes = Set.of("1", "2", "3", "4");
 
                 // 'answer' 필드가 1~4 값을 가졌는지 확인
@@ -81,7 +75,7 @@ public class QuizCreateService {
             }
 
             // 2. 단답식
-            if ("2".equals(typeValue)) {
+            if (quizType.equals(2)) {
                 // 'answer' 필드가 빈 문자열이 아닌지 확인
                 if (answerValue.isEmpty()) {
                     return false;
@@ -89,7 +83,7 @@ public class QuizCreateService {
             }
 
             // 3. 선 긋기
-            if ("3".equals(typeValue)) {
+            if (quizType.equals(3)) {
                 // 'left_option' 필드가 배열이며, 빈 배열이 아닌지 확인
                 if (!leftOptionNode.isArray() || leftOptionNode.isEmpty()) {
                     return false;
@@ -107,7 +101,7 @@ public class QuizCreateService {
             }
 
             // 4. O/X
-            if ("4".equals(typeValue)) {
+            if (quizType.equals(4)) {
                 Set<String> zeroOrOne = Set.of("0", "1");
 
                 // 'answer' 필드가 0, 1만 가지고 있는지 확인
@@ -117,7 +111,7 @@ public class QuizCreateService {
             }
 
             // 5. 빈칸 채우기
-            if ("5".equals(typeValue)) {
+            if (quizType.equals(5)) {
                 // 'answer' 필드가 배열이며, 빈 배열이 아닌지 확인
                 if (!answerNode.isArray() || answerNode.isEmpty()) {
                     return false;
@@ -144,7 +138,7 @@ public class QuizCreateService {
         }
 
         // jsonContent 형식 검사
-        if (!isValidJsonContent(quizDTO.getJsonContent())) {
+        if (!isValidJsonContent(quizDTO.getQuizType(), quizDTO.getJsonContent())) {
             throw new RuntimeException("Incorrect jsonContent");
         }
 

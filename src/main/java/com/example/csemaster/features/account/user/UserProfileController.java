@@ -1,6 +1,6 @@
 package com.example.csemaster.features.account.user;
 
-import com.example.csemaster.dto.NickNameDTO;
+import com.example.csemaster.dto.NicknameDTO;
 import com.example.csemaster.dto.response.QuizStatsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,7 +39,7 @@ public class UserProfileController {
             description = "사용자의 (새) 닉네임을 받아서 설정"
     )
     @PutMapping("/info/nickname")
-    private ResponseEntity<?> setUserNickname(@RequestBody @Valid NickNameDTO nickNameDTO) {
+    private ResponseEntity<?> setUserNickname(@RequestBody @Valid NicknameDTO nickNameDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
