@@ -2,7 +2,6 @@ package com.example.csemaster.features.account.manager;
 
 import com.example.csemaster.dto.ManagerLoginDTO;
 import com.example.csemaster.entity.AccessTokenBlackListEntity;
-import com.example.csemaster.entity.ActiveUserEntity;
 import com.example.csemaster.entity.ManagerEntity;
 import com.example.csemaster.entity.ManagerRefreshTokenEntity;
 import com.example.csemaster.features.account.TokenUtils;
@@ -16,9 +15,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -34,9 +30,9 @@ public class ManagerAccountService {
     private final ManagerRefreshTokenRepository managerRefreshTokenRepository;
     private final AccessTokenBlackListRepository accessTokenBlackListRepository;
 
-    private void saveRefreshToken(ManagerLoginDTO managerLoginDto, JwtInfo jwtInfo) {
+    private void saveRefreshToken(ManagerEntity manager, JwtInfo jwtInfo) {
         // 토큰 해쉬 후 저장
-        ManagerRefreshTokenEntity refreshToken = refreshTokenMapper.toRefreshTokenEntity(managerLoginDto, jwtInfo);
+        ManagerRefreshTokenEntity refreshToken = refreshTokenMapper.toRefreshTokenEntity(manager, jwtInfo);
         refreshToken.setRefreshToken(TokenUtils.hashString(refreshToken.getRefreshToken()));
         managerRefreshTokenRepository.save(refreshToken);
     }
@@ -58,7 +54,7 @@ public class ManagerAccountService {
         JwtInfo jwtInfo = jwtProvider.generateToken(managerLoginDto.getManagerId());
 
         // 3. 토큰 정보를 RefreshTokenEntity 에 저장
-        saveRefreshToken(managerLoginDto, jwtInfo);
+        saveRefreshToken(manager.get(), jwtInfo);
 
         log.info("로그인 성공 [ID:" + managerLoginDto.getManagerId() + "]");
         return jwtInfo;

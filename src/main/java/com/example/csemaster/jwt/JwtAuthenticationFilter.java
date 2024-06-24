@@ -38,8 +38,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 Authentication authentication = jwtProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-            String clientIp = request.getRemoteAddr();
-            logger.info("Request from IP: " + clientIp);
             chain.doFilter(request, response);
         } catch (SecurityException | MalformedJwtException e) {
             setErrorResponse((HttpServletResponse) response, ExceptionEnum.INVALID_JWT);
