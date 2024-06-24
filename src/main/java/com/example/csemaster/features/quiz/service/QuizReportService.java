@@ -1,6 +1,8 @@
 package com.example.csemaster.features.quiz.service;
 
 import com.example.csemaster.dto.response.QuizReportResponse;
+import com.example.csemaster.exception.CustomException;
+import com.example.csemaster.exception.ExceptionEnum;
 import com.example.csemaster.entity.QuizReportEntity;
 import com.example.csemaster.mapper.QuizReportMapper;
 import com.example.csemaster.repository.QuizReportRepository;
@@ -16,12 +18,13 @@ import java.util.stream.Collectors;
 public class QuizReportService {
     private final QuizReportRepository quizReportRepository;
     private final QuizReportMapper quizReportMapper;
+
     public QuizReportResponse getQuizReport(Long quizReportId) {
         Optional<QuizReportEntity> quizReport = quizReportRepository.findByQuizReportId(quizReportId);
 
         // quizReportId가 존재하는지 확인
         if (quizReport.isEmpty()) {
-            throw new RuntimeException("Incorrect quizReportId");
+            throw new CustomException(ExceptionEnum.NOT_FOUND_ID);
         }
 
         return quizReportMapper.toQuizReportResponse(quizReport.get());

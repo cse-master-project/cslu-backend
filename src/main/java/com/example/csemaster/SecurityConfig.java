@@ -38,7 +38,8 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/manager/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasRole("USER")
-                        .requestMatchers("/api/quiz/**").hasAnyRole("USER", "ADMIN")
+                        //.requestMatchers("/api/quiz/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/quiz/**").permitAll()
                         .requestMatchers("/api/management/**").hasRole("ADMIN")
                         .requestMatchers("/v3/**", "/swagger-ui/**").permitAll()
                         .anyRequest().denyAll())

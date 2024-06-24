@@ -2,16 +2,19 @@ package com.example.csemaster.features.quiz.service;
 
 import com.example.csemaster.dto.QuizDTO;
 import com.example.csemaster.entity.*;
+import com.example.csemaster.exception.CustomException;
+import com.example.csemaster.exception.ExceptionEnum;
 import com.example.csemaster.mapper.AddQuizMapper;
 import com.example.csemaster.repository.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
@@ -34,13 +37,12 @@ public class QuizCreateService {
 
     // jsonContent 형식 검사
     public boolean isValidJsonContent(Integer quizType, String jsonContent) {
-        try {
-            /* 1. 4지선다 / 2. 단답식 / 3. 선 긋기 / 4. O/X / 5. 빈칸 채우기 */
+        /* 1. 4지선다 / 2. 단답식 / 3. 선 긋기 / 4. O/X / 5. 빈칸 채우기 */
 
+        try {
             // 전체 JSON 파싱
             JsonNode rootNode = objectMapper.readTree(jsonContent);
 
-            String typeValue = rootNode.path("type").asText();
             String quizValue = rootNode.path("quiz").asText();
             String commentaryValue = rootNode.path("commentary").asText();
             JsonNode answerNode = rootNode.path("answer");
@@ -50,13 +52,8 @@ public class QuizCreateService {
             JsonNode rightOptionNode = rootNode.path("right_option");
 
             // 'quiz' 필드가 빈 문자열이 아닌지 확인
-            if (quizValue.isEmpty()) {
-                return false;
-            }
-
-            // 'commentary' 필드가 빈 문자열이 아닌지 확인
-            if (commentaryValue.isEmpty()) {
-                return false;
+            if (quizValue.isEmpty() || commentaryValue.isEmpty()) {
+                throw new CustomException(ExceptionEnum.NULL_VALUE);
             }
 
             // 1. 4지선다
@@ -113,15 +110,12 @@ public class QuizCreateService {
             // 5. 빈칸 채우기
             if (quizType.equals(5)) {
                 // 'answer' 필드가 배열이며, 빈 배열이 아닌지 확인
-                if (!answerNode.isArray() || answerNode.isEmpty()) {
-                    return false;
-                }
+                return answerNode.isArray() && !answerNode.isEmpty();
             }
 
             return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+        } catch (JsonProcessingException e) {
+            throw new CustomException(ExceptionEnum.INVALID_JSON);
         }
     }
 
@@ -129,17 +123,17 @@ public class QuizCreateService {
         // subject, detailSubject 확인
         Optional<SubjectEntity> subject = quizSubjectRepository.findBySubject(quizDTO.getSubject());
         if (subject.isEmpty()) {
-            throw new RuntimeException("subject isn't present.");
+            throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
         }
 
         Optional<DetailSubjectEntity> detailSubject = quizDetailSubjectRepository.findBySubjectIdAndDetailSubject(subject.get().getSubjectId(), quizDTO.getDetailSubject());
         if (detailSubject.isEmpty()) {
-            throw new RuntimeException("detailSubject isn't present.");
+            throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
         }
 
         // jsonContent 형식 검사
         if (!isValidJsonContent(quizDTO.getQuizType(), quizDTO.getJsonContent())) {
-            throw new RuntimeException("Incorrect jsonContent");
+            throw new CustomException(ExceptionEnum.INCORRECT_QUIZ_CONTENT);
         }
 
         // Quiz 테이블에 추가
@@ -151,17 +145,18 @@ public class QuizCreateService {
         return quizEntity.getQuizId();
     }
 
-    public Boolean addDefaultQuiz(Long quizId, String managerId) {
+    public void addDefaultQuiz(Long quizId, String managerId) {
         // managerId를 사용하여 ManagerEntity 조회
         Optional<ManagerEntity> managerEntityOptional = managerRepository.findById(managerId);
-        if (!managerEntityOptional.isPresent()) {
-            throw new RuntimeException("Manager not found with id: " + managerId);
+        if (managerEntityOptional.isEmpty()) {
+            throw new CustomException(ExceptionEnum.INVALID_IDENTIFIER);
         }
 
         // quizId가 존재하는지 확인
         Optional<QuizEntity> quizEntity = quizRepository.findByQuizId(quizId);
-        if (!quizEntity.isPresent()) {
-            throw new RuntimeException("Incorrect quizId");
+        if (quizEntity.isEmpty()) {
+            // 무결성 문제라서 500 반환
+            throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
         }
 
         // Default Quiz 테이블에 추가
@@ -172,20 +167,19 @@ public class QuizCreateService {
         defaultQuizRepository.save(defaultQuizEntity);
 
         log.info("Default Quiz 저장 완료");
-        return true;
     }
 
-    public Boolean addUserQuiz(Long quizId, String userId) {
+    public void addUserQuiz(Long quizId, String userId) {
         // userId를 사용하여 UserEntity 조회
         Optional<UserEntity> userEntity = userRepository.findById(userId);
-        if (!userEntity.isPresent()) {
-            throw new RuntimeException("Manager not found with id: " + quizId);
+        if (userEntity.isEmpty()) {
+            throw new CustomException(ExceptionEnum.INVALID_IDENTIFIER);
         }
 
         // quizId가 존재하는지 확인
         Optional<QuizEntity> quizEntity = quizRepository.findByQuizId(quizId);
-        if (!quizEntity.isPresent()) {
-            throw new RuntimeException("Incorrect quizId");
+        if (quizEntity.isEmpty()) {
+            throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
         }
 
         // User Quiz 테이블에 추가
@@ -195,8 +189,6 @@ public class QuizCreateService {
         userQuizEntity.setUserId(userEntity.get());
 
         userQuizRepository.save(userQuizEntity);
-
-        return true;
     }
 
     @Transactional
@@ -205,9 +197,7 @@ public class QuizCreateService {
         Long quizId = addQuiz(quizDTO);
 
         // 반환된 ID를 사용하여 DefaultQuiz 추가
-        if (!addDefaultQuiz(quizId, managerId)) {
-            throw new RuntimeException("QuizCreateService - addDefaultQuiz()");
-        }
+        addDefaultQuiz(quizId, managerId);
 
         log.info("Quiz has been saved successfully");
         return quizId;
@@ -219,64 +209,68 @@ public class QuizCreateService {
         Long quizId = addQuiz(quizDTO);
 
         // 반환된 ID를 사용하여 UserQuiz 추가
-        if (!addUserQuiz(quizId, userId)) {
-            throw new RuntimeException("QuizCreateService - addUserQuiz()");
-        }
+        addUserQuiz(quizId, userId);
 
         log.info("Quiz has been saved successfully");
         return quizId;
     }
 
     private String getFileExtension(String[] strings, Long quizId) {
+        System.out.println(strings[0].toLowerCase());
         if (strings[0].toLowerCase().contains("png")) {
             return quizId.toString() + ".png";
         } else if (strings[0].toLowerCase().contains("jpeg") || strings[0].toLowerCase().contains("jpg")) {
             return quizId.toString() + ".jpg";
         } else {
-            throw new IllegalArgumentException("지원하지 않는 파일 형식");
+            throw new CustomException(ExceptionEnum.UNSUPPORTED_FILE_EXTENSION);
         }
     }
 
-    private void saveImage(Long quizId, String base64String) throws IOException {
-        String[] strings = base64String.split(",");
-        String filename = getFileExtension(strings, quizId);
+    private void saveImage(Long quizId, String base64String) {
+        try {
+            String[] strings = base64String.split(",");
+            String filename = "/quiz-img" + quizId + ".jpg";  // 무조건 jpg 로 저장
 
-        byte[] decodedBytes = Base64.getDecoder().decode(base64String);
+            File directory = new File("quiz-img");
+            if (!directory.exists()) {
+                directory.mkdirs(); // 폴더가 존재하지 않는다면 생성
+            }
 
-        FileOutputStream fos = new FileOutputStream(filename);
-        fos.write(decodedBytes);
-        fos.close();
+            byte[] decodedBytes = Base64.getDecoder().decode(strings[1]);
 
-        log.info("file save successful. [quizId: " + quizId + "]");
+            FileOutputStream fos = new FileOutputStream(filename);
+            fos.write(decodedBytes);
+            fos.close();
+
+            log.info("file save successful. [quizId: " + quizId + "]");
+        } catch (IOException e) {
+            // 입출력 실패시 500
+            throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Transactional
-    public ResponseEntity<?> userUploadImage(String userId, Long quizId, String base64String) {
-        return userQuizRepository.findByQuizIdAndUserId(quizId, userId).map(quiz -> {
-            try {
-                saveImage(quizId, base64String);
-            } catch (IOException e) {
-                return ResponseEntity.notFound().build();
-            }
-            quiz.getQuiz().setHasImage(true);
-            quizRepository.save(quiz.getQuiz());
+    public void userUploadImage(String userId, Long quizId, String base64String) {
+        Optional<UserQuizEntity> quiz = userQuizRepository.findByQuizIdAndUserId(quizId, userId);
+        if (quiz.isPresent()) {
+            saveImage(quizId, base64String);
 
-            return ResponseEntity.ok().build();
-        }).orElse(ResponseEntity.notFound().build());
-
+            quiz.get().getQuiz().setHasImage(true);
+            quizRepository.save(quiz.get().getQuiz());
+        } else {
+            throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    public ResponseEntity<?> managerUploadImage(String managerId, Long quizId, String base64String) {
-        return defaultQuizRepository.findByQuizIdAndManagerId(quizId, managerId).map(quiz -> {
-            try {
-                saveImage(quizId, base64String);
-            } catch (IOException e) {
-                return ResponseEntity.notFound().build();
-            }
-            quiz.getQuiz().setHasImage(true);
-            quizRepository.save(quiz.getQuiz());
+    public void managerUploadImage(String managerId, Long quizId, String base64String) {
+        Optional<DefaultQuizEntity> quiz = defaultQuizRepository.findByQuizIdAndManagerId(quizId, managerId);
+        if (quiz.isPresent()) {
+            saveImage(quizId, base64String);
 
-            return ResponseEntity.ok().build();
-        }).orElse(ResponseEntity.notFound().build());
+            quiz.get().getQuiz().setHasImage(true);
+            quizRepository.save(quiz.get().getQuiz());
+        } else {
+            throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
+        }
     }
 }

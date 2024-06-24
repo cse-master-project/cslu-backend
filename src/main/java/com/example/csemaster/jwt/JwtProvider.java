@@ -156,24 +156,12 @@ public class JwtProvider {
 
     // 토큰 정보를 검증하는 메서드
     public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token);
-            // 블랙되었는지 확인, 검색된게 없으면 유효한 토큰
-            return accessTokenBlackListRepository.findByAccessToken(TokenUtils.hashString(token)).isEmpty();
-
-        } catch (SecurityException | MalformedJwtException e) {
-            log.info("Invalid JWT Token");
-        } catch (ExpiredJwtException e) {
-            log.info("Expired JWT Token");
-        } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT Token");
-        } catch (IllegalArgumentException e) {
-            log.info("JWT claims string is empty");
-        }
-        return false;
+        Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token);
+        // 블랙되었는지 확인, 검색된게 없으면 유효한 토큰
+        return accessTokenBlackListRepository.findByAccessToken(TokenUtils.hashString(token)).isEmpty();
     }
 
     // token 의 클레임 추출

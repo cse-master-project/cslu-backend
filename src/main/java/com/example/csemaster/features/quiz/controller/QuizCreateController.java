@@ -70,16 +70,15 @@ public class QuizCreateController {
             description = "문제 생성시 이미지는 별도로 전송, 리턴받은 문제 아이디로 요청함."
     )
     @PostMapping("/image")
-    public ResponseEntity<?> uploadImage(@RequestBody QuizImageRequest request) {
+    public void uploadImage(@RequestBody QuizImageRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String id = authentication.getName();
-        System.out.println(id);
 
         // 아이디의 길이로 유저, 매니저 구분
         if (id.length() <= 20) {
-            return quizCreateService.managerUploadImage(id, request.getQuizId(), request.getBase64String());
+            quizCreateService.managerUploadImage(id, request.getQuizId(), request.getBase64String());
         } else {
-            return quizCreateService.userUploadImage(id, request.getQuizId(), request.getBase64String());
+            quizCreateService.userUploadImage(id, request.getQuizId(), request.getBase64String());
         }
     }
 }

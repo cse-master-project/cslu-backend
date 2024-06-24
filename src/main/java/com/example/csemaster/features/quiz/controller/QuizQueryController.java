@@ -75,7 +75,7 @@ public class QuizQueryController {
             description = "카테고리를 받아서 지정한 카테고리에 맞게 무작위로 하나의 문제 제공"
     )
     @GetMapping("/random")
-    public QuizResponse getRandomQuiz(@RequestParam String subject, @RequestParam String detailSubject) {
+    public QuizResponse getRandomQuiz(@RequestParam String subject, @RequestParam List<String> detailSubject) {
         // 사용자 인증 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
@@ -90,7 +90,7 @@ public class QuizQueryController {
             description = "문제 아이디를 받아서 해당하는 문제의 이미지를 조회"
     )
     @GetMapping("/{quizId}/image")
-    public ResponseEntity<?> getQuizImage(@PathVariable Long quizId) {
+    public ResponseEntity<?> getQuizImage(@PathVariable("quizId") Long quizId) {
         return quizSolverService.getQuizImage(quizId);
     }
 
