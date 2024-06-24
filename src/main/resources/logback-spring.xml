@@ -6,7 +6,7 @@
 
     <!-- 로그 파일이 저장될 경로 -->
     <!-- LOG_PATH=/home/cse/logs -->
-    <property name="LOG_PATH" value="D:/test/logs"/>\
+    <property name="LOG_PATH" value="${log.file.path}"/>
 
     <!-- 로그 설정 가져오기 -->
     <!-- info 로그 -->
@@ -31,7 +31,7 @@
         <logger name="org.hibernate" level="ERROR" />
         <logger name="org.apache" level="ERROR" />
         <logger name="com.zaxxer" level="ERROR" />
-
+        <logger name="com.example.csemaster.CseMasterApplication.logStarting" level="ERROR" />
     </springProfile>
 
     <!-- prod profile 에서 로그 설정 -->

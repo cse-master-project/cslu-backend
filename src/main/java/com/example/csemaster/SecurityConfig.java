@@ -42,6 +42,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/quiz/**").permitAll()
                         .requestMatchers("/api/management/**").hasRole("ADMIN")
                         .requestMatchers("/v3/**", "/swagger-ui/**").permitAll()
+                        .requestMatchers("/dev/**").permitAll()
                         .anyRequest().denyAll())
 
                 // 인증과정에서 JWT 검증을 수행하는 기본 필터와 사용자 정의 필터 추가
