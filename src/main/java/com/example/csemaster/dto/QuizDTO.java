@@ -1,5 +1,7 @@
 package com.example.csemaster.dto;
 
+import com.example.csemaster.entity.ActiveUserEntity;
+import com.example.csemaster.entity.QuizEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
