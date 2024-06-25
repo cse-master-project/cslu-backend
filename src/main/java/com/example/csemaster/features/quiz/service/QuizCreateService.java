@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +35,9 @@ public class QuizCreateService {
     private final UserQuizRepository userQuizRepository;
     private final QuizSubjectRepository quizSubjectRepository;
     private final QuizDetailSubjectRepository quizDetailSubjectRepository;
+
+    @Value("${img.file.path}")
+    private String imgPath;
 
     // jsonContent 형식 검사
     public boolean isValidJsonContent(Integer quizType, String jsonContent) {
@@ -229,21 +233,22 @@ public class QuizCreateService {
     private void saveImage(Long quizId, String base64String) {
         try {
             String[] strings = base64String.split(",");
-            String filename = "/quiz-img" + quizId + ".jpg";  // 무조건 jpg 로 저장
+            String filename = imgPath + "\\" + quizId + ".jpg";  // 무조건 jpg 로 저장
 
-            File directory = new File("quiz-img");
+            File directory = new File(imgPath);
             if (!directory.exists()) {
                 directory.mkdirs(); // 폴더가 존재하지 않는다면 생성
             }
 
             byte[] decodedBytes = Base64.getDecoder().decode(strings[1]);
-
-            FileOutputStream fos = new FileOutputStream(filename);
+            System.out.println(filename);
+            FileOutputStream fos = new FileOutputStream(filename, true);
             fos.write(decodedBytes);
             fos.close();
 
             log.info("file save successful. [quizId: " + quizId + "]");
         } catch (IOException e) {
+            System.out.println(e.getMessage());
             // 입출력 실패시 500
             throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
         }
