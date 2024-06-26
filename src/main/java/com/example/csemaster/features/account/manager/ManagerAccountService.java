@@ -42,11 +42,11 @@ public class ManagerAccountService {
         // 1. managerLoginDto를 기반으로 객체 생성 및 검증
         Optional<ManagerEntity> manager = managerRepository.findById(managerLoginDto.getManagerId());
         if (manager.isEmpty()) {
-            log.error("존재하지 않는 ID");
+            log.debug("존재하지 않는 ID");
             return null;
         }
         if (!managerLoginDto.getManagerPw().equals(manager.get().getManagerPw())) {
-            log.error("PW 불일치");
+            log.debug("PW 불일치");
             return null;
         }
 
@@ -69,6 +69,7 @@ public class ManagerAccountService {
 
         accessTokenBlackListRepository.save(accessTokenBlackList);
 
+        log.info("로그아웃 [ID: " + managerId + "]");
         // 리프레시 토큰 삭제
         return managerRefreshTokenRepository.findById(managerId)
             .map(token -> {
@@ -82,14 +83,14 @@ public class ManagerAccountService {
         System.out.println(jwtProvider.validateRefreshToken(refreshToken));
         // 1. 리프레시 토큰 검증
         if (!jwtProvider.validateRefreshToken(refreshToken)) {
-            log.error("유효하지 않은 토큰");
+            log.debug("유효하지 않은 토큰");
             return null;
         }
 
         // 2. 리프레시 토큰으로부터 사용자 정보 추출
         String managerId = jwtProvider.getIdFromRefreshToken(refreshToken);
         if (managerId == null || managerId.isEmpty()) {
-            log.error("토큰으로부터 관리자 정보 추출 실패");
+            log.debug("토큰으로부터 관리자 정보 추출 실패");
             return null;
         }
 

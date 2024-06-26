@@ -8,6 +8,7 @@ import com.example.csemaster.repository.ActiveUserRepository;
 import com.example.csemaster.repository.QuizLogRepository;
 import com.example.csemaster.repository.QuizSubjectRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserProfileService {
@@ -53,7 +55,7 @@ public class UserProfileService {
             try {
                 quizResultCounter.pushLog(q.getSubject(), q.isCorrect());
             } catch (IllegalArgumentException e) {
-                System.out.println("Invalid subject.");
+                log.debug("Invalid subject.");
             }
         });
 
