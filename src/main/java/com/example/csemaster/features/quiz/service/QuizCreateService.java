@@ -245,7 +245,7 @@ public class QuizCreateService {
     private void saveImage(Long quizId, String base64String) {
         try {
             String[] strings = base64String.split(",");
-            String filename = imgPath + "\\" + quizId + ".jpg";  // 무조건 jpg 로 저장
+            String filename = imgPath + "/" + quizId + ".jpg";  // 무조건 jpg 로 저장
 
             File directory = new File(imgPath);
             if (!directory.exists()) {
