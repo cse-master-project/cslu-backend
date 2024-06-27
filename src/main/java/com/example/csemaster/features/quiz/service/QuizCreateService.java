@@ -254,7 +254,7 @@ public class QuizCreateService {
 
             byte[] decodedBytes = Base64.getDecoder().decode(strings[1]);
             System.out.println(filename);
-            FileOutputStream fos = new FileOutputStream(filename, true);
+            FileOutputStream fos = new FileOutputStream(filename, false);
             fos.write(decodedBytes);
             fos.close();
 
