@@ -1,5 +1,6 @@
 package com.example.csemaster.features.quiz.controller;
 
+import com.example.csemaster.dto.UnApprovalQuizDTO;
 import com.example.csemaster.dto.request.QuizSolverRequest;
 import com.example.csemaster.dto.response.QuizRejectResponse;
 import com.example.csemaster.dto.response.QuizReportResponse;
@@ -67,7 +68,7 @@ public class QuizQueryController {
             summary = "문제 아이디로 특정 문제 조회"
     )
     @GetMapping("/{quizId}")
-    public Optional<QuizEntity> getQuizById(@PathVariable Long quizId) { return quizSearchService.getQuizById(quizId); }
+    public UnApprovalQuizDTO getQuizById(@PathVariable Long quizId) { return quizSearchService.getQuizById(quizId); }
 
     // 지정한 카테고리에 맞게 무작위로 하나의 문제 제공
     @Operation(
