@@ -67,7 +67,9 @@ public class UserAccountService {
     }
 
     public String getUserIdFromDeleteUser(String googleId) {
-        return deleteUserRepository.findByGoogleId(googleId).getUserId();
+        DeleteUserEntity user = deleteUserRepository.findByGoogleId(googleId);
+        if (user != null) return user.getUserId();
+        else return null;
     }
 
     @Transactional

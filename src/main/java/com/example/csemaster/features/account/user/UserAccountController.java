@@ -47,7 +47,7 @@ public class UserAccountController {
             } else {
                 // 재가입
                 userAccountService.rejoin(delUserId, googleId, request.getNickname());
-                return ResponseEntity.ok(userAccountService.getRegistered(delUserId));
+                return ResponseEntity.ok(userAccountService.getTokens(delUserId));
             }
         } else {
             // 구글 액세스토큰이 유효하지 않을 경우
