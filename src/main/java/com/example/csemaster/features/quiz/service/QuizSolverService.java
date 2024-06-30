@@ -1,6 +1,7 @@
 package com.example.csemaster.features.quiz.service;
 
 import com.example.csemaster.dto.response.QuizResponse;
+import com.example.csemaster.dto.response.UserQuizResponse;
 import com.example.csemaster.entity.*;
 import com.example.csemaster.exception.CustomException;
 import com.example.csemaster.exception.ExceptionEnum;
@@ -9,6 +10,7 @@ import com.example.csemaster.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -29,46 +31,68 @@ public class QuizSolverService {
     private final QuizLogRepository quizLogRepository;
     private final QuizReportRepository quizReportRepository;
     private final QuizSubjectRepository quizSubjectRepository;
+    private final UserQuizRepository userQuizRepository;
+    private final DefaultQuizRepository defaultQuizRepository;
 
     @Value("${img.file.path}")
     private String imgPath;
 
-    public QuizResponse getQuiz(String userId, String subject, List<String> detailSubject) {
+    public void verifySubject(String subject, List<String> detailSubject) {
         Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subject);
 
         // 유저가 요청한 subject가 유효한지 검증
         if (subjectEntity.isPresent()) {
-            List<String> dbDetailSubject = subjectEntity.get().getDetailSubjects().stream().map(DetailSubjectEntity::getDetailSubject).toList();
-
-            // detailSubject가 비었는지 확인 & detailSubject가 유효한지 검증
-            if (detailSubject == null || detailSubject.isEmpty()) {
-                // 유저가 풀지 않은 문제이면서 지정한 과목과 목차에 해당하는 문제를 한 개 제공
-                List<ActiveQuizEntity> quiz = activeQuizRepository.getAnOpenQuiz(userId, subject, dbDetailSubject);
-                if (!quiz.isEmpty()) {
-                    int randomIndex = (int)(Math.random() * quiz.size());
-                    return QuizMapper.INSTANCE.entityToResponse(quiz.get(randomIndex));
-                } else {
-                    throw new CustomException(ExceptionEnum.DONE_QUIZ);
-                }
-            } else {
+            if (!(detailSubject == null || detailSubject.isEmpty())) {
+                // DB에 저장된 detailSubject 검색
+                List<String> dbDetailSubject = subjectEntity.get().getDetailSubjects().stream().map(DetailSubjectEntity::getDetailSubject).toList();
                 // 합집합 후에도 db에 있는 내용과 같다면 요소의 개수가 같음
                 // 개수가 서로 다르다면 유효하지 않은 detailSubject 가 있다는 의미
                 Set<String> set = new HashSet<>(detailSubject);
                 set.addAll(dbDetailSubject);
 
                 if (set.size() != dbDetailSubject.size()) throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
-
-                // 유저가 풀지 않은 문제이면서 지정한 과목과 목차에 해당하는 문제를 한 개 제공
-                List<ActiveQuizEntity> quiz = activeQuizRepository.getAnOpenQuiz(userId, subject, detailSubject);
-                if (!quiz.isEmpty()) {
-                    int randomIndex = (int)(Math.random() * quiz.size());
-                    return QuizMapper.INSTANCE.entityToResponse(quiz.get(randomIndex));
-                } else {
-                    throw new CustomException(ExceptionEnum.DONE_QUIZ);
-                }
             }
         } else {
             throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
+        }
+    }
+
+    public QuizResponse getQuiz(String userId, String subject, List<String> detailSubject, boolean hasUserQuiz, boolean hasDefaultQuiz, boolean hasSolvedQuiz) {
+        // detailSubject가 비었는지 확인 & detailSubject가 유효한지 검증
+        List<ActiveQuizEntity> quiz = null;
+
+        if (detailSubject == null || detailSubject.isEmpty()) {
+            // 유저가 풀지 않은 문제이면서 지정한 과목과 목차에 해당하는 문제를 한 개 제공
+            if (hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuiz(userId, subject);
+            else quiz = activeQuizRepository.getAnOpenQuizWithSolved(userId, subject);
+        } else {
+            // 유저가 풀지 않은 문제이면서 지정한 과목과 목차에 해당하는 문제를 한 개 제공
+            if (hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuiz(userId, subject, detailSubject);
+            else quiz = activeQuizRepository.getAnOpenQuizWithSolved(userId, subject, detailSubject);
+        }
+        if (!quiz.isEmpty()) {
+            quiz = quizFiltering(quiz, hasUserQuiz, hasDefaultQuiz);
+
+            int randomIndex = (int)(Math.random() * quiz.size());
+            return QuizMapper.INSTANCE.entityToResponse(quiz.get(randomIndex));
+        } else {
+            throw new CustomException(ExceptionEnum.DONE_QUIZ);
+        }
+    }
+
+    public List<ActiveQuizEntity> quizFiltering(List<ActiveQuizEntity> quiz, boolean hasUserQuiz, boolean hasDefaultQuiz) {
+        if (!hasUserQuiz) {
+            quiz.removeIf(q -> userQuizRepository.findById(q.getQuizId()).isEmpty());
+        }
+        if (!hasDefaultQuiz) {
+            quiz.removeIf(q -> defaultQuizRepository.findById(q.getQuizId()).isEmpty());
+        }
+        return quiz;
+    }
+
+    public QuizResponse getQuizWithSolved(String userId, String subject, List<String> detailSubject) {
+        if (!(detailSubject == null || detailSubject.isEmpty())) {
+
         }
     }
 
