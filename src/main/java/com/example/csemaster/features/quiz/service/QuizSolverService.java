@@ -62,11 +62,11 @@ public class QuizSolverService {
         if (detailSubject == null || detailSubject.isEmpty()) {
             // 유저가 풀지 않은 문제이면서 지정한 과목과 목차에 해당하는 문제를 한 개 제공
             if (hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuiz(userId, subject);
-            else quiz = activeQuizRepository.getAnOpenQuizWithSolved(userId, subject);
+            else quiz = activeQuizRepository.getAnOpenQuizWithSolved(subject);
         } else {
             // 유저가 풀지 않은 문제이면서 지정한 과목과 목차에 해당하는 문제를 한 개 제공
             if (hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuiz(userId, subject, detailSubject);
-            else quiz = activeQuizRepository.getAnOpenQuizWithSolved(userId, subject, detailSubject);
+            else quiz = activeQuizRepository.getAnOpenQuizWithSolved(subject, detailSubject);
         }
         if (!quiz.isEmpty()) {
             quiz = quizFiltering(quiz, hasUserQuiz, hasDefaultQuiz);
