@@ -32,14 +32,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/auth/google/login").permitAll()
                         .requestMatchers("/api/user/auth/google/sign-up").permitAll()
+                        .requestMatchers("/api/user/auth/google/check").permitAll()
                         .requestMatchers("/api/user/auth/refresh").permitAll()
                         .requestMatchers("/api/manager/login").permitAll()
                         .requestMatchers("/api/manager/refresh").permitAll()
 
                         .requestMatchers("/api/manager/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasRole("USER")
-                        //.requestMatchers("/api/quiz/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/api/quiz/**").permitAll()
+                        .requestMatchers("/api/quiz/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/management/**").hasRole("ADMIN")
                         .requestMatchers("/v3/**", "/swagger-ui/**").permitAll()
                         .requestMatchers("/dev/**").permitAll()

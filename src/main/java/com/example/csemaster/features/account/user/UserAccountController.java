@@ -1,6 +1,10 @@
 package com.example.csemaster.features.account.user;
 
+import com.example.csemaster.dto.request.SignUpCheckRequest;
 import com.example.csemaster.dto.request.SignUpRequest;
+import com.example.csemaster.dto.response.SignUpCheckResponse;
+import com.example.csemaster.exception.CustomException;
+import com.example.csemaster.exception.ExceptionEnum;
 import com.example.csemaster.features.account.TokenUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,18 +35,35 @@ public class UserAccountController {
             description = "구글 액세스 토큰과 닉네임을 받아서 회원 가입 후 토큰 발급"
     )
     @PostMapping("/auth/google/sign-up")
-    @Transactional
     public ResponseEntity<?> signUp(@RequestBody SignUpRequest request) {
         String googleId = userAccountService.isGoogleAuth(request.getAccessToken());
 
         if (googleId != null) {
-            String userId = userAccountService.createUser(googleId, request.getNickname());
-
-            return ResponseEntity.ok(userAccountService.getTokens(userId));
+            String delUserId = userAccountService.getUserIdFromDeleteUser(googleId);
+            if (delUserId == null) {
+                // 탈퇴 이력 없음
+                String userId = userAccountService.createUser(googleId, request.getNickname());
+                return ResponseEntity.ok(userAccountService.getTokens(userId));
+            } else {
+                // 재가입
+                userAccountService.rejoin(delUserId, googleId, request.getNickname());
+                return ResponseEntity.ok(userAccountService.getRegistered(delUserId));
+            }
         } else {
             // 구글 액세스토큰이 유효하지 않을 경우
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Unauthorized: Google login failed");
+        }
+    }
+
+    @PostMapping("/auth/google/check")
+    public SignUpCheckResponse signupCheck(@RequestBody SignUpCheckRequest request) {
+        String googleId = userAccountService.isGoogleAuth(request.getAccessToken());
+
+        if (googleId != null) {
+            return new SignUpCheckResponse(userAccountService.getRegistered(googleId));
+        } else {
+            throw new CustomException(ExceptionEnum.INVALID_JWT);
         }
     }
 

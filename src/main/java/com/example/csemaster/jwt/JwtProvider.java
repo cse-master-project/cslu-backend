@@ -144,6 +144,7 @@ public class JwtProvider {
 
         // 클레임에서 userId(managerId), 권한 추출 후 인증 객체로 반환
         UserDetails principal = new User(claims.getSubject(), "", authorities);
+        System.out.println(principal.getUsername());
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
