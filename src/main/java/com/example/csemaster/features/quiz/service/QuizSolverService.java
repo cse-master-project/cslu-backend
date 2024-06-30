@@ -1,7 +1,6 @@
 package com.example.csemaster.features.quiz.service;
 
 import com.example.csemaster.dto.response.QuizResponse;
-import com.example.csemaster.dto.response.UserQuizResponse;
 import com.example.csemaster.entity.*;
 import com.example.csemaster.exception.CustomException;
 import com.example.csemaster.exception.ExceptionEnum;
@@ -10,7 +9,6 @@ import com.example.csemaster.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -88,12 +86,6 @@ public class QuizSolverService {
             quiz.removeIf(q -> defaultQuizRepository.findById(q.getQuizId()).isEmpty());
         }
         return quiz;
-    }
-
-    public QuizResponse getQuizWithSolved(String userId, String subject, List<String> detailSubject) {
-        if (!(detailSubject == null || detailSubject.isEmpty())) {
-
-        }
     }
 
     public ResponseEntity<?> saveQuizResult(String userId, Long quizId, Boolean isCorrect) {
