@@ -37,3 +37,6 @@ out/
 .vscode/
 application-mysql.properties
 application-jwt.properties
+
+### logs ###
+logs/

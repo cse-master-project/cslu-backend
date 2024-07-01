@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 60초마다 설정 파일의 변경을 확인 하여 변경시 갱신 -->
+<configuration scan="true" scanPeriod="60 seconds">
+    <!-- 프로퍼티 로드해서 환경변수 가져오기 -->
+    <property resource="application.properties"/>
+
+    <!-- 로그 파일이 저장될 경로 -->
+    <!-- LOG_PATH=/home/cse/logs -->
+    <property name="LOG_PATH" value="${log.file.path}"/>
+
+    <!-- 로그 설정 가져오기 -->
+    <!-- info 로그 -->
+    <include resource="appender/info_appender.xml" />
+    <include resource="appender/error_appender.xml" />
+
+    <!-- debug 로그 -->
+    <include resource="appender/debug_appender.xml" />
+
+
+    <!-- 로그 패턴에 색상 적용 %clr(pattern){color} -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+
+    <!-- dev profile 에서 로그 설정 -->
+    <springProfile name="dev">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE_DEBUG"/>
+            <appender-ref ref="DEBUG"/>
+        </root>
+        <logger name="com.example.csemaster" level="DEBUG" />
+        <logger name="org.springframework" level="ERROR" />
+        <logger name="org.hibernate" level="ERROR" />
+        <logger name="org.apache" level="ERROR" />
+        <logger name="com.zaxxer" level="ERROR" />
+
+    </springProfile>
+
+    <!-- prod profile 에서 로그 설정 -->
+    <springProfile name="prod">
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="INFO"/>
+            <appender-ref ref="ERROR"/>
+        </root>
+        <logger name="org.springframework.boot.devtools.properties.DevToolsPropertyDefaultsPostProcessor" level="OFF" />
+    </springProfile>
+</configuration>

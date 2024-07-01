@@ -5,6 +5,8 @@ import com.example.csemaster.dto.DetailSubjectUpdateDTO;
 import com.example.csemaster.dto.SubjectDTO;
 import com.example.csemaster.dto.response.SubjectResponse;
 import com.example.csemaster.dto.SubjectUpdateDTO;
+import com.example.csemaster.exception.CustomException;
+import com.example.csemaster.exception.ExceptionEnum;
 import com.example.csemaster.entity.SubjectEntity;
 import com.example.csemaster.entity.DetailSubjectEntity;
 import com.example.csemaster.repository.QuizDetailSubjectRepository;
@@ -44,7 +46,7 @@ public class QuizSubjectService {
         Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subjectDTO.getSubject());
 
         if (subjectEntity.isPresent()) {
-            throw new RuntimeException("subject is already present.");
+            throw new CustomException(ExceptionEnum.DUPLICATE_SUBJECT);
         }
 
         SubjectEntity newSubjectEntity = new SubjectEntity();
@@ -59,14 +61,14 @@ public class QuizSubjectService {
         Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(detailSubjectDTO.getSubject());
 
         if (subjectEntity.isEmpty()) {
-            throw new RuntimeException("subject isn't present.");
+            throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
         }
 
         Optional<DetailSubjectEntity> existingDetailSubject = quizDetailSubjectRepository.findBySubjectIdAndDetailSubject(
                 subjectEntity.get().getSubjectId(), detailSubjectDTO.getDetailSubject());
 
         if (existingDetailSubject.isPresent()) {
-            throw new RuntimeException("detailSubject is already present with the given subject.");
+            throw new CustomException(ExceptionEnum.DUPLICATE_DETAIL_SUBJECT);
         }
 
         DetailSubjectEntity detailSubjectEntity = new DetailSubjectEntity();
@@ -82,14 +84,14 @@ public class QuizSubjectService {
 
         // subject가 존재하는지 확인
         if (subject.isEmpty()) {
-            throw new RuntimeException("subject isn't present.");
+            throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
         }
 
         // 수정 전후가 같은지 확인
         String oldSubject = subject.get().getSubject();
         String newSubject = subjectUpdateDTO.getNewSubject();
         if (newSubject.equals(oldSubject)) {
-            throw new RuntimeException("Be the same before and after correction");
+            throw new CustomException(ExceptionEnum.NO_CHANGE);
         }
 
         subject.get().setSubject(newSubject);
@@ -102,18 +104,18 @@ public class QuizSubjectService {
     public ResponseEntity<?> updateDetailSubject(DetailSubjectUpdateDTO updateDTO) {
         Optional<SubjectEntity> subject = quizSubjectRepository.findBySubject(updateDTO.getSubject());
         if (subject.isEmpty()) {
-            throw new RuntimeException("subject isn't present.");
+            throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
         }
 
         Optional<DetailSubjectEntity> detailSubject = quizDetailSubjectRepository.findBySubjectIdAndDetailSubject(subject.get().getSubjectId(), updateDTO.getDetailSubject());
         if (detailSubject.isEmpty()) {
-            throw new RuntimeException("detailSubject isn't present.");
+            throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
         }
 
         String oldDetail = detailSubject.get().getDetailSubject();
         String newDetail = updateDTO.getNewDetailSubject();
         if (newDetail.equals(oldDetail)) {
-            throw new RuntimeException("Be the same before and after correction");
+            throw new CustomException(ExceptionEnum.NO_CHANGE);
         }
 
         // detailSubject 삭제
@@ -134,7 +136,7 @@ public class QuizSubjectService {
     public ResponseEntity<?> deleteSubject(SubjectDTO subjectDTO) {
         Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subjectDTO.getSubject());
         if (subjectEntity.isEmpty()) {
-            throw new RuntimeException("subject isn't present.");
+            throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
         }
 
         quizSubjectRepository.delete(subjectEntity.get());
@@ -145,12 +147,12 @@ public class QuizSubjectService {
     public ResponseEntity<?> deleteDetailSubject(DetailSubjectDTO detailSubjectDTO) {
         Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(detailSubjectDTO.getSubject());
         if (subjectEntity.isEmpty()) {
-            throw new RuntimeException("subject isn't present.");
+            throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
         }
 
         Optional<DetailSubjectEntity> detail = quizDetailSubjectRepository.findBySubjectIdAndDetailSubject(subjectEntity.get().getSubjectId(), detailSubjectDTO.getDetailSubject());
         if (detail.isEmpty()) {
-            throw new RuntimeException("detailSubject isn't present.");
+            throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
         }
 
         quizDetailSubjectRepository.delete(detail.get());

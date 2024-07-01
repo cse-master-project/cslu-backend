@@ -58,12 +58,7 @@ public class QuizManagementController {
     )
     @PatchMapping("/{quizId}")
     public ResponseEntity<?> updateQuiz(@PathVariable Long quizId, @RequestBody String newJsonContent) {
-        boolean updateJsonContent = quizManagerService.updateQuiz(quizId, newJsonContent);
-        if(!updateJsonContent) {
-            return ResponseEntity.badRequest().body("QuizUpdateController - updateQuiz()");
-        }
-
-        return ResponseEntity.ok().body("Update Successfully");
+        return quizManagerService.updateQuiz(quizId, newJsonContent);
     }
 
     // 문제 삭제
@@ -73,12 +68,6 @@ public class QuizManagementController {
     )
     @DeleteMapping("/{quizId}")
     public ResponseEntity<?> deleteQuiz(@PathVariable Long quizId) {
-        boolean deleteQuiz = quizManagerService.deleteQuiz(quizId);
-
-        if (!deleteQuiz) {
-            return ResponseEntity.badRequest().body("QuizDeleteController - deleteQuiz()");
-        }
-
-        return ResponseEntity.ok().body("Delete Successfully");
+        return quizManagerService.deleteQuiz(quizId);
     }
 }

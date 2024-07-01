@@ -1,6 +1,8 @@
 package com.example.csemaster.dto;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.csemaster.entity.ActiveUserEntity;
+import com.example.csemaster.entity.QuizEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -10,13 +12,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @ToString
 public class QuizDTO {
+    @Schema(hidden = true)
     private Long quizId;
 
     @NotBlank
@@ -29,5 +30,7 @@ public class QuizDTO {
     private Integer quizType;
     private String jsonContent;
     private Boolean hasImage;
+
+    @Schema(hidden = true)
     private Boolean isDeleted;
 }

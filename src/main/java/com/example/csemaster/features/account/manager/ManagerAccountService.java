@@ -2,7 +2,6 @@ package com.example.csemaster.features.account.manager;
 
 import com.example.csemaster.dto.ManagerLoginDTO;
 import com.example.csemaster.entity.AccessTokenBlackListEntity;
-import com.example.csemaster.entity.ActiveUserEntity;
 import com.example.csemaster.entity.ManagerEntity;
 import com.example.csemaster.entity.ManagerRefreshTokenEntity;
 import com.example.csemaster.features.account.TokenUtils;
@@ -16,9 +15,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -34,9 +30,9 @@ public class ManagerAccountService {
     private final ManagerRefreshTokenRepository managerRefreshTokenRepository;
     private final AccessTokenBlackListRepository accessTokenBlackListRepository;
 
-    private void saveRefreshToken(ManagerLoginDTO managerLoginDto, JwtInfo jwtInfo) {
+    private void saveRefreshToken(ManagerEntity manager, JwtInfo jwtInfo) {
         // 토큰 해쉬 후 저장
-        ManagerRefreshTokenEntity refreshToken = refreshTokenMapper.toRefreshTokenEntity(managerLoginDto, jwtInfo);
+        ManagerRefreshTokenEntity refreshToken = refreshTokenMapper.toRefreshTokenEntity(manager, jwtInfo);
         refreshToken.setRefreshToken(TokenUtils.hashString(refreshToken.getRefreshToken()));
         managerRefreshTokenRepository.save(refreshToken);
     }
@@ -46,11 +42,11 @@ public class ManagerAccountService {
         // 1. managerLoginDto를 기반으로 객체 생성 및 검증
         Optional<ManagerEntity> manager = managerRepository.findById(managerLoginDto.getManagerId());
         if (manager.isEmpty()) {
-            log.error("존재하지 않는 ID");
+            log.debug("존재하지 않는 ID");
             return null;
         }
         if (!managerLoginDto.getManagerPw().equals(manager.get().getManagerPw())) {
-            log.error("PW 불일치");
+            log.debug("PW 불일치");
             return null;
         }
 
@@ -58,7 +54,7 @@ public class ManagerAccountService {
         JwtInfo jwtInfo = jwtProvider.generateToken(managerLoginDto.getManagerId());
 
         // 3. 토큰 정보를 RefreshTokenEntity 에 저장
-        saveRefreshToken(managerLoginDto, jwtInfo);
+        saveRefreshToken(manager.get(), jwtInfo);
 
         log.info("로그인 성공 [ID:" + managerLoginDto.getManagerId() + "]");
         return jwtInfo;
@@ -73,6 +69,7 @@ public class ManagerAccountService {
 
         accessTokenBlackListRepository.save(accessTokenBlackList);
 
+        log.info("로그아웃 [ID: " + managerId + "]");
         // 리프레시 토큰 삭제
         return managerRefreshTokenRepository.findById(managerId)
             .map(token -> {
@@ -86,14 +83,14 @@ public class ManagerAccountService {
         System.out.println(jwtProvider.validateRefreshToken(refreshToken));
         // 1. 리프레시 토큰 검증
         if (!jwtProvider.validateRefreshToken(refreshToken)) {
-            log.error("유효하지 않은 토큰");
+            log.debug("유효하지 않은 토큰");
             return null;
         }
 
         // 2. 리프레시 토큰으로부터 사용자 정보 추출
         String managerId = jwtProvider.getIdFromRefreshToken(refreshToken);
         if (managerId == null || managerId.isEmpty()) {
-            log.error("토큰으로부터 관리자 정보 추출 실패");
+            log.debug("토큰으로부터 관리자 정보 추출 실패");
             return null;
         }
 

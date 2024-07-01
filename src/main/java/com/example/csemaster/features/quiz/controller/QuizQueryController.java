@@ -1,12 +1,14 @@
 package com.example.csemaster.features.quiz.controller;
 
+import com.example.csemaster.dto.UnApprovalQuizDTO;
 import com.example.csemaster.dto.request.QuizSolverRequest;
 import com.example.csemaster.dto.response.QuizRejectResponse;
 import com.example.csemaster.dto.response.QuizReportResponse;
 import com.example.csemaster.dto.response.QuizResponse;
 import com.example.csemaster.dto.response.UserQuizResponse;
 import com.example.csemaster.entity.ActiveQuizEntity;
-import com.example.csemaster.entity.QuizEntity;
+import com.example.csemaster.exception.CustomException;
+import com.example.csemaster.exception.ExceptionEnum;
 import com.example.csemaster.features.quiz.service.QuizReportService;
 import com.example.csemaster.features.quiz.service.QuizSearchService;
 import com.example.csemaster.features.quiz.service.QuizSolverService;
@@ -21,7 +23,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @Tag(name = "QuizQuery", description = "문제 조회 관련 기능")
 @RestController
@@ -67,7 +68,7 @@ public class QuizQueryController {
             summary = "문제 아이디로 특정 문제 조회"
     )
     @GetMapping("/{quizId}")
-    public Optional<QuizEntity> getQuizById(@PathVariable Long quizId) { return quizSearchService.getQuizById(quizId); }
+    public UnApprovalQuizDTO getQuizById(@PathVariable Long quizId) { return quizSearchService.getQuizById(quizId); }
 
     // 지정한 카테고리에 맞게 무작위로 하나의 문제 제공
     @Operation(
@@ -75,13 +76,21 @@ public class QuizQueryController {
             description = "카테고리를 받아서 지정한 카테고리에 맞게 무작위로 하나의 문제 제공"
     )
     @GetMapping("/random")
-    public QuizResponse getRandomQuiz(@RequestParam String subject, @RequestParam String detailSubject) {
+    public QuizResponse getRandomQuiz(@RequestParam String subject, @RequestParam(required = false) List<String> detailSubject,
+                                      @RequestParam(required = false, defaultValue = "true") Boolean hasUserQuiz,
+                                      @RequestParam(required = false, defaultValue = "true") Boolean hasDefaultQuiz,
+                                      @RequestParam(required = false, defaultValue = "false") Boolean hasSolvedQuiz) {
         // 사용자 인증 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
+        // 검증
+        quizSolverService.verifySubject(subject, detailSubject);
+
+        if (!hasDefaultQuiz && !hasUserQuiz) throw new CustomException(ExceptionEnum.ILLEGAL_ARGUMENT);
+
         // 무작위로 하나의 문제를 반환
-        return quizSolverService.getQuiz(userId, subject, detailSubject);
+        return quizSolverService.getQuiz(userId, subject, detailSubject, hasUserQuiz, hasDefaultQuiz, hasSolvedQuiz);
     }
 
     // 문제 이미지 조회
@@ -90,7 +99,7 @@ public class QuizQueryController {
             description = "문제 아이디를 받아서 해당하는 문제의 이미지를 조회"
     )
     @GetMapping("/{quizId}/image")
-    public ResponseEntity<?> getQuizImage(@PathVariable Long quizId) {
+    public ResponseEntity<?> getQuizImage(@PathVariable("quizId") Long quizId) {
         return quizSolverService.getQuizImage(quizId);
     }
 
@@ -103,7 +112,6 @@ public class QuizQueryController {
     public ResponseEntity<?> solveQuiz(@RequestBody QuizSolverRequest request)  {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
-        System.out.println(request.getIsCorrect());
 
         return quizSolverService.saveQuizResult(userId, request.getQuizId(), request.getIsCorrect());
     }
