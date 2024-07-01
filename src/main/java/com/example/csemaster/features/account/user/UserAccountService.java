@@ -40,7 +40,7 @@ public class UserAccountService {
             String userInfoEndpoint = "https://www.googleapis.com/oauth2/v3/userinfo";
             String requestUri = userInfoEndpoint + "?access_token=" + accessToken;
             String response = restTemplate.getForObject(requestUri, String.class);
-            System.out.println(response);
+            // System.out.println(response);
 
             try {
                 // 리스폰 받은 json 정보 파싱 후, google id만 반환
@@ -58,6 +58,40 @@ public class UserAccountService {
             return null;
         }
     }
+
+    public boolean getRegistered(String googleId) {
+        ActiveUserEntity user = activeUserRepository.findByGoogleId(googleId);
+
+        // 가입 여부 반환
+        return user != null;
+    }
+
+    public String getUserIdFromDeleteUser(String googleId) {
+        return deleteUserRepository.findByGoogleId(googleId).getUserId();
+    }
+
+    @Transactional
+    public String rejoin(String userId, String googleId, String nickname) {
+        UserEntity user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            user.setIsActive(true);
+            userRepository.save(user);
+        }
+
+        ActiveUserEntity rejoinUser = new ActiveUserEntity();
+        rejoinUser.setUserId(userId);
+        rejoinUser.setGoogleId(googleId);
+        rejoinUser.setCreateAt(LocalDateTime.now());
+        rejoinUser.setNickname(nickname);
+
+        activeUserRepository.save(rejoinUser);
+
+        deleteUserRepository.deleteById(userId);
+
+        log.info(rejoinUser.getUserId() + " : 재가입");
+        return userId;
+    }
+
     public String getUserId(String googleId) {
         ActiveUserEntity user = activeUserRepository.findByGoogleId(googleId);
         if (user != null) {
@@ -81,6 +115,7 @@ public class UserAccountService {
         return token;
     }
 
+    @Transactional
     public String createUser(String googleId, String nickname) {
         UserEntity user = new UserEntity();
         UUID uuid = UUID.randomUUID();

@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/quiz")
+@Slf4j
 public class QuizCreateController {
     private final QuizSolverService quizSolverService;
     private final QuizCreateService quizCreateService;
@@ -45,8 +47,8 @@ public class QuizCreateController {
     )
     @PostMapping("/default")
     public Long addDefaultQuiz(@RequestBody @Valid QuizDTO quizDTO) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String managerId = authentication.getName();
+        String managerId = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println(managerId);
 
         return quizCreateService.addQuizAndDefaultQuiz(quizDTO, managerId);
     }
