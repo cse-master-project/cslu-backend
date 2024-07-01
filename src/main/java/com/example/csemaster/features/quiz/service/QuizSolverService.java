@@ -34,28 +34,41 @@ public class QuizSolverService {
     private String imgPath;
 
     public QuizResponse getQuiz(String userId, String subject, List<String> detailSubject) {
-        // 유저가 요청한 subject 와 detailSubject 가 유효한지 검증
         Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subject);
+
+        // 유저가 요청한 subject가 유효한지 검증
         if (subjectEntity.isPresent()) {
             List<String> dbDetailSubject = subjectEntity.get().getDetailSubjects().stream().map(DetailSubjectEntity::getDetailSubject).toList();
 
-            // 합집합 후에도 db에 있는 내용과 같다면 요소의 개수가 같음
-            // 개수가 서로 다르다면 유효하지 않은 detailSubject 가 있다는 의미
-            Set<String> set = new HashSet<>(detailSubject);
-            set.addAll(dbDetailSubject);
+            // detailSubject가 비었는지 확인 & detailSubject가 유효한지 검증
+            if (detailSubject == null || detailSubject.isEmpty()) {
+                // 유저가 풀지 않은 문제이면서 지정한 과목과 목차에 해당하는 문제를 한 개 제공
+                List<ActiveQuizEntity> quiz = activeQuizRepository.getAnOpenQuiz(userId, subject, dbDetailSubject);
+                if (!quiz.isEmpty()) {
+                    int randomIndex = (int)(Math.random() * quiz.size());
+                    return QuizMapper.INSTANCE.entityToResponse(quiz.get(randomIndex));
+                } else {
+                    throw new CustomException(ExceptionEnum.DONE_QUIZ);
+                }
+            } else {
+                // 합집합 후에도 db에 있는 내용과 같다면 요소의 개수가 같음
+                // 개수가 서로 다르다면 유효하지 않은 detailSubject 가 있다는 의미
+                Set<String> set = new HashSet<>(detailSubject);
+                set.addAll(dbDetailSubject);
 
-            if (set.size() != dbDetailSubject.size()) throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
+                if (set.size() != dbDetailSubject.size()) throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
+
+                // 유저가 풀지 않은 문제이면서 지정한 과목과 목차에 해당하는 문제를 한 개 제공
+                List<ActiveQuizEntity> quiz = activeQuizRepository.getAnOpenQuiz(userId, subject, detailSubject);
+                if (!quiz.isEmpty()) {
+                    int randomIndex = (int)(Math.random() * quiz.size());
+                    return QuizMapper.INSTANCE.entityToResponse(quiz.get(randomIndex));
+                } else {
+                    throw new CustomException(ExceptionEnum.DONE_QUIZ);
+                }
+            }
         } else {
             throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
-        }
-
-        // 유저가 풀지 않은 문제이면서 지정한 과목과 목차에 해당하는 문제를 한 개 제공
-        List<ActiveQuizEntity> quiz = activeQuizRepository.getAnOpenQuiz(userId, subject, detailSubject);
-        if (!quiz.isEmpty()) {
-            int randomIndex = (int)(Math.random() * quiz.size());
-            return QuizMapper.INSTANCE.entityToResponse(quiz.get(randomIndex));
-        } else {
-            throw new CustomException(ExceptionEnum.DONE_QUIZ);
         }
     }
 

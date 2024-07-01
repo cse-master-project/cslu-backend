@@ -268,25 +268,50 @@ public class QuizCreateService {
 
     @Transactional
     public void userUploadImage(String userId, Long quizId, String base64String) {
-        Optional<UserQuizEntity> quiz = userQuizRepository.findByQuizIdAndUserId(quizId, userId);
-        if (quiz.isPresent()) {
-            saveImage(quizId, base64String);
+        Optional<UserQuizEntity> userQuiz = userQuizRepository.findByQuizIdAndUserId(quizId, userId);
+        Optional<QuizEntity> quiz = quizRepository.findByQuizId(quizId);
+        if (userQuiz.isPresent() && quiz.isPresent()) {
+            if (quiz.get().getHasImage().equals(false)) {
+                saveImage(quizId, base64String);
 
-            quiz.get().getQuiz().setHasImage(true);
-            quizRepository.save(quiz.get().getQuiz());
+                userQuiz.get().getQuiz().setHasImage(true);
+                quizRepository.save(userQuiz.get().getQuiz());
+            } else {
+                log.debug("이미 이미지가 존재하는 quiz ID");
+                throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
+            }
         } else {
+            log.debug("존재하지 않는 quiz ID 또는 user가 생성한 quiz가 아님");
             throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public void managerUploadImage(String managerId, Long quizId, String base64String) {
-        Optional<DefaultQuizEntity> quiz = defaultQuizRepository.findByQuizIdAndManagerId(quizId, managerId);
-        if (quiz.isPresent()) {
-            saveImage(quizId, base64String);
+    public void managerUploadImage(Long quizId, String base64String) {
+        Optional<DefaultQuizEntity> defaultQuiz = defaultQuizRepository.findById(quizId);
+        Optional<UserQuizEntity> userQuiz = userQuizRepository.findById(quizId);
+        Optional<QuizEntity> quiz = quizRepository.findByQuizId(quizId);
+        if (userQuiz.isPresent() && quiz.isPresent()) {
+            if (quiz.get().getHasImage().equals(false)) {
+                saveImage(quizId, base64String);
 
-            quiz.get().getQuiz().setHasImage(true);
-            quizRepository.save(quiz.get().getQuiz());
+                userQuiz.get().getQuiz().setHasImage(true);
+                quizRepository.save(userQuiz.get().getQuiz());
+            } else {
+                log.debug("이미 이미지가 존재하는 quiz ID");
+                throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
+            }
+        } else if (defaultQuiz.isPresent() && quiz.isPresent()) {
+            if (quiz.get().getHasImage().equals(false)) {
+                saveImage(quizId, base64String);
+
+                defaultQuiz.get().getQuiz().setHasImage(true);
+                quizRepository.save(defaultQuiz.get().getQuiz());
+            } else {
+                log.debug("이미 이미지가 존재하는 quiz ID");
+                throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
+            }
         } else {
+            log.debug("존재하지 않는 quiz ID");
             throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
         }
     }
