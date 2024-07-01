@@ -108,7 +108,6 @@ public class JwtProvider {
                     .claim("auth", MemberRole.USER.getValue())
                     .signWith(key, SignatureAlgorithm.HS256)
                     .compact();
-            System.out.println(MemberRole.USER);
 
             Date refreshExp = new Date(nowMils + USER_REFRESH_TOKEN_EXPIRE_TIME);
             // 리프레시 토큰 발급 (만료 기간 7일)
@@ -144,7 +143,6 @@ public class JwtProvider {
 
         // 클레임에서 userId(managerId), 권한 추출 후 인증 객체로 반환
         UserDetails principal = new User(claims.getSubject(), "", authorities);
-        System.out.println(principal.getUsername());
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
