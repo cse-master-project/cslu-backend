@@ -76,7 +76,7 @@ public class QuizCreateController {
 
         // 아이디의 길이로 유저, 매니저 구분
         if (id.length() <= 20) {
-            quizCreateService.managerUploadImage(id, request.getQuizId(), request.getBase64String());
+            quizCreateService.managerUploadImage(request.getQuizId(), request.getBase64String());
         } else {
             quizCreateService.userUploadImage(id, request.getQuizId(), request.getBase64String());
         }
