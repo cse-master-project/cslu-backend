@@ -8,6 +8,7 @@ import com.example.csemaster.mapper.QuizMapper;
 import com.example.csemaster.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,9 @@ public class QuizSolverService {
     private final QuizLogRepository quizLogRepository;
     private final QuizReportRepository quizReportRepository;
     private final QuizSubjectRepository quizSubjectRepository;
+
+    @Value("${img.file.path}")
+    private String imgPath;
 
     public QuizResponse getQuiz(String userId, String subject, List<String> detailSubject) {
         // 유저가 요청한 subject 와 detailSubject 가 유효한지 검증
@@ -97,7 +101,7 @@ public class QuizSolverService {
 
     public ResponseEntity<?> getQuizImage(Long quizId) {
         try {
-            BufferedImage image = ImageIO.read(new File("/quiz-img/", quizId +".jpg"));
+            BufferedImage image = ImageIO.read(new File(imgPath + "/" + quizId +".jpg"));
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

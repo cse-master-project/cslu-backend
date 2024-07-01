@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserAccountService {
@@ -47,10 +49,12 @@ public class UserAccountService {
 
                 return jsonNode.get("sub").asText();
             } catch (JsonProcessingException e) {
+                log.debug("json 정보 파싱 실패");
                 return null;
             }
         } catch (HttpClientErrorException.Unauthorized e) {
             // 401이 반환되면 예외가 발생하며, 액세스 토큰의 인증이 실패 했다는 의미
+            log.debug("액세스 토큰 인증 실패");
             return null;
         }
     }
@@ -59,6 +63,7 @@ public class UserAccountService {
         if (user != null) {
             return user.getUserId();
         } else {
+            log.debug("존재하지 않는 구글 ID");
             return null;
         }
     }
@@ -90,6 +95,7 @@ public class UserAccountService {
         activeUser.setCreateAt(LocalDateTime.now());
         activeUserRepository.save(activeUser);
 
+        log.info("회원가입 성공 [닉네임: " + activeUser.getNickname() + "]");
         return user.getUserId();
     }
 
@@ -103,10 +109,14 @@ public class UserAccountService {
         Optional<UserRefreshTokenEntity> refreshToken = refreshTokenRepository.findById(userId);
         refreshToken.ifPresent(refreshTokenRepository::delete);
 
+        Optional<ActiveUserEntity> activeUser = activeUserRepository.findById(userId);
+        log.info("로그아웃 [닉네임: " + activeUser.get().getNickname() + "]");
         return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<?> deactivateUser(String userId) {
+        Optional<ActiveUserEntity> activeUser = activeUserRepository.findById(userId);
+        log.info("회원 탈퇴 [닉네임: " + activeUser.get().getNickname() + "]");
         return activeUserRepository.findById(userId)
                         .map(this::handleUserDeactivation)
                 .orElse(ResponseEntity.notFound().build());
@@ -139,6 +149,8 @@ public class UserAccountService {
                 // 3. 새로운 액세스 토큰과 리프레시 토큰 생성
                 JwtInfo newJwtInfo = jwtProvider.generateToken(userId);
 
+                Optional<ActiveUserEntity> activeUser = activeUserRepository.findById(userId);
+                log.info("토큰 재발급 [닉네임: " + activeUser.get().getNickname() + "]");
                 return refreshTokenRepository.findById(userId)
                         .map(token -> {
                             token.setRefreshToken(newJwtInfo.getRefreshToken());
@@ -147,9 +159,11 @@ public class UserAccountService {
                             return ResponseEntity.ok().body(newJwtInfo);
                         }).orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
             } else {
+                log.debug("User가 아님");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid User Type");
             }
         } else {
+            log.debug("유효하지 않은 리프레시 토큰");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
         }
     }

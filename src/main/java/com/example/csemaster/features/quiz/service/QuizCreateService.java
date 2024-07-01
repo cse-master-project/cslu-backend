@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,9 @@ public class QuizCreateService {
     private final QuizSubjectRepository quizSubjectRepository;
     private final QuizDetailSubjectRepository quizDetailSubjectRepository;
 
+    @Value("${img.file.path}")
+    private String imgPath;
+
     // jsonContent 형식 검사
     public boolean isValidJsonContent(Integer quizType, String jsonContent) {
         /* 1. 4지선다 / 2. 단답식 / 3. 선 긋기 / 4. O/X / 5. 빈칸 채우기 */
@@ -53,6 +57,7 @@ public class QuizCreateService {
 
             // 'quiz' 필드가 빈 문자열이 아닌지 확인
             if (quizValue.isEmpty() || commentaryValue.isEmpty()) {
+                log.debug("quiz 또는 commentary 필드가 비어있음");
                 throw new CustomException(ExceptionEnum.NULL_VALUE);
             }
 
@@ -62,11 +67,13 @@ public class QuizCreateService {
 
                 // 'answer' 필드가 1~4 값을 가졌는지 확인
                 if (!answerTypes.contains(answerValue)) {
+                    log.debug("answer 필드가 1~4 이외의 값을 가짐");
                     return false;
                 }
 
                 // 'option' 필드가 배열이며, 크기가 4인지 확인
                 if (!optionNode.isArray() || optionNode.size() != 4) {
+                    log.debug("option 필드가 배열이 아니거나 크기가 4가 아님");
                     return false;
                 }
             }
@@ -75,6 +82,7 @@ public class QuizCreateService {
             if (quizType.equals(2)) {
                 // 'answer' 필드가 빈 문자열이 아닌지 확인
                 if (answerValue.isEmpty()) {
+                    log.debug("answer 필드가 비어있음");
                     return false;
                 }
             }
@@ -83,16 +91,19 @@ public class QuizCreateService {
             if (quizType.equals(3)) {
                 // 'left_option' 필드가 배열이며, 빈 배열이 아닌지 확인
                 if (!leftOptionNode.isArray() || leftOptionNode.isEmpty()) {
+                    log.debug("left_option 필드가 배열이 아니거나 비어있음");
                     return false;
                 }
 
                 // 'right_option' 필드가 배열이며, 빈 배열이 아닌지 확인
                 if (!rightOptionNode.isArray() || rightOptionNode.isEmpty()) {
+                    log.debug("right_option 필드가 배열이 아니거나 비어있음");
                     return false;
                 }
 
                 // 'answer' 필드가 배열이며, 빈 배열이 아닌지 확인
                 if (!answerNode.isArray() || answerNode.isEmpty()) {
+                    log.debug("answer 필드가 배열이 아니거나 비어있음");
                     return false;
                 }
             }
@@ -103,6 +114,7 @@ public class QuizCreateService {
 
                 // 'answer' 필드가 0, 1만 가지고 있는지 확인
                 if (!zeroOrOne.contains(answerValue)) {
+                    log.debug("answer 필드가 0, 1 이외의 값을 가짐");
                     return false;
                 }
             }
@@ -110,6 +122,7 @@ public class QuizCreateService {
             // 5. 빈칸 채우기
             if (quizType.equals(5)) {
                 // 'answer' 필드가 배열이며, 빈 배열이 아닌지 확인
+                log.debug("answer 필드가 배열이 아니거나 비어있음");
                 return answerNode.isArray() && !answerNode.isEmpty();
             }
 
@@ -156,6 +169,7 @@ public class QuizCreateService {
         Optional<QuizEntity> quizEntity = quizRepository.findByQuizId(quizId);
         if (quizEntity.isEmpty()) {
             // 무결성 문제라서 500 반환
+            log.debug("존재하지 않는 문제");
             throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
         }
 
@@ -179,6 +193,7 @@ public class QuizCreateService {
         // quizId가 존재하는지 확인
         Optional<QuizEntity> quizEntity = quizRepository.findByQuizId(quizId);
         if (quizEntity.isEmpty()) {
+            log.debug("존재하지 안는 문제");
             throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
         }
 
@@ -189,6 +204,7 @@ public class QuizCreateService {
         userQuizEntity.setUserId(userEntity.get());
 
         userQuizRepository.save(userQuizEntity);
+        log.info("User Quiz 저장 완료");
     }
 
     @Transactional
@@ -229,21 +245,22 @@ public class QuizCreateService {
     private void saveImage(Long quizId, String base64String) {
         try {
             String[] strings = base64String.split(",");
-            String filename = "/quiz-img" + quizId + ".jpg";  // 무조건 jpg 로 저장
+            String filename = imgPath + "/" + quizId + ".jpg";  // 무조건 jpg 로 저장
 
-            File directory = new File("quiz-img");
+            File directory = new File(imgPath);
             if (!directory.exists()) {
                 directory.mkdirs(); // 폴더가 존재하지 않는다면 생성
             }
 
             byte[] decodedBytes = Base64.getDecoder().decode(strings[1]);
-
-            FileOutputStream fos = new FileOutputStream(filename);
+            System.out.println(filename);
+            FileOutputStream fos = new FileOutputStream(filename, false);
             fos.write(decodedBytes);
             fos.close();
 
             log.info("file save successful. [quizId: " + quizId + "]");
         } catch (IOException e) {
+            System.out.println(e.getMessage());
             // 입출력 실패시 500
             throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
         }

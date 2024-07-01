@@ -13,7 +13,6 @@ import java.util.TimeZone;
 @EnableScheduling
 @Slf4j
 public class CseMasterApplication {
-
     @PostConstruct
     public void started() {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
@@ -23,5 +22,4 @@ public class CseMasterApplication {
         SpringApplication.run(CseMasterApplication.class, args);
         log.info("CSLU server started successfully!");
     }
-
 }
