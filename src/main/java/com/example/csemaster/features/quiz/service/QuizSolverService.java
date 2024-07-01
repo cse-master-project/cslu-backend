@@ -59,17 +59,20 @@ public class QuizSolverService {
         // detailSubject가 비었는지 확인 & detailSubject가 유효한지 검증
         List<ActiveQuizEntity> quiz = null;
 
+        // detailSubject 에 데이터가 없으면 모든 세부 목차 검색
         if (detailSubject == null || detailSubject.isEmpty()) {
-            // 유저가 풀지 않은 문제이면서 지정한 과목과 목차에 해당하는 문제를 한 개 제공
-            if (hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuiz(userId, subject);
+            // 푼 퀴즈를 나오게 설정한 경우 포함해서 검색
+            if (!hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuiz(userId, subject);
             else quiz = activeQuizRepository.getAnOpenQuizWithSolved(subject);
         } else {
-            // 유저가 풀지 않은 문제이면서 지정한 과목과 목차에 해당하는 문제를 한 개 제공
-            if (hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuiz(userId, subject, detailSubject);
+            if (!hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuiz(userId, subject, detailSubject);
             else quiz = activeQuizRepository.getAnOpenQuizWithSolved(subject, detailSubject);
         }
         if (!quiz.isEmpty()) {
+            // 필터링을 통해 사용자 문제와 기본 문제 설정에 따라 제거
             quiz = quizFiltering(quiz, hasUserQuiz, hasDefaultQuiz);
+
+            if (quiz.isEmpty()) throw new CustomException(ExceptionEnum.DONE_QUIZ);
 
             int randomIndex = (int)(Math.random() * quiz.size());
             return QuizMapper.INSTANCE.entityToResponse(quiz.get(randomIndex));
@@ -80,11 +83,12 @@ public class QuizSolverService {
 
     public List<ActiveQuizEntity> quizFiltering(List<ActiveQuizEntity> quiz, boolean hasUserQuiz, boolean hasDefaultQuiz) {
         if (!hasUserQuiz) {
-            quiz.removeIf(q -> userQuizRepository.findById(q.getQuizId()).isEmpty());
+            quiz.removeIf(q -> userQuizRepository.findById(q.getQuizId()).isPresent());
         }
         if (!hasDefaultQuiz) {
-            quiz.removeIf(q -> defaultQuizRepository.findById(q.getQuizId()).isEmpty());
+            quiz.removeIf(q -> defaultQuizRepository.findById(q.getQuizId()).isPresent());
         }
+
         return quiz;
     }
 

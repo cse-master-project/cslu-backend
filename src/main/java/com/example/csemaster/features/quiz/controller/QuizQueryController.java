@@ -79,7 +79,7 @@ public class QuizQueryController {
     public QuizResponse getRandomQuiz(@RequestParam String subject, @RequestParam(required = false) List<String> detailSubject,
                                       @RequestParam(required = false, defaultValue = "true") Boolean hasUserQuiz,
                                       @RequestParam(required = false, defaultValue = "true") Boolean hasDefaultQuiz,
-                                      @RequestParam(required = false, defaultValue = "true") Boolean hasSolvedQuiz) {
+                                      @RequestParam(required = false, defaultValue = "false") Boolean hasSolvedQuiz) {
         // 사용자 인증 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
@@ -112,7 +112,6 @@ public class QuizQueryController {
     public ResponseEntity<?> solveQuiz(@RequestBody QuizSolverRequest request)  {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
-        System.out.println(request.getIsCorrect());
 
         return quizSolverService.saveQuizResult(userId, request.getQuizId(), request.getIsCorrect());
     }

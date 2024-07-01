@@ -260,9 +260,8 @@ public class QuizCreateService {
 
             log.info("file save successful. [quizId: " + quizId + "]");
         } catch (IOException e) {
-            System.out.println(e.getMessage());
             // 입출력 실패시 500
-            throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
+            throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR, "image save error");
         }
     }
 
