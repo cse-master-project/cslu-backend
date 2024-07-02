@@ -98,7 +98,7 @@ public class QuizQueryController {
             summary = "여러 카테고리 문제를 무작위로 조회",
             description = "여러 카테고리를 선택하면 해당 카테고리의 모든 하위 카테고리에서 무작위로 하나의 문제를 제공"
     )
-    @GetMapping("/random-multiple")
+    @GetMapping("/random/only-subject")
     public QuizResponse getRandomQuizWithSubject(@RequestParam List<String> subject,
                                                  @RequestParam(required = false, defaultValue = "true") Boolean hasUserQuiz,
                                                  @RequestParam(required = false, defaultValue = "true") Boolean hasDefaultQuiz,
