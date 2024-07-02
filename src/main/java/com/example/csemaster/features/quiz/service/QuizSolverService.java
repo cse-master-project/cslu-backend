@@ -62,11 +62,11 @@ public class QuizSolverService {
         // detailSubject 에 데이터가 없으면 모든 세부 목차 검색
         if (detailSubject == null || detailSubject.isEmpty()) {
             // 푼 퀴즈를 나오게 설정한 경우 포함해서 검색
-            if (!hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuiz(userId, subject);
-            else quiz = activeQuizRepository.getAnOpenQuizWithSolved(subject);
+            if (hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuizWithSolved(subject);
+            else quiz = activeQuizRepository.getAnOpenQuiz(userId, subject);
         } else {
-            if (!hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuiz(userId, subject, detailSubject);
-            else quiz = activeQuizRepository.getAnOpenQuizWithSolved(subject, detailSubject);
+            if (hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuizWithSolved(subject, detailSubject);
+            else quiz = activeQuizRepository.getAnOpenQuiz(userId, subject, detailSubject);
         }
         if (!quiz.isEmpty()) {
             // 필터링을 통해 사용자 문제와 기본 문제 설정에 따라 제거
@@ -76,6 +76,52 @@ public class QuizSolverService {
 
             int randomIndex = (int)(Math.random() * quiz.size());
             return QuizMapper.INSTANCE.entityToResponse(quiz.get(randomIndex));
+        } else {
+            throw new CustomException(ExceptionEnum.DONE_QUIZ);
+        }
+    }
+
+    public void verifySubjects(List<String> subject) {
+        List<ActiveQuizEntity> quiz = null;
+
+        if (!(subject == null || subject.isEmpty())) {
+            // DB에 저장된 subject 검색
+            List<String> dbSubject = quizSubjectRepository.getAllSubject();
+            // 합집합 후에도 db에 있는 내용과 같다면 요소의 개수가 같음
+            // 개수가 서로 다르다면 유효하지 않은 subject 가 있다는 의미
+            Set<String> set = new HashSet<>(subject);
+            set.addAll(dbSubject);
+
+            if (set.size() != dbSubject.size()) throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
+        } else {
+            throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
+        }
+    }
+
+    public QuizResponse getQuizWithSubjects(String userId, List<String> subject, boolean hasUserQuiz, boolean hasDefaultQuiz, boolean hasSolvedQuiz) {
+        List<ActiveQuizEntity> allQuiz = new ArrayList<>();
+
+        for (String sub : subject) {
+            List<ActiveQuizEntity> quiz = null;
+
+            // 푼 퀴즈를 나오게 설정한 경우 포함해서 검색
+            if (hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuizWithSolved(sub);
+            else quiz = activeQuizRepository.getAnOpenQuiz(userId, sub);
+
+            // 각 subject에 대해 검색된 퀴즈를 allQuiz에 추가
+            if (quiz != null && !quiz.isEmpty()) {
+                allQuiz.addAll(quiz);
+            }
+        }
+
+        if (!allQuiz.isEmpty()) {
+            // 필터링을 통해 사용자 문제와 기본 문제 설정에 따라 제거
+            allQuiz = quizFiltering(allQuiz, hasUserQuiz, hasDefaultQuiz);
+
+            if (allQuiz.isEmpty()) throw new CustomException(ExceptionEnum.DONE_QUIZ);
+
+            int randomIndex = (int)(Math.random() * allQuiz.size());
+            return QuizMapper.INSTANCE.entityToResponse(allQuiz.get(randomIndex));
         } else {
             throw new CustomException(ExceptionEnum.DONE_QUIZ);
         }

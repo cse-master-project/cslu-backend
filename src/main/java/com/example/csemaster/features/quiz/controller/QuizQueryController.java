@@ -93,6 +93,29 @@ public class QuizQueryController {
         return quizSolverService.getQuiz(userId, subject, detailSubject, hasUserQuiz, hasDefaultQuiz, hasSolvedQuiz);
     }
 
+    // 여러 카테고리 문제를 무작위로 조회
+    @Operation(
+            summary = "여러 카테고리 문제를 무작위로 조회",
+            description = "여러 카테고리를 선택하면 해당 카테고리의 모든 하위 카테고리에서 무작위로 하나의 문제를 제공"
+    )
+    @GetMapping("/random-multiple")
+    public QuizResponse getRandomQuizWithSubject(@RequestParam List<String> subject,
+                                                 @RequestParam(required = false, defaultValue = "true") Boolean hasUserQuiz,
+                                                 @RequestParam(required = false, defaultValue = "true") Boolean hasDefaultQuiz,
+                                                 @RequestParam(required = false, defaultValue = "false") Boolean hasSolvedQuiz) {
+        // 사용자 인증 정보 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+
+        // 검증
+        quizSolverService.verifySubjects(subject);
+
+        if(!hasDefaultQuiz && !hasUserQuiz) throw new CustomException(ExceptionEnum.ILLEGAL_ARGUMENT);
+
+        // 무작위로 하나의 문제를 반환
+        return quizSolverService.getQuizWithSubjects(userId, subject, hasUserQuiz, hasDefaultQuiz, hasSolvedQuiz);
+    }
+
     // 문제 이미지 조회
     @Operation(
             summary = "문제 이미지 조회",
