@@ -35,7 +35,7 @@ public class LoggingFilter implements Filter {
             // ContentCachingResponseWrapper httpServletResponse = new ContentCachingResponseWrapper((HttpServletResponse) response);
             // String resContent = new String(httpServletResponse.getContentAsByteArray());
             // int httpStatus = httpServletResponse.getStatus();
-            log.debug("State : {}, Response Body : '{}'" , httpStatus, resContent);
+            // log.debug("State : {}, Response Body : '{}'" , httpStatus, resContent);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         } finally {
