@@ -24,24 +24,12 @@ public class LoggingFilter implements Filter {
         MDC.put("traceId", requestID);
         try {
             log.info("Request URI : '{}', from IP : {}", requestURI, clientIP);
-            try {
-                // 1. ServletInputStream 객체 얻기
-                InputStream inputStream = request.getInputStream();
 
-                // 2. 바이트 배열로 요청 바디 읽기
-                byte[] buffer = new byte[4096];
-                int bytesRead;
-                StringBuilder requestBody = new StringBuilder();
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                    requestBody.append(new String(buffer, 0, bytesRead));
-                }
+            chain.doFilter(httpServletRequest, response);
 
-                // 3. 바이트 배열을 문자열로 변환하여 출력
-                log.debug("Request Body: " + requestBody);
-            } catch (IOException e) {
-                log.debug(e.getMessage());
-            }
-            chain.doFilter(request, response);
+            String reqContent = new String(httpServletRequest.getContentAsByteArray());
+            log.debug("Request Body : '{}'" , reqContent);
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         } finally {
