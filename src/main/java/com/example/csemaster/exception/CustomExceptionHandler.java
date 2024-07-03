@@ -26,7 +26,7 @@ public class CustomExceptionHandler {
     }
     @ExceptionHandler({RuntimeException.class})
     public ResponseEntity<ExceptionEntity> exceptionHandler(HttpServletRequest request, final RuntimeException e) {
-        log.error(e.getMessage(), e);
+        log.error(e.getMessage());
         return ResponseEntity
                 .status(ExceptionEnum.RUNTIME_EXCEPTION.getStatus())
                 .body(ExceptionEntity.builder()
