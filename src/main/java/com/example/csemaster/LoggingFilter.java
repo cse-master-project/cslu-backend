@@ -19,7 +19,6 @@ public class LoggingFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {
         ContentCachingRequestWrapper httpServletRequest = new ContentCachingRequestWrapper((HttpServletRequest) request);
-        ContentCachingResponseWrapper httpServletResponse = new ContentCachingResponseWrapper((HttpServletResponse) response);
         String requestURI = httpServletRequest.getRequestURI();
         String requestID = UUID.randomUUID().toString();
         String clientIP = request.getRemoteAddr();
@@ -33,8 +32,10 @@ public class LoggingFilter implements Filter {
             String reqContent = new String(httpServletRequest.getContentAsByteArray());
             log.debug("Request Body : '{}'" , reqContent);
 
-            String resContent = new String(httpServletResponse.getContentAsByteArray());
-            log.debug("Response Body : '{}'" , resContent);
+            // ContentCachingResponseWrapper httpServletResponse = new ContentCachingResponseWrapper((HttpServletResponse) response);
+            // String resContent = new String(httpServletResponse.getContentAsByteArray());
+            // int httpStatus = httpServletResponse.getStatus();
+            log.debug("State : {}, Response Body : '{}'" , httpStatus, resContent);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         } finally {
