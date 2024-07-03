@@ -63,21 +63,23 @@ public class UserProfileService {
         return quizResultCounter.getCorrectRate();
     };
 
-    // 전체 정답률 구하는 함수
-    private Double getTotalAccuracy(List<QuizResultDTO> quizResult) {
-        int total = 0;
+    private int getTotalCorrect(List<QuizResultDTO> quizResult) {
         int correctCnt = 0;
 
         for (QuizResultDTO e : quizResult) {
-            total++;
             correctCnt += e.isCorrect() ? 1 : 0;
         }
 
-        return ((double) correctCnt / total) * 100;
+        return correctCnt;
     }
 
     public QuizStatsResponse getUserQuizResult(String userId) {
         List<QuizResultDTO> quizResult = quizLogRepository.findAllByUserId(userId);
-        return new QuizStatsResponse(getTotalAccuracy(quizResult), getQuizAccuracy(quizResult));
+        int total = quizResult.size();
+        int totalCorrect = getTotalCorrect(quizResult);
+        int totalIncorrect = total - totalCorrect;
+        Double totalAccuracy = ((double) totalCorrect / total) * 100;
+
+        return new QuizStatsResponse(total, totalCorrect, totalIncorrect, totalAccuracy, getQuizAccuracy(quizResult));
     }
 }
