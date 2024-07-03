@@ -10,6 +10,9 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 public class QuizStatsResponse {
+    private int totalSolved;
+    private int totalCorrect;
+    private int totalIncorrect;
     private Double totalCorrectRate;
     private Map<String, Double> correctRateBySubject;
 }
