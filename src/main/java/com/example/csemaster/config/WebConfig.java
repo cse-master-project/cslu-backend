@@ -1,5 +1,6 @@
-package com.example.csemaster;
+package com.example.csemaster.config;
 
+import com.example.csemaster.filter.LoggingFilter;
 import jakarta.servlet.Filter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;

@@ -1,7 +1,7 @@
-package com.example.csemaster;
+package com.example.csemaster.config;
 
-import com.example.csemaster.jwt.JwtAuthenticationFilter;
-import com.example.csemaster.jwt.JwtProvider;
+import com.example.csemaster.filter.JwtAuthenticationFilter;
+import com.example.csemaster.features.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

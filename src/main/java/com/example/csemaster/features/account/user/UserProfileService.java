@@ -3,6 +3,9 @@ package com.example.csemaster.features.account.user;
 import com.example.csemaster.dto.NicknameDTO;
 import com.example.csemaster.dto.QuizResultDTO;
 import com.example.csemaster.dto.response.QuizStatsResponse;
+import com.example.csemaster.dto.response.UserInfoResponse;
+import com.example.csemaster.exception.CustomException;
+import com.example.csemaster.exception.ExceptionEnum;
 import com.example.csemaster.mapper.ActiveUserMapper;
 import com.example.csemaster.repository.ActiveUserRepository;
 import com.example.csemaster.repository.QuizLogRepository;
@@ -10,7 +13,6 @@ import com.example.csemaster.repository.QuizSubjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -25,23 +27,24 @@ public class UserProfileService {
     private final QuizLogRepository quizLogRepository;
     private final QuizSubjectRepository quizSubjectRepository;
 
-    public ResponseEntity<?> getUserInfo(String userId) {
+    public UserInfoResponse getUserInfo(String userId) {
         return activeUserRepository.findById(userId)
-                .map(activeUser -> ResponseEntity.ok().body(ActiveUserMapper.INSTANCE.toUserInfo(activeUser)))
-                .orElse(ResponseEntity.notFound().build());
+                .map(ActiveUserMapper.INSTANCE::toUserInfo)
+                .orElse(null);
     }
 
     public ResponseEntity<?> setUserNickname(String userId, NicknameDTO nickNameDTO) {
         try {
             return activeUserRepository.findById(userId)
                     .map(activeUser -> {
+                        log.info("User nickname change '{}' to '{}' [userId: {}]", activeUser.getNickname(), nickNameDTO.getNickname(), userId);
                         activeUser.setNickname(nickNameDTO.getNickname());
                         activeUserRepository.save(activeUser);
 
                         return ResponseEntity.ok().build();
                     }).orElse(ResponseEntity.notFound().build());
         } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            throw new CustomException(ExceptionEnum.DUPLICATE_NICKNAME);
         }
     }
 

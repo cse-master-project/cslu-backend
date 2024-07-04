@@ -32,9 +32,9 @@ public class QuizManagerService {
         quiz.get().setIsDeleted(true);
         quizRepository.save(quiz.get());
 
-        log.info("문제 삭제 성공 [quiz ID: " + quiz.get().getQuizId() + "]");
+        log.info("Delete Quiz [quiz ID: " + quizId + "]");
 
-        return ResponseEntity.ok().body("Delete Successfully");
+        return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<?> updateQuiz(Long quizId, String newJsonContent) {
@@ -61,8 +61,8 @@ public class QuizManagerService {
         quiz.get().setJsonContent(newJsonContent);
         quizRepository.save(quiz.get());
 
-        log.info("jsonContent 수정 완료 [quiz ID: " + quiz.get().getQuizId() + "]");
+        log.info("Patch quiz content [quiz ID: " + quiz.get().getQuizId() + "]");
 
-        return ResponseEntity.ok().body("Update Successfully");
+        return ResponseEntity.ok().build();
     }
 }

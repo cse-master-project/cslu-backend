@@ -54,6 +54,8 @@ public class QuizSubjectService {
         newSubjectEntity.setSubject(subjectDTO.getSubject());
         quizSubjectRepository.save(newSubjectEntity);
 
+        log.info("Create new subject( {} )]", subjectDTO.getSubject());
+
         return ResponseEntity.ok().build();
     }
 
@@ -75,6 +77,8 @@ public class QuizSubjectService {
         detailSubjectEntity.setSubjectId(subjectEntity.get().getSubjectId());
         detailSubjectEntity.setDetailSubject(detailSubjectDTO.getDetailSubject());
         quizDetailSubjectRepository.save(detailSubjectEntity);
+
+        log.info("Create new detail Subject( {} - {} )]", detailSubjectDTO.getSubject(), detailSubjectDTO.getDetailSubject());
 
         return ResponseEntity.ok().build();
     }
