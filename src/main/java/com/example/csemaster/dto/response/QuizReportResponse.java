@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class QuizReportResponse {
     private Long quizReportId;
     private Long quizId;
-    private String userId;
+    private String userNickname;
     private String content;
     private LocalDateTime reportAt;
 }
