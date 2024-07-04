@@ -122,8 +122,16 @@ public class QuizCreateService {
             // 5. 빈칸 채우기
             if (quizType.equals(5)) {
                 // 'answer' 필드가 배열이며, 빈 배열이 아닌지 확인
-                log.debug("answer 필드가 배열이 아니거나 비어있음");
-                return answerNode.isArray() && !answerNode.isEmpty();
+                if (!answerNode.isArray() && answerNode.isEmpty()) {
+                    log.debug("answer 필드가 배열이 아니거나 비어있음");
+                    return false;
+                }
+
+                // 'answer' 필드의 요소가 세 개 이하인지 확인
+                if (answerNode.size() > 3) {
+                    log.debug("answer 필드의 요소가 세 개를 초과함");
+                    return false;
+                }
             }
 
             return true;
