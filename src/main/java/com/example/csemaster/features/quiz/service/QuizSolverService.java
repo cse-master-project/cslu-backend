@@ -82,8 +82,6 @@ public class QuizSolverService {
     }
 
     public void verifySubjects(List<String> subject) {
-        List<ActiveQuizEntity> quiz = null;
-
         if (!(subject == null || subject.isEmpty())) {
             // DB에 저장된 subject 검색
             List<String> dbSubject = quizSubjectRepository.getAllSubject();
