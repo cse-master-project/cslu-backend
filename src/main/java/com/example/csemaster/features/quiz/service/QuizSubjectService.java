@@ -83,7 +83,7 @@ public class QuizSubjectService {
         List<DetailSubjectEntity> detailSubjects = quizDetailSubjectRepository.findBySubjectId(subjectEntity.get().getSubjectId());
         detailSubjects.sort(Comparator.comparingInt(DetailSubjectEntity::getSortIndex));
         
-        if (detailSubjectDTO.getSortIndex() >= detailSubjects.size()) {
+        if (detailSubjectDTO.getSortIndex() > detailSubjects.size()) {
             log.debug("sortIndex가 최대값을 초과함");
             throw new CustomException(ExceptionEnum.ARGS_NOT_VALID);
         }
