@@ -82,8 +82,6 @@ public class QuizSolverService {
     }
 
     public void verifySubjects(List<String> subject) {
-        List<ActiveQuizEntity> quiz = null;
-
         if (!(subject == null || subject.isEmpty())) {
             // DB에 저장된 subject 검색
             List<String> dbSubject = quizSubjectRepository.getAllSubject();
@@ -152,10 +150,11 @@ public class QuizSolverService {
 
             quizLogRepository.save(quizLog);
 
+            log.info("User solved quiz [quizId: {}, userId{}]", quizId, userId);
             return ResponseEntity.ok().build();
         } catch (DataIntegrityViolationException e) {
             // 잘못된 quiz id를 전달했을 때 발생하는 제약 조건 위반 예외
-            return ResponseEntity.badRequest().body("Invalid value");
+            throw new CustomException(ExceptionEnum.NOT_FOUND_ID);
         }
     }
 

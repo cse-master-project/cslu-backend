@@ -1,11 +1,12 @@
 package com.example.csemaster.features.account.manager;
 
 import com.example.csemaster.dto.ManagerLoginDTO;
-import com.example.csemaster.jwt.JwtInfo;
+import com.example.csemaster.exception.CustomException;
+import com.example.csemaster.exception.ExceptionEnum;
+import com.example.csemaster.features.jwt.JwtInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -31,14 +32,15 @@ public class ManagerAccountController {
             description = "관리자 아이디, 비밀번호를 받아서 토큰 발급"
     )
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody ManagerLoginDTO managerLoginDto) {
+    public JwtInfo login(@RequestBody ManagerLoginDTO managerLoginDto) {
         JwtInfo jwtInfo = managerAccountService.login(managerLoginDto);
 
         if (jwtInfo == null) {
-            return ResponseEntity.badRequest().body("아이디나 비밀번호가 잘못됨");
+            // id or pw 틀림
+            throw new CustomException(ExceptionEnum.ACCESS_DENIED_EXCEPTION);
         }
-
-        return ResponseEntity.ok(jwtInfo);
+        log.info("Login manager");
+        return jwtInfo;
     }
 
     // 관리자 로그아웃
@@ -51,6 +53,7 @@ public class ManagerAccountController {
         String managerId = SecurityContextHolder.getContext().getAuthentication().getName();
         String accessToken = extractAccessTokenFromHeader(request);
 
+        log.info("Logout manager");
         return managerAccountService.logout(managerId, accessToken);
     }
 
@@ -60,13 +63,13 @@ public class ManagerAccountController {
             description = "관리자의 리프레시 토큰을 추출하여 액세스 토큰 및 리프레시 토큰 재발급"
     )
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+    public JwtInfo refreshToken(HttpServletRequest request) {
         JwtInfo jwtInfo = managerAccountService.refreshToken(request.getHeader("Refresh-Token"));
 
         if (jwtInfo == null) {
-            return ResponseEntity.badRequest().body("유효하지 않은 토큰");
+            throw new CustomException(ExceptionEnum.INVALID_JWT);
         }
-
-        return ResponseEntity.ok(jwtInfo);
+        log.info("Manager reissued Tokens");
+        return jwtInfo;
     }
 }

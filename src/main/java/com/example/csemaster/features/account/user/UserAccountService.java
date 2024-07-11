@@ -1,9 +1,11 @@
 package com.example.csemaster.features.account.user;
 
 import com.example.csemaster.entity.*;
+import com.example.csemaster.exception.CustomException;
+import com.example.csemaster.exception.ExceptionEnum;
 import com.example.csemaster.features.account.TokenUtils;
-import com.example.csemaster.jwt.JwtInfo;
-import com.example.csemaster.jwt.JwtProvider;
+import com.example.csemaster.features.jwt.JwtInfo;
+import com.example.csemaster.features.jwt.JwtProvider;
 import com.example.csemaster.mapper.ActiveUserMapper;
 import com.example.csemaster.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,7 +14,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -54,7 +55,7 @@ public class UserAccountService {
             }
         } catch (HttpClientErrorException.Unauthorized e) {
             // 401이 반환되면 예외가 발생하며, 액세스 토큰의 인증이 실패 했다는 의미
-            log.debug("액세스 토큰 인증 실패");
+            log.debug("구글 액세스 토큰 인증 실패");
             return null;
         }
     }
@@ -73,7 +74,7 @@ public class UserAccountService {
     }
 
     @Transactional
-    public String rejoin(String userId, String googleId, String nickname) {
+    public void rejoin(String userId, String googleId, String nickname) {
         UserEntity user = userRepository.findById(userId).orElse(null);
         if (user != null) {
             user.setIsActive(true);
@@ -90,8 +91,7 @@ public class UserAccountService {
 
         deleteUserRepository.deleteById(userId);
 
-        log.info(rejoinUser.getUserId() + " : 재가입");
-        return userId;
+        log.info("User rejoin [userId: {}]", rejoinUser.getUserId());
     }
 
     public String getUserId(String googleId) {
@@ -99,7 +99,7 @@ public class UserAccountService {
         if (user != null) {
             return user.getUserId();
         } else {
-            log.debug("존재하지 않는 구글 ID");
+            log.debug("존재하지 않는 구글 openID");
             return null;
         }
     }
@@ -146,25 +146,23 @@ public class UserAccountService {
         Optional<UserRefreshTokenEntity> refreshToken = refreshTokenRepository.findById(userId);
         refreshToken.ifPresent(refreshTokenRepository::delete);
 
-        Optional<ActiveUserEntity> activeUser = activeUserRepository.findById(userId);
-        log.info("로그아웃 [닉네임: " + activeUser.get().getNickname() + "]");
+        log.info("User logout [userId: " + userId + "]");
         return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<?> deactivateUser(String userId) {
-        Optional<ActiveUserEntity> activeUser = activeUserRepository.findById(userId);
-        log.info("회원 탈퇴 [닉네임: " + activeUser.get().getNickname() + "]");
+        log.info("User deactivate [userId: " + userId + "]");
         return activeUserRepository.findById(userId)
                         .map(this::handleUserDeactivation)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     private ResponseEntity<Void> handleUserDeactivation(ActiveUserEntity activeUser) {
-        // 유저 비황성화
+        // 유저 비활성화
         activeUser.getUser().setIsActive(false);
         userRepository.save(activeUser.getUser());
 
-        // Active에서 Delete로 이동
+        // Active 에서 Delete 로 이동
         DeleteUserEntity deleteUser = ActiveUserMapper.INSTANCE.activeToDelete(activeUser);
         deleteUser.setDeleteAt(LocalDateTime.now());
         deleteUserRepository.save(deleteUser);
@@ -176,7 +174,7 @@ public class UserAccountService {
     }
 
     @Transactional
-    public ResponseEntity<?> refreshToken(String refreshToken) {
+    public JwtInfo refreshToken(String refreshToken) {
         // 1. 리프레시 토큰 검증
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             // 2. 리프레시 토큰으로부터 사용자 정보 추출
@@ -186,22 +184,25 @@ public class UserAccountService {
                 // 3. 새로운 액세스 토큰과 리프레시 토큰 생성
                 JwtInfo newJwtInfo = jwtProvider.generateToken(userId);
 
-                Optional<ActiveUserEntity> activeUser = activeUserRepository.findById(userId);
-                log.info("토큰 재발급 [닉네임: " + activeUser.get().getNickname() + "]");
-                return refreshTokenRepository.findById(userId)
-                        .map(token -> {
-                            token.setRefreshToken(newJwtInfo.getRefreshToken());
-                            token.setIssueAt(newJwtInfo.getRefreshIseAt());
-                            token.setExpAt(newJwtInfo.getRefreshExpAt());
-                            return ResponseEntity.ok().body(newJwtInfo);
-                        }).orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+                log.info("Reissue token [userId: " + userId + "]");
+
+                Optional<UserRefreshTokenEntity> preRefresh = refreshTokenRepository.findById(userId);
+                if (preRefresh.isPresent()) {
+                    preRefresh.get().setRefreshToken(newJwtInfo.getRefreshToken());
+                    preRefresh.get().setIssueAt(newJwtInfo.getRefreshIseAt());
+                    preRefresh.get().setExpAt(newJwtInfo.getRefreshExpAt());
+                    refreshTokenRepository.save(preRefresh.get());
+
+                    return newJwtInfo;
+                } else {
+                    throw new CustomException(ExceptionEnum.EXPIRED_JWT);
+                }
             } else {
-                log.debug("User가 아님");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid User Type");
+                throw new CustomException(ExceptionEnum.INVALID_IDENTIFIER);
             }
         } else {
             log.debug("유효하지 않은 리프레시 토큰");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+            throw new CustomException(ExceptionEnum.INVALID_JWT);
         }
     }
 }

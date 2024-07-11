@@ -5,6 +5,7 @@ import com.example.csemaster.entity.QuizRejectEntity;
 import com.example.csemaster.repository.QuizRejectRepository;
 import com.example.csemaster.repository.UserQuizRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ApprovalQuizService {
     private final UserQuizRepository userQuizRepository;
     private final QuizRejectRepository quizRejectRepository;
@@ -25,6 +27,7 @@ public class ApprovalQuizService {
                 .map(quiz -> {
                     quiz.setPermissionStatus(state);
                     userQuizRepository.save(quiz);
+                    log.info("User quiz approved [quizId: {}]", quizId);
                     return ResponseEntity.ok().build();
                 }).orElse(ResponseEntity.notFound().build());
     }
@@ -39,6 +42,8 @@ public class ApprovalQuizService {
                 .map(quiz -> {
                     quiz.setPermissionStatus(state);
                     userQuizRepository.save(quiz);
+
+                    log.info("User quiz rejected [quizId: {}]", quizId);
                     return ResponseEntity.ok().build();
                 }).orElse(ResponseEntity.notFound().build());
     }

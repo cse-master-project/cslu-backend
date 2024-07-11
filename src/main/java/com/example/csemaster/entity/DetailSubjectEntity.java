@@ -24,4 +24,7 @@ public class DetailSubjectEntity {
 
     @Column(name = "detail_subject")
     private String detailSubject;
+
+    @Column(name = "sort_index")
+    private Integer sortIndex;
 }

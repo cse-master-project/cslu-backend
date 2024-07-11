@@ -2,6 +2,9 @@ package com.example.csemaster.features.account.user;
 
 import com.example.csemaster.dto.NicknameDTO;
 import com.example.csemaster.dto.response.QuizStatsResponse;
+import com.example.csemaster.dto.response.UserInfoResponse;
+import com.example.csemaster.exception.CustomException;
+import com.example.csemaster.exception.ExceptionEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -26,11 +29,13 @@ public class UserProfileController {
             description = "토큰에서 사용자 아이디를 추출하여 사용자 정보 조회"
     )
     @GetMapping("/info")
-    private ResponseEntity<?> getUserInfo() {
+    private UserInfoResponse getUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
-        return userProfileService.getUserInfo(userId);
+        UserInfoResponse response = userProfileService.getUserInfo(userId);
+        if (response != null) return response;
+        else throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
     }
 
     // 사용자 닉네임 설정

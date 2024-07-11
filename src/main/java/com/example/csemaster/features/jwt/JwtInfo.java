@@ -1,4 +1,4 @@
-package com.example.csemaster.jwt;
+package com.example.csemaster.features.jwt;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

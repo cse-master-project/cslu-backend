@@ -84,7 +84,6 @@ public class QuizSubjectController {
         return quizSubjectService.deleteSubject(subjectDTO);
     }
 
-
     // 서브 카테고리 삭제
     @Operation(
             summary = "서브 카테고리 삭제",
@@ -93,6 +92,16 @@ public class QuizSubjectController {
     @DeleteMapping("/detail")
     public ResponseEntity<?> deleteDetailSubject(@RequestBody DetailSubjectDTO detailSubjectDTO) {
         return quizSubjectService.deleteDetailSubject(detailSubjectDTO);
+    }
+
+    // 서브 카테고리 순서 변경
+    @Operation(
+            summary = "서브 카테고리 순서 재설정",
+            description = "서브 카테고리의 순서를 통째로 재설정"
+    )
+    @PostMapping("/adjust-detail")
+    public ResponseEntity<?> adjustDetailSubject(@RequestBody List<DetailSubjectDTO> detailSubjectDTO) {
+        return quizSubjectService.adjustDetailSubject(detailSubjectDTO);
     }
 
 }

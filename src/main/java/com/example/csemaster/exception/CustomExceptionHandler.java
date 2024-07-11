@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class CustomExceptionHandler {
     @ExceptionHandler({CustomException.class})
     public ResponseEntity<ExceptionEntity> exceptionHandler(HttpServletRequest request, final CustomException e) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(), e);
         return ResponseEntity
                 .status(e.getError().getStatus())
                 .body(ExceptionEntity.builder()
@@ -26,7 +26,7 @@ public class CustomExceptionHandler {
     }
     @ExceptionHandler({RuntimeException.class})
     public ResponseEntity<ExceptionEntity> exceptionHandler(HttpServletRequest request, final RuntimeException e) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(), e);
         return ResponseEntity
                 .status(ExceptionEnum.RUNTIME_EXCEPTION.getStatus())
                 .body(ExceptionEntity.builder()
@@ -37,7 +37,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<ExceptionEntity> exceptionHandler(HttpServletRequest request, final MethodArgumentNotValidException e) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(), e);
         return ResponseEntity
                 .status(ExceptionEnum.ARGS_NOT_VALID.getStatus())
                 .body(ExceptionEntity.builder()

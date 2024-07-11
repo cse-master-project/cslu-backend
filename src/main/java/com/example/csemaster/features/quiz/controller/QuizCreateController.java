@@ -48,7 +48,6 @@ public class QuizCreateController {
     @PostMapping("/default")
     public Long addDefaultQuiz(@RequestBody @Valid QuizDTO quizDTO) {
         String managerId = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println(managerId);
 
         return quizCreateService.addQuizAndDefaultQuiz(quizDTO, managerId);
     }

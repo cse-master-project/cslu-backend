@@ -1,10 +1,12 @@
 package com.example.csemaster.features.quiz.service;
 
 import com.example.csemaster.dto.response.QuizReportResponse;
+import com.example.csemaster.entity.ActiveUserEntity;
 import com.example.csemaster.exception.CustomException;
 import com.example.csemaster.exception.ExceptionEnum;
 import com.example.csemaster.entity.QuizReportEntity;
 import com.example.csemaster.mapper.QuizReportMapper;
+import com.example.csemaster.repository.ActiveUserRepository;
 import com.example.csemaster.repository.QuizReportRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class QuizReportService {
     private final QuizReportRepository quizReportRepository;
+    private final ActiveUserRepository activeUserRepository;
     private final QuizReportMapper quizReportMapper;
 
     public QuizReportResponse getQuizReport(Long quizReportId) {
@@ -26,8 +29,12 @@ public class QuizReportService {
         if (quizReport.isEmpty()) {
             throw new CustomException(ExceptionEnum.NOT_FOUND_ID);
         }
+        QuizReportResponse response = quizReportMapper.toQuizReportResponse(quizReport.get());
+        ActiveUserEntity activeUser = activeUserRepository.findById(quizReport.get().getUserId()).orElse(null);
+        if (activeUser != null) response.setUserNickname(activeUser.getNickname());
+        else response.setUserNickname("탈퇴한 사용자");
 
-        return quizReportMapper.toQuizReportResponse(quizReport.get());
+        return response;
     }
 
     public List<QuizReportResponse> allQuizReport() {

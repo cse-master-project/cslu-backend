@@ -10,4 +10,6 @@ public class DetailSubjectDTO {
     private String subject;
     @NotBlank
     private String detailSubject;
+
+    private Integer sortIndex;
 }

@@ -122,8 +122,16 @@ public class QuizCreateService {
             // 5. 빈칸 채우기
             if (quizType.equals(5)) {
                 // 'answer' 필드가 배열이며, 빈 배열이 아닌지 확인
-                log.debug("answer 필드가 배열이 아니거나 비어있음");
-                return answerNode.isArray() && !answerNode.isEmpty();
+                if (!answerNode.isArray() && answerNode.isEmpty()) {
+                    log.debug("answer 필드가 배열이 아니거나 비어있음");
+                    return false;
+                }
+
+                // 'answer' 필드의 요소가 세 개 이하인지 확인
+                if (answerNode.size() > 3) {
+                    log.debug("answer 필드의 요소가 세 개를 초과함");
+                    return false;
+                }
             }
 
             return true;
@@ -153,7 +161,7 @@ public class QuizCreateService {
         QuizEntity quizEntity = addQuizMapper.toQuizEntity(quizDTO);
         quizRepository.save(quizEntity);
 
-        log.info("Quiz 저장 완료");
+        // log.info("Quiz 저장 완료");
 
         return quizEntity.getQuizId();
     }
@@ -169,7 +177,7 @@ public class QuizCreateService {
         Optional<QuizEntity> quizEntity = quizRepository.findByQuizId(quizId);
         if (quizEntity.isEmpty()) {
             // 무결성 문제라서 500 반환
-            log.debug("존재하지 않는 문제");
+            // log.debug("존재하지 않는 문제");
             throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
         }
 
@@ -179,8 +187,6 @@ public class QuizCreateService {
         defaultQuizEntity.setManagerId(managerEntityOptional.get());
 
         defaultQuizRepository.save(defaultQuizEntity);
-
-        log.info("Default Quiz 저장 완료");
     }
 
     public void addUserQuiz(Long quizId, String userId) {
@@ -193,7 +199,7 @@ public class QuizCreateService {
         // quizId가 존재하는지 확인
         Optional<QuizEntity> quizEntity = quizRepository.findByQuizId(quizId);
         if (quizEntity.isEmpty()) {
-            log.debug("존재하지 안는 문제");
+            // log.debug("존재하지 않는 문제");
             throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
         }
 
@@ -204,7 +210,7 @@ public class QuizCreateService {
         userQuizEntity.setUserId(userEntity.get());
 
         userQuizRepository.save(userQuizEntity);
-        log.info("User Quiz 저장 완료");
+        // log.info("User Quiz 저장 완료");
     }
 
     @Transactional
@@ -215,7 +221,7 @@ public class QuizCreateService {
         // 반환된 ID를 사용하여 DefaultQuiz 추가
         addDefaultQuiz(quizId, managerId);
 
-        log.info("Quiz has been saved successfully");
+        log.info("Create default quiz [new quizId: {}]", quizId);
         return quizId;
     }
 
@@ -227,7 +233,7 @@ public class QuizCreateService {
         // 반환된 ID를 사용하여 UserQuiz 추가
         addUserQuiz(quizId, userId);
 
-        log.info("Quiz has been saved successfully");
+        log.info("Create user quiz [new quizId: {}, userId: {}]", quizId, userId);
         return quizId;
     }
 
@@ -258,7 +264,7 @@ public class QuizCreateService {
             fos.write(decodedBytes);
             fos.close();
 
-            log.info("file save successful. [quizId: " + quizId + "]");
+            // log.info("file save successful. [quizId: " + quizId + "]");
         } catch (IOException e) {
             // 입출력 실패시 500
             throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR, "image save error");
@@ -275,43 +281,34 @@ public class QuizCreateService {
 
                 userQuiz.get().getQuiz().setHasImage(true);
                 quizRepository.save(userQuiz.get().getQuiz());
+                log.info("Quiz image upload [quizId: {}, userId: {}]", quizId, userId);
             } else {
-                log.debug("이미 이미지가 존재하는 quiz ID");
-                throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
+                // log.debug("이미 이미지가 존재하는 quiz ID");
+                throw new CustomException(ExceptionEnum.DUPLICATE_IMAGE);
             }
         } else {
-            log.debug("존재하지 않는 quiz ID 또는 user가 생성한 quiz가 아님");
-            throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
+            if (quiz.isEmpty()) throw new CustomException(ExceptionEnum.NOT_FOUND_ID);  // 존재하지 않는 quiz id
+            else throw new CustomException(ExceptionEnum.ACCESS_DENIED_EXCEPTION);  // 자기가 만든 quiz 아님
         }
     }
 
     public void managerUploadImage(Long quizId, String base64String) {
-        Optional<DefaultQuizEntity> defaultQuiz = defaultQuizRepository.findById(quizId);
-        Optional<UserQuizEntity> userQuiz = userQuizRepository.findById(quizId);
         Optional<QuizEntity> quiz = quizRepository.findByQuizId(quizId);
-        if (userQuiz.isPresent() && quiz.isPresent()) {
+        if (quiz.isPresent()) {
             if (quiz.get().getHasImage().equals(false)) {
                 saveImage(quizId, base64String);
 
-                userQuiz.get().getQuiz().setHasImage(true);
-                quizRepository.save(userQuiz.get().getQuiz());
-            } else {
-                log.debug("이미 이미지가 존재하는 quiz ID");
-                throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
-            }
-        } else if (defaultQuiz.isPresent() && quiz.isPresent()) {
-            if (quiz.get().getHasImage().equals(false)) {
-                saveImage(quizId, base64String);
+                quiz.get().setHasImage(true);
+                quizRepository.save(quiz.get());
 
-                defaultQuiz.get().getQuiz().setHasImage(true);
-                quizRepository.save(defaultQuiz.get().getQuiz());
+                log.info("Quiz image upload [quizId: {}]", quizId);
             } else {
-                log.debug("이미 이미지가 존재하는 quiz ID");
-                throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
+                // log.debug("이미 이미지가 존재하는 quiz ID");
+                throw new CustomException(ExceptionEnum.DUPLICATE_IMAGE);
             }
         } else {
-            log.debug("존재하지 않는 quiz ID");
-            throw new CustomException(ExceptionEnum.INTERNAL_SERVER_ERROR);
+            // log.debug("존재하지 않는 quiz ID");
+            throw new CustomException(ExceptionEnum.NOT_FOUND_ID);
         }
     }
 }

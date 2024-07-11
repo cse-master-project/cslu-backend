@@ -1,4 +1,4 @@
-package com.example.csemaster;
+package com.example.csemaster.features.jwt;
 
 import com.example.csemaster.repository.AccessTokenBlackListRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ScheduleService {
+public class TokenRemoveService {
     private final AccessTokenBlackListRepository accessTokenBlackListRepository;
 
     // 블랙리스트에 있는 만료된 토큰 1시간 마다 정리
