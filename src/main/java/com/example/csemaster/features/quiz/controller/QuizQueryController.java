@@ -145,7 +145,9 @@ public class QuizQueryController {
             description = "사용자 아이디를 받아서 해당 사용자가 추가한 문제만 조회"
     )
     @GetMapping("/my")
-    public List<UserQuizResponse> getMyQuiz(@RequestParam String userId) {
+    public List<UserQuizResponse> getMyQuiz() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
         return quizSearchService.getMyQuiz(userId);
     }
 
