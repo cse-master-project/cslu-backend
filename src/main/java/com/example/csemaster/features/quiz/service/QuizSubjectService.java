@@ -49,7 +49,7 @@ public class QuizSubjectService {
         return quizSubjectRepository.getAllSubject();
     }
 
-    public List<String> addDetailSubject(String subject, String chapter) {
+    public List<String> addChapter(String subject, String chapter) {
         Long subjectId = quizSubjectRepository.findBySubject(subject).map(SubjectEntity::getSubjectId).orElse(null);
 
         if (subjectId == null) {
@@ -105,17 +105,17 @@ public class QuizSubjectService {
        }
 
        // 기존의 텍스트와 새로운 텍스트 비교시 변경점이 있는지 확인
-       if (updateDTO.getDetailSubject().equals(updateDTO.getNewDetailSubject())) {
+       if (updateDTO.getChapter().equals(updateDTO.getNewChapter())) {
            throw new CustomException(ExceptionEnum.NO_CHANGE);
        }
 
-       ChapterEntity chapter = chapterRepository.findBySubjectIdAndChapter(subjectId, updateDTO.getDetailSubject()).orElse(null);
+       ChapterEntity chapter = chapterRepository.findBySubjectIdAndChapter(subjectId, updateDTO.getChapter()).orElse(null);
        if (chapter == null) {
            throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
        }
 
        // 챕터명 변경
-       chapter.setChapter(updateDTO.getNewDetailSubject());
+       chapter.setChapter(updateDTO.getNewChapter());
        chapterRepository.save(chapter);
 
        // 변경된 챕터 목록 반환

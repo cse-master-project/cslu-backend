@@ -48,8 +48,8 @@ public class QuizSubjectController {
             description = "지정한 과목에 새로운 챕터 추가"
     )
     @PostMapping("/detail")
-    public List<String> addDetailSubject(@RequestBody @Valid String subject, @RequestBody @Valid String chapter) {
-        return quizSubjectService.addDetailSubject(subject, chapter);
+    public List<String> addChapter(@RequestBody @Valid String subject, @RequestBody @Valid String chapter) {
+        return quizSubjectService.addChapter(subject, chapter);
     }
 
     // 카테고리 수정
@@ -68,7 +68,7 @@ public class QuizSubjectController {
             description = "기존의 챕터 이름을 새로운 챕터 이름으로 변경할 수 있다."
     )
     @PatchMapping("/detail")
-    public SubjectDTO updateDetailSubject(@RequestBody @Valid ChapterUpdateDTO updateDTO) {
+    public SubjectDTO updateChapter(@RequestBody @Valid ChapterUpdateDTO updateDTO) {
         return quizSubjectService.updateDetailSubject(updateDTO);
     }
 

@@ -8,7 +8,7 @@ public class ChapterUpdateDTO {
     @NotBlank
     private String subject;
     @NotBlank
-    private String detailSubject;
+    private String chapter;
     @NotBlank
-    private String newDetailSubject;
+    private String newChapter;
 }
