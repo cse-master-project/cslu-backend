@@ -4,6 +4,7 @@ import com.example.csemaster.dto.response.QuizResponse;
 import com.example.csemaster.entity.*;
 import com.example.csemaster.exception.CustomException;
 import com.example.csemaster.exception.ExceptionEnum;
+import com.example.csemaster.features.quiz.QuizValidator;
 import com.example.csemaster.mapper.QuizMapper;
 import com.example.csemaster.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -31,29 +32,11 @@ public class QuizSolverService {
     private final QuizSubjectRepository quizSubjectRepository;
     private final UserQuizRepository userQuizRepository;
     private final DefaultQuizRepository defaultQuizRepository;
+    private final QuizValidator quizValidator;
+
 
     @Value("${img.file.path}")
     private String imgPath;
-
-    public void verifySubject(String subject, List<String> detailSubject) {
-        Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subject);
-
-        // 유저가 요청한 subject가 유효한지 검증
-        if (subjectEntity.isPresent()) {
-            if (!(detailSubject == null || detailSubject.isEmpty())) {
-                // DB에 저장된 detailSubject 검색
-                List<String> dbDetailSubject = subjectEntity.get().getDetailSubjects().stream().map(DetailSubjectEntity::getDetailSubject).toList();
-                // 합집합 후에도 db에 있는 내용과 같다면 요소의 개수가 같음
-                // 개수가 서로 다르다면 유효하지 않은 detailSubject 가 있다는 의미
-                Set<String> set = new HashSet<>(detailSubject);
-                set.addAll(dbDetailSubject);
-
-                if (set.size() != dbDetailSubject.size()) throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
-            }
-        } else {
-            throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
-        }
-    }
 
     public QuizResponse getQuiz(String userId, String subject, List<String> detailSubject, boolean hasUserQuiz, boolean hasDefaultQuiz, boolean hasSolvedQuiz) {
         // detailSubject가 비었는지 확인 & detailSubject가 유효한지 검증
@@ -78,21 +61,6 @@ public class QuizSolverService {
             return QuizMapper.INSTANCE.entityToResponse(quiz.get(randomIndex));
         } else {
             throw new CustomException(ExceptionEnum.DONE_QUIZ);
-        }
-    }
-
-    public void verifySubjects(List<String> subject) {
-        if (!(subject == null || subject.isEmpty())) {
-            // DB에 저장된 subject 검색
-            List<String> dbSubject = quizSubjectRepository.getAllSubject();
-            // 합집합 후에도 db에 있는 내용과 같다면 요소의 개수가 같음
-            // 개수가 서로 다르다면 유효하지 않은 subject 가 있다는 의미
-            Set<String> set = new HashSet<>(subject);
-            set.addAll(dbSubject);
-
-            if (set.size() != dbSubject.size()) throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
-        } else {
-            throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
         }
     }
 

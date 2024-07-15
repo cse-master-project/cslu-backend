@@ -1,15 +1,14 @@
 package com.example.csemaster.features.quiz.service;
 
-import com.example.csemaster.dto.DetailSubjectDTO;
-import com.example.csemaster.dto.DetailSubjectUpdateDTO;
-import com.example.csemaster.dto.SubjectDTO;
+import com.example.csemaster.dto.*;
 import com.example.csemaster.dto.response.SubjectResponse;
-import com.example.csemaster.dto.SubjectUpdateDTO;
 import com.example.csemaster.exception.CustomException;
 import com.example.csemaster.exception.ExceptionEnum;
 import com.example.csemaster.entity.SubjectEntity;
-import com.example.csemaster.entity.DetailSubjectEntity;
-import com.example.csemaster.repository.QuizDetailSubjectRepository;
+import com.example.csemaster.entity.ChapterEntity;
+import com.example.csemaster.features.quiz.QuizValidator;
+import com.example.csemaster.mapper.SubjectMapper;
+import com.example.csemaster.repository.ChapterRepository;
 import com.example.csemaster.repository.QuizSubjectRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,25 +25,16 @@ import java.util.stream.Collectors;
 public class QuizSubjectService {
 
     private final QuizSubjectRepository quizSubjectRepository;
-    private final QuizDetailSubjectRepository quizDetailSubjectRepository;
+    private final ChapterRepository chapterRepository;
+    private final QuizValidator quizValidator;
 
     public List<SubjectResponse> getAllSubject() {
         List<SubjectEntity> subjects = quizSubjectRepository.findAll();
-        return subjects.stream().map(subject -> {
-            SubjectResponse response = new SubjectResponse();
-            response.setSubjectId(subject.getSubjectId());
-            response.setSubject(subject.getSubject());
-            List<String> sortedDetailSubjects = subject.getDetailSubjects().stream()
-                    .sorted(Comparator.comparingInt(DetailSubjectEntity::getSortIndex))
-                    .map(DetailSubjectEntity::getDetailSubject)
-                    .collect(Collectors.toList());
-            response.setDetailSubject(sortedDetailSubjects);
-            return response;
-        }).collect(Collectors.toList());
+        return subjects.stream().map(SubjectMapper.INSTANCE::toResponse).collect(Collectors.toList());
     }
 
-    public ResponseEntity<?> addSubject(SubjectDTO subjectDTO) {
-        Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subjectDTO.getSubject());
+    public List<String> addSubject(SubjectRequest subjectRequest) {
+        Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subjectRequest.getSubject());
 
         if (subjectEntity.isPresent()) {
             throw new CustomException(ExceptionEnum.DUPLICATE_SUBJECT);
@@ -52,63 +42,39 @@ public class QuizSubjectService {
 
         SubjectEntity newSubjectEntity = new SubjectEntity();
         newSubjectEntity.setSubjectId(null);
-        newSubjectEntity.setSubject(subjectDTO.getSubject());
+        newSubjectEntity.setSubject(subjectRequest.getSubject());
         quizSubjectRepository.save(newSubjectEntity);
 
-        log.info("Create new subject( {} )]", subjectDTO.getSubject());
+        log.info("Create new subject( {} )]", subjectRequest.getSubject());
 
-        return ResponseEntity.ok().build();
+        return quizSubjectRepository.getAllSubject();
     }
 
-    public ResponseEntity<?> addDetailSubject(DetailSubjectDTO detailSubjectDTO) {
-        Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(detailSubjectDTO.getSubject());
+    public List<String> addDetailSubject(String subject, String chapter) {
+        Long subjectId = quizSubjectRepository.findBySubject(subject).map(SubjectEntity::getSubjectId).orElse(null);
 
-        if (subjectEntity.isEmpty()) {
+        if (subjectId == null) {
             throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
         }
 
-        Optional<DetailSubjectEntity> existingDetailSubject = quizDetailSubjectRepository.findBySubjectIdAndDetailSubject(
-                subjectEntity.get().getSubjectId(), detailSubjectDTO.getDetailSubject());
+        Optional<ChapterEntity> existingChapter = chapterRepository.findBySubjectIdAndChapter(subjectId, chapter);
 
-        if (existingDetailSubject.isPresent()) {
+        // 이미 있는지 중복 체크
+        if (existingChapter.isPresent()) {
             throw new CustomException(ExceptionEnum.DUPLICATE_DETAIL_SUBJECT);
         }
 
-        if (detailSubjectDTO.getSortIndex() == null) {
-            log.debug("sortIndex가 비었음");
-            throw new CustomException(ExceptionEnum.NULL_VALUE);
-        }
-
-        // 해당 subject가 가진 detailSubject을 index 기준으로 오름차순 정렬
-        List<DetailSubjectEntity> detailSubjects = quizDetailSubjectRepository.findBySubjectId(subjectEntity.get().getSubjectId());
-        detailSubjects.sort(Comparator.comparingInt(DetailSubjectEntity::getSortIndex));
-        
-        if (detailSubjectDTO.getSortIndex() > detailSubjects.size()) {
-            log.debug("sortIndex가 최대값을 초과함");
-            throw new CustomException(ExceptionEnum.ARGS_NOT_VALID);
-        }
+        Integer maxIdx = chapterRepository.getMaxIndex(subject).orElse(-1);
 
         // 새 detailSubject 생성
-        DetailSubjectEntity newDetailSubject = new DetailSubjectEntity();
-        newDetailSubject.setSubjectId(subjectEntity.get().getSubjectId());
-        newDetailSubject.setDetailSubject(detailSubjectDTO.getDetailSubject());
-        newDetailSubject.setSortIndex(detailSubjectDTO.getSortIndex());
-
-        // 삽입할 index 위치를 index 조정
-        int insertSortIndex = findSortIndex(detailSubjects, detailSubjectDTO.getSortIndex());
-
-        // 이후의 index들을 +1 해주기
-        adjustSortIndex(detailSubjects, insertSortIndex, 1);
-
-        // 변경된 DetailSubjectEntity 리스트 저장
-        quizDetailSubjectRepository.saveAll(detailSubjects);
+        ChapterEntity newChapter = new ChapterEntity(subjectId, chapter, maxIdx + 1);
 
         // 새 DetailSubjectEntity 저장
-        quizDetailSubjectRepository.save(newDetailSubject);
+        chapterRepository.save(newChapter);
 
-        log.info("Create new detail Subject( {} - {} )]", detailSubjectDTO.getSubject(), detailSubjectDTO.getDetailSubject());
+        log.info("Create new detail Subject( {} - {} )]", subject, chapter);
 
-        return ResponseEntity.ok().build();
+        return chapterRepository.findChapterBySubject(subject);
     }
 
     public ResponseEntity<?> updateSubject(SubjectUpdateDTO subjectUpdateDTO) {
@@ -132,13 +98,13 @@ public class QuizSubjectService {
         return ResponseEntity.ok().build();
     }
 
-   public ResponseEntity<?> updateDetailSubject(DetailSubjectUpdateDTO updateDTO) {
+   public ResponseEntity<?> updateDetailSubject(ChapterUpdateDTO updateDTO) {
         Optional<SubjectEntity> subject = quizSubjectRepository.findBySubject(updateDTO.getSubject());
         if (subject.isEmpty()) {
             throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
         }
 
-        Optional<DetailSubjectEntity> detailSubject = quizDetailSubjectRepository.findBySubjectIdAndDetailSubject(subject.get().getSubjectId(), updateDTO.getDetailSubject());
+        Optional<ChapterEntity> detailSubject = chapterRepository.findBySubjectIdAndDetailSubject(subject.get().getSubjectId(), updateDTO.getDetailSubject());
         if (detailSubject.isEmpty()) {
             throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
         }
@@ -152,21 +118,21 @@ public class QuizSubjectService {
         Integer sortIndex = detailSubject.get().getSortIndex();
 
         // detailSubject 삭제
-        quizDetailSubjectRepository.delete(detailSubject.get());
+        chapterRepository.delete(detailSubject.get());
 
         // 새로운 detailSubject 추가
-        DetailSubjectEntity newDetailSubject = new DetailSubjectEntity();
+        ChapterEntity newDetailSubject = new ChapterEntity();
         newDetailSubject.setSubjectId(subject.get().getSubjectId());
         newDetailSubject.setDetailSubject(updateDTO.getNewDetailSubject());
         newDetailSubject.setSortIndex(sortIndex);
 
-        quizDetailSubjectRepository.save(newDetailSubject);
+        chapterRepository.save(newDetailSubject);
 
         return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<?> deleteSubject(SubjectDTO subjectDTO) {
-        Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subjectDTO.getSubject());
+    public ResponseEntity<?> deleteSubject(SubjectRequest subjectRequest) {
+        Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subjectRequest.getSubject());
         if (subjectEntity.isEmpty()) {
             throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
         }
@@ -176,70 +142,68 @@ public class QuizSubjectService {
         return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<?> deleteDetailSubject(DetailSubjectDTO detailSubjectDTO) {
-        Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(detailSubjectDTO.getSubject());
+    public SubjectDTO deleteDetailSubject(String subject, String chapter) {
+        Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subject);
         if (subjectEntity.isEmpty()) {
             throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
+        } else {
+            List<ChapterEntity> chapters = subjectEntity.get().getDetailSubjects();
+            // 검색한 전체 목록에서 삭제할 레코드 검색
+            ChapterEntity delChapter = chapters.stream().filter(e -> e.getDetailSubject().equals(chapter)).findAny().orElse(null);
+            // 검색 결과 없으면 유효하지 않은 요청
+            if (delChapter == null) throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
+            // 삭제한 챕터 뒤부터 index 1만큼 당기기
+            for (int i = delChapter.getSortIndex() + 1; i < chapters.size(); i++) {
+                chapters.get(i).setSortIndex(i - 1);
+            }
+
+            // 삭제 후 바꾼 index 저장
+            chapterRepository.delete(delChapter);
+            chapterRepository.saveAll(chapters);
+            chapterRepository.flush();
         }
 
-        Optional<DetailSubjectEntity> detail = quizDetailSubjectRepository.findBySubjectIdAndDetailSubject(subjectEntity.get().getSubjectId(), detailSubjectDTO.getDetailSubject());
-        if (detail.isEmpty()) {
-            throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
-        }
-
-        // 해당 subject가 가진 detailSubject을 index 기준으로 오름차순 정렬
-        List<DetailSubjectEntity> detailSubjects = quizDetailSubjectRepository.findBySubjectId(subjectEntity.get().getSubjectId());
-        detailSubjects.sort(Comparator.comparingInt(DetailSubjectEntity::getSortIndex));
-
-        // 제거할 index 위치를 index 조정
-        int insertSortIndex = findSortIndex(detailSubjects, detail.get().getSortIndex());
-
-        // 이후의 index들을 -1 해주기
-        adjustSortIndex(detailSubjects, insertSortIndex, -1);
-
-        // 변경된 DetailSubjectEntity 리스트 저장
-        quizDetailSubjectRepository.saveAll(detailSubjects);
-
-
-        quizDetailSubjectRepository.delete(detail.get());
-
-        return ResponseEntity.ok().build();
+        return new SubjectDTO(subject, chapterRepository.findChapterBySubject(subject));
     }
 
     @Transactional
-    public ResponseEntity<?> adjustDetailSubject(List<DetailSubjectDTO> detailSubjectDTO) {
-        // 프론트로부터 받은 DTO 리스트가 DB에 존재하는지 검사
-        validateDetailSubjects(detailSubjectDTO);
+    public SubjectResponse adjustDetailSubject(String subject, List<ChapterDTO> detailSubject) {
+        List<ChapterEntity> bass = chapterRepository.findBySubject(subject);
+        // 검색 결과가 없으면 해당 subject 가 유효하지 않는다는 의미
+        if (bass.isEmpty()) throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
+        // 기존과 변경 사항의 개수가 다를 경우 잘못된 요청 값임
+        else if (bass.size() != detailSubject.size()) throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
+        else {
+            // 편한 비교를 위해 Detail subject 순으로 정렬
+            bass.sort(Comparator.comparing(ChapterEntity::getDetailSubject));
+            detailSubject.sort(Comparator.comparing(ChapterDTO::getDetailSubject));
 
-        // DTO를 엔티티로 변환하여 저장
-        List<DetailSubjectEntity> entities = detailSubjectDTO.stream()
-                .map(dto -> {
-                    DetailSubjectEntity entity = new DetailSubjectEntity();
-                    entity.setSubjectId(getSubjectId(dto.getSubject())); // subjectId 설정
-                    entity.setDetailSubject(dto.getDetailSubject());
-                    entity.setSortIndex(dto.getSortIndex());
-                    return entity;
-                })
-                .collect(Collectors.toList());
-
-        // 엔티티들을 저장소에 저장
-        quizDetailSubjectRepository.saveAll(entities);
-
-        // sortIndex 기준으로 오름차순 정렬
-        entities.sort(Comparator.comparingInt(DetailSubjectEntity::getSortIndex));
-
-        // 검사: sortIndex의 순차적 증가 여부 확인
-        for (int i = 0; i < entities.size(); i++) {
-            if (i != entities.get(i).getSortIndex()) {
-                log.debug("sortIndex가 잘못됨. index: {}, sortIndex: {}", i, entities.get(i).getSortIndex());
-                throw new CustomException(ExceptionEnum.ARGS_NOT_VALID);
+            for (int i = 0; i < bass.size(); i++) {
+                // 정렬이 됐기 때문에 같은 index 의 detail subject 가 서로 다르면 잘못된 값임
+                if (bass.get(i).getDetailSubject().equals(detailSubject.get(i).getDetailSubject())) {
+                    // 일치할 경우 새로운 정렬 기준으로 변경
+                    bass.get(i).setSortIndex(detailSubject.get(i).getSortIndex());
+                } else {
+                    throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
+                }
             }
+
+            // 변경된 index 을 기준으로 다시 정렬
+            bass.sort(Comparator.comparingInt(ChapterEntity::getSortIndex));
+
+            // 검사: sortIndex 의 순차적 증가 여부 확인
+            for (int i = 0; i < bass.size(); i++) {
+                if (i != bass.get(i).getSortIndex()) {
+                    log.debug("sort Index 가 잘못됨. index: {}, sortIndex: {}", i, bass.get(i).getSortIndex());
+                    throw new CustomException(ExceptionEnum.ARGS_NOT_VALID);
+                }
+            }
+
+            // 변경사항 저장
+            chapterRepository.saveAll(bass);
+
+            return new SubjectResponse(subject, bass.stream().map(ChapterEntity::getDetailSubject).toList());
         }
-
-        // 저장
-        quizDetailSubjectRepository.saveAll(entities);
-
-        return ResponseEntity.ok().build();
     }
 
     private Long getSubjectId(String subjectName) {
@@ -247,8 +211,8 @@ public class QuizSubjectService {
         return subjectEntityOptional.map(SubjectEntity::getSubjectId).orElse(null);
     }
 
-    public void validateDetailSubjects(List<DetailSubjectDTO> detailSubjectDTOs) {
-        for (DetailSubjectDTO dto : detailSubjectDTOs) {
+    public void validateDetailSubjects(List<ChapterDTO> chapterDTOS) {
+        for (ChapterDTO dto : chapterDTOS) {
             // Subject가 존재하는지 확인
             Optional<SubjectEntity> subjectEntityOpt = quizSubjectRepository.findBySubject(dto.getSubject());
             if (subjectEntityOpt.isEmpty()) {
@@ -257,7 +221,7 @@ public class QuizSubjectService {
 
             // 해당 Subject의 DetailSubject가 존재하는지 확인
             SubjectEntity subjectEntity = subjectEntityOpt.get();
-            Optional<DetailSubjectEntity> detailSubjectEntityOpt = quizDetailSubjectRepository.findBySubjectIdAndDetailSubject(
+            Optional<ChapterEntity> detailSubjectEntityOpt = chapterRepository.findBySubjectIdAndDetailSubject(
                     subjectEntity.getSubjectId(), dto.getDetailSubject());
             if (detailSubjectEntityOpt.isEmpty()) {
                 throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
@@ -266,7 +230,7 @@ public class QuizSubjectService {
     }
 
     // index 위치 찾기
-    private int findSortIndex(List<DetailSubjectEntity> detailSubjects, int sortIndex) {
+    private int findSortIndex(List<ChapterEntity> detailSubjects, int sortIndex) {
         for (int i = 0; i < detailSubjects.size(); i++) {
             if (detailSubjects.get(i).getSortIndex() >= sortIndex) {
                 return i;
@@ -277,7 +241,7 @@ public class QuizSubjectService {
     }
 
     // 삽입된 위치 이후의 index 변경
-    private void adjustSortIndex(List<DetailSubjectEntity> detailSubjects, int startSortIndex, int num) {
+    private void adjustSortIndex(List<ChapterEntity> detailSubjects, int startSortIndex, int num) {
         for (int i = startSortIndex; i < detailSubjects.size(); i++) {
             detailSubjects.get(i).setSortIndex(detailSubjects.get(i).getSortIndex() + num);
         }

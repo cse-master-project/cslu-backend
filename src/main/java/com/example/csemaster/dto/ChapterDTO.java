@@ -1,15 +1,13 @@
 package com.example.csemaster.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class DetailSubjectDTO {
-    @NotBlank
-    private String subject;
+public class ChapterDTO {
     @NotBlank
     private String detailSubject;
 
+    @NotBlank
     private Integer sortIndex;
 }

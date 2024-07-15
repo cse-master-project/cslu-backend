@@ -9,6 +9,7 @@ import com.example.csemaster.dto.response.UserQuizResponse;
 import com.example.csemaster.entity.ActiveQuizEntity;
 import com.example.csemaster.exception.CustomException;
 import com.example.csemaster.exception.ExceptionEnum;
+import com.example.csemaster.features.quiz.QuizValidator;
 import com.example.csemaster.features.quiz.service.QuizReportService;
 import com.example.csemaster.features.quiz.service.QuizSearchService;
 import com.example.csemaster.features.quiz.service.QuizSolverService;
@@ -32,6 +33,7 @@ public class QuizQueryController {
     private final QuizSearchService quizSearchService;
     private final QuizSolverService quizSolverService;
     private final QuizReportService quizReportService;
+    private final QuizValidator quizValidator;
 
     // 모든 활성화된 문제 조회
     @Operation(
@@ -85,7 +87,8 @@ public class QuizQueryController {
         String userId = authentication.getName();
 
         // 검증
-        quizSolverService.verifySubject(subject, detailSubject);
+        if (!quizValidator.isValidSubject(subject)) throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
+        if (!quizValidator.isValidDetailSubject(subject, detailSubject)) throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
 
         if (!hasDefaultQuiz && !hasUserQuiz) throw new CustomException(ExceptionEnum.ILLEGAL_ARGUMENT);
 
@@ -108,7 +111,7 @@ public class QuizQueryController {
         String userId = authentication.getName();
 
         // 검증
-        quizSolverService.verifySubjects(subject);
+        if (!quizValidator.isValidSubject(subject)) throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
 
         if(!hasDefaultQuiz && !hasUserQuiz) throw new CustomException(ExceptionEnum.ILLEGAL_ARGUMENT);
 

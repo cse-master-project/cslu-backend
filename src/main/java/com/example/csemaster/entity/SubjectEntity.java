@@ -6,8 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -26,5 +25,6 @@ public class SubjectEntity {
 
     @OneToMany
     @JoinColumn(name = "subject_id_for_detail_subject")
-    private Set<DetailSubjectEntity> detailSubjects = new HashSet<>();
+    @OrderBy("sortIndex ASC")
+    private List<ChapterEntity> chapters;
 }

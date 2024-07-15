@@ -34,7 +34,7 @@ public class QuizCreateService {
     private final UserRepository userRepository;
     private final UserQuizRepository userQuizRepository;
     private final QuizSubjectRepository quizSubjectRepository;
-    private final QuizDetailSubjectRepository quizDetailSubjectRepository;
+    private final ChapterRepository chapterRepository;
 
     @Value("${img.file.path}")
     private String imgPath;
@@ -147,7 +147,7 @@ public class QuizCreateService {
             throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
         }
 
-        Optional<DetailSubjectEntity> detailSubject = quizDetailSubjectRepository.findBySubjectIdAndDetailSubject(subject.get().getSubjectId(), quizDTO.getDetailSubject());
+        Optional<ChapterEntity> detailSubject = chapterRepository.findBySubjectIdAndDetailSubject(subject.get().getSubjectId(), quizDTO.getDetailSubject());
         if (detailSubject.isEmpty()) {
             throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
         }

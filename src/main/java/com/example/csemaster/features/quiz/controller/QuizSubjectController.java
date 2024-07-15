@@ -1,9 +1,7 @@
 package com.example.csemaster.features.quiz.controller;
 
-import com.example.csemaster.dto.DetailSubjectDTO;
-import com.example.csemaster.dto.DetailSubjectUpdateDTO;
-import com.example.csemaster.dto.SubjectDTO;
-import com.example.csemaster.dto.SubjectUpdateDTO;
+import com.example.csemaster.dto.*;
+import com.example.csemaster.dto.request.SubjectSortRequest;
 import com.example.csemaster.dto.response.SubjectResponse;
 import com.example.csemaster.features.quiz.service.QuizSubjectService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,8 +37,8 @@ public class QuizSubjectController {
             description = "새 카테고리를 받아서 추가"
     )
     @PostMapping()
-    public ResponseEntity<?> addSubject(@RequestBody @Valid SubjectDTO subjectDTO) {
-        return quizSubjectService.addSubject(subjectDTO);
+    public List<String> addSubject(@RequestBody @Valid SubjectRequest subjectRequest) {
+        return quizSubjectService.addSubject(subjectRequest);
     }
 
 
@@ -50,8 +48,8 @@ public class QuizSubjectController {
             description = "추가할 서브 카테고리의 메인 카테고리와 새 서브 카테고리를 받아서 추가"
     )
     @PostMapping("/detail")
-    public ResponseEntity<?> addDetailSubject(@RequestBody @Valid DetailSubjectDTO detailSubjectDTO) {
-        return quizSubjectService.addDetailSubject(detailSubjectDTO);
+    public List<String> addDetailSubject(@RequestBody @Valid String subject, @RequestBody @Valid String chapter) {
+        return quizSubjectService.addDetailSubject(subject, chapter);
     }
 
     // 카테고리 수정
@@ -70,7 +68,7 @@ public class QuizSubjectController {
             description = "수정할 서브 카테고리의 메인 카테고리와 새 서브 카테고리를 받아서 수정"
     )
     @PatchMapping("/detail")
-    public ResponseEntity<?> updateDetailSubject(@RequestBody @Valid DetailSubjectUpdateDTO updateDTO) {
+    public ResponseEntity<?> updateDetailSubject(@RequestBody @Valid ChapterUpdateDTO updateDTO) {
         return quizSubjectService.updateDetailSubject(updateDTO);
     }
 
@@ -80,8 +78,8 @@ public class QuizSubjectController {
             description = "카테고리를 받아서 삭제"
     )
     @DeleteMapping()
-    public ResponseEntity<?> deleteSubject(@RequestBody @Valid SubjectDTO subjectDTO) {
-        return quizSubjectService.deleteSubject(subjectDTO);
+    public ResponseEntity<?> deleteSubject(@RequestBody @Valid SubjectRequest subjectRequest) {
+        return quizSubjectService.deleteSubject(subjectRequest);
     }
 
     // 서브 카테고리 삭제
@@ -90,8 +88,8 @@ public class QuizSubjectController {
             description = "삭제할 서브 카테고리의 메인 카테고리와 서브 카테고리를 받아서 삭제"
     )
     @DeleteMapping("/detail")
-    public ResponseEntity<?> deleteDetailSubject(@RequestBody DetailSubjectDTO detailSubjectDTO) {
-        return quizSubjectService.deleteDetailSubject(detailSubjectDTO);
+    public SubjectDTO deleteDetailSubject(@RequestBody @Valid String subject, @RequestBody @Valid String chapter) {
+        return quizSubjectService.deleteDetailSubject(subject, chapter);
     }
 
     // 서브 카테고리 순서 변경
@@ -99,9 +97,9 @@ public class QuizSubjectController {
             summary = "서브 카테고리 순서 재설정",
             description = "서브 카테고리의 순서를 통째로 재설정"
     )
-    @PostMapping("/adjust-detail")
-    public ResponseEntity<?> adjustDetailSubject(@RequestBody List<DetailSubjectDTO> detailSubjectDTO) {
-        return quizSubjectService.adjustDetailSubject(detailSubjectDTO);
+    @PostMapping("/detail/sort-order")
+    public SubjectResponse adjustDetailSubject(@RequestBody @Valid SubjectSortRequest request) {
+        return quizSubjectService.adjustDetailSubject(request.getSubject(), request.getChapters());
     }
 
 }
