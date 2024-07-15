@@ -29,12 +29,12 @@ public class QuizValidator {
     }
 
     // detail subject 유효성 검사
-    public boolean isValidDetailSubject(String subject, List<String> detailSubject) {
+    public boolean isValidDetailSubject(String subject, List<String> chapter) {
         try {
             // 요청받은 subject 의 detailSubject 검색
             List<ChapterEntity> bass = getSubjectEntity(subject).getChapters();
             // db 의 내용과 요청한 내용과 동일한지 비교
-            return ListUtils.compareList(bass.stream().map(ChapterEntity::getChapter).toList(), detailSubject);
+            return ListUtils.compareList(bass.stream().map(ChapterEntity::getChapter).toList(), chapter);
         } catch (Exception e) {
             // 비교중 null 이 반환돼서 예외가 발생함. 이는 유효한 값이 아니라는 것을 나타냄
             return false;
