@@ -5,7 +5,7 @@ import com.example.csemaster.dto.request.SignUpRequest;
 import com.example.csemaster.dto.response.SignUpCheckResponse;
 import com.example.csemaster.exception.CustomException;
 import com.example.csemaster.exception.ExceptionEnum;
-import com.example.csemaster.features.account.TokenUtils;
+import com.example.csemaster.utils.TokenUtils;
 import com.example.csemaster.features.jwt.JwtInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

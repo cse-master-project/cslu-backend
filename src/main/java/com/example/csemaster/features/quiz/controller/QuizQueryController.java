@@ -9,7 +9,7 @@ import com.example.csemaster.dto.response.UserQuizResponse;
 import com.example.csemaster.entity.ActiveQuizEntity;
 import com.example.csemaster.exception.CustomException;
 import com.example.csemaster.exception.ExceptionEnum;
-import com.example.csemaster.features.quiz.QuizValidator;
+import com.example.csemaster.utils.QuizValidator;
 import com.example.csemaster.features.quiz.service.QuizReportService;
 import com.example.csemaster.features.quiz.service.QuizSearchService;
 import com.example.csemaster.features.quiz.service.QuizSolverService;
@@ -88,7 +88,7 @@ public class QuizQueryController {
 
         // 검증
         if (!quizValidator.isValidSubject(subject)) throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
-        if (!quizValidator.isValidDetailSubject(subject, chapters)) throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
+        if (!quizValidator.isValidDetailSubject(subject, chapters)) throw new CustomException(ExceptionEnum.NOT_FOUND_CHAPTER);
 
         if (!hasDefaultQuiz && !hasUserQuiz) throw new CustomException(ExceptionEnum.ILLEGAL_ARGUMENT);
 

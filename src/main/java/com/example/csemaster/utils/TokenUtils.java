@@ -1,4 +1,4 @@
-package com.example.csemaster.features.account;
+package com.example.csemaster.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

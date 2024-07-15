@@ -1,4 +1,4 @@
-package com.example.csemaster.features.account.user;
+package com.example.csemaster.utils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,7 +8,7 @@ public class QuizResultCounter {
     // 과목별로 푼 횟수와 정답 횟수를 저장하는 Map (stats[0] : 푼 횟수, stats[1] : 정답 횟수)
     private Map<String, int[]> categoryStats;
 
-    QuizResultCounter(List<String> subjectList) {
+    public QuizResultCounter(List<String> subjectList) {
         this.categoryStats = new HashMap<>();
         subjectList.forEach(subject -> {
             this.categoryStats.put(subject, new int[]{0, 0});

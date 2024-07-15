@@ -11,7 +11,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Data
-public class DetailSubjectId implements Serializable {
+public class ChapterId implements Serializable {
     private Long subjectId;
-    private String detailSubject;
+    private String chapter;
 }

@@ -11,14 +11,14 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-@IdClass(DetailSubjectId.class)
+@IdClass(ChapterId.class)
 @Table(name = "detail_subject")
 public class ChapterEntity {
     @Id
     @Column(name = "subject_id_for_detail_subject")
     private Long subjectId;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "subject_id_for_detail_subject", referencedColumnName = "subject_id", insertable = false, updatable = false)
     private SubjectEntity subjectEntity;
 

@@ -3,7 +3,7 @@ package com.example.csemaster.features.account.user;
 import com.example.csemaster.entity.*;
 import com.example.csemaster.exception.CustomException;
 import com.example.csemaster.exception.ExceptionEnum;
-import com.example.csemaster.features.account.TokenUtils;
+import com.example.csemaster.utils.TokenUtils;
 import com.example.csemaster.features.jwt.JwtInfo;
 import com.example.csemaster.features.jwt.JwtProvider;
 import com.example.csemaster.mapper.ActiveUserMapper;

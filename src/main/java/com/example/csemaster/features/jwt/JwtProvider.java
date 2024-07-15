@@ -2,7 +2,7 @@ package com.example.csemaster.features.jwt;
 
 import com.example.csemaster.entity.ManagerRefreshTokenEntity;
 import com.example.csemaster.entity.UserRefreshTokenEntity;
-import com.example.csemaster.features.account.TokenUtils;
+import com.example.csemaster.utils.TokenUtils;
 import com.example.csemaster.repository.AccessTokenBlackListRepository;
 import com.example.csemaster.repository.ManagerRefreshTokenRepository;
 import com.example.csemaster.repository.UserRefreshTokenRepository;

@@ -10,6 +10,7 @@ import com.example.csemaster.mapper.ActiveUserMapper;
 import com.example.csemaster.repository.ActiveUserRepository;
 import com.example.csemaster.repository.QuizLogRepository;
 import com.example.csemaster.repository.QuizSubjectRepository;
+import com.example.csemaster.utils.QuizResultCounter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;

@@ -4,7 +4,7 @@ import com.example.csemaster.dto.ManagerLoginDTO;
 import com.example.csemaster.entity.AccessTokenBlackListEntity;
 import com.example.csemaster.entity.ManagerEntity;
 import com.example.csemaster.entity.ManagerRefreshTokenEntity;
-import com.example.csemaster.features.account.TokenUtils;
+import com.example.csemaster.utils.TokenUtils;
 import com.example.csemaster.features.jwt.JwtInfo;
 import com.example.csemaster.features.jwt.JwtProvider;
 import com.example.csemaster.mapper.RefreshTokenMapper;

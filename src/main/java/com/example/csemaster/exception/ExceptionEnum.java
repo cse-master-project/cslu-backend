@@ -24,7 +24,7 @@ public enum ExceptionEnum {
     // Custom Exception
     NON_SIGN_UP(HttpStatus.UNAUTHORIZED, "no sign-up", "not registered as a member."),
     NOT_FOUND_SUBJECT(HttpStatus.NOT_FOUND, "not found subject","It's a subject that's not on the list"),
-    NOT_FOUND_DETAIL_SUBJECT(HttpStatus.NOT_FOUND, "not found detail subject", "It's a detail subject that's not on the list"),
+    NOT_FOUND_CHAPTER(HttpStatus.NOT_FOUND, "not found chapter", "It's a chapter that's not on the list"),
     DUPLICATE_SUBJECT(HttpStatus.BAD_REQUEST, "existing subject", "It's a subject that already exists"),
     DUPLICATE_DETAIL_SUBJECT(HttpStatus.BAD_REQUEST, "existing detail subject", "It's a detail subject that already exists"),
 

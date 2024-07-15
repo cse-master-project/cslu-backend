@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class ChapterDTO {
     @NotBlank
-    private String detailSubject;
+    private String chapter;
 
     @NotBlank
     private Integer sortIndex;

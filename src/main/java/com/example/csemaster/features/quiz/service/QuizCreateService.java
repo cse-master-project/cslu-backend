@@ -147,9 +147,9 @@ public class QuizCreateService {
             throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
         }
 
-        Optional<ChapterEntity> detailSubject = chapterRepository.findBySubjectIdAndDetailSubject(subject.get().getSubjectId(), quizDTO.getDetailSubject());
+        Optional<ChapterEntity> detailSubject = chapterRepository.findBySubjectIdAndChapter(subject.get().getSubjectId(), quizDTO.getDetailSubject());
         if (detailSubject.isEmpty()) {
-            throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
+            throw new CustomException(ExceptionEnum.NOT_FOUND_CHAPTER);
         }
 
         // jsonContent 형식 검사

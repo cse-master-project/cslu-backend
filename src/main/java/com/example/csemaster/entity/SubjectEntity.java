@@ -23,8 +23,8 @@ public class SubjectEntity {
     @Column(name = "subject")
     private String subject;
 
-    @OneToMany
-    @JoinColumn(name = "subject_id_for_detail_subject")
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "subject_id_for_detail_subject", insertable = false, updatable = false)
     @OrderBy("sortIndex ASC")
     private List<ChapterEntity> chapters;
 }

@@ -9,5 +9,5 @@ import java.util.List;
 @AllArgsConstructor
 public class SubjectResponse {
     private String subject;
-    private List<String> chapter;
+    private List<String> chapters;
 }

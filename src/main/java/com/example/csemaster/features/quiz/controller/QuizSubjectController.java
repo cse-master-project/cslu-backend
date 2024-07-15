@@ -1,6 +1,7 @@
 package com.example.csemaster.features.quiz.controller;
 
 import com.example.csemaster.dto.*;
+import com.example.csemaster.dto.request.ChapterRequest;
 import com.example.csemaster.dto.request.SubjectSortRequest;
 import com.example.csemaster.dto.response.SubjectResponse;
 import com.example.csemaster.features.quiz.service.QuizSubjectService;
@@ -48,8 +49,8 @@ public class QuizSubjectController {
             description = "지정한 과목에 새로운 챕터 추가"
     )
     @PostMapping("/detail")
-    public List<String> addChapter(@RequestBody @Valid String subject, @RequestBody @Valid String chapter) {
-        return quizSubjectService.addChapter(subject, chapter);
+    public List<String> addChapter(@RequestBody @Valid ChapterRequest request) {
+        return quizSubjectService.addChapter(request.getSubject(), request.getChapter());
     }
 
     // 카테고리 수정
@@ -78,7 +79,7 @@ public class QuizSubjectController {
             description = "과목을 삭제할 수 있으며 하위 챕터들은 모두 삭제된다. 삭제할 과목에 속한 문제가 있다면 삭제할 수 없다."
     )
     @DeleteMapping()
-    public ResponseEntity<?> deleteSubject(@RequestBody @Valid SubjectRequest subjectRequest) {
+    public List<String> deleteSubject(@RequestBody @Valid SubjectRequest subjectRequest) {
         return quizSubjectService.deleteSubject(subjectRequest);
     }
 
@@ -88,8 +89,8 @@ public class QuizSubjectController {
             description = "챕터를 삭제할 수 있다. 과목과 마찬가지로 해당 챕터에 속한 문제가 있을 경우 삭제할 수 없다."
     )
     @DeleteMapping("/detail")
-    public SubjectDTO deleteChapter(@RequestBody @Valid String subject, @RequestBody @Valid String chapter) {
-        return quizSubjectService.deleteChapter(subject, chapter);
+    public SubjectDTO deleteChapter(@RequestBody @Valid ChapterRequest request) {
+        return quizSubjectService.deleteChapter(request.getSubject(), request.getChapter());
     }
 
     // 서브 카테고리 순서 변경

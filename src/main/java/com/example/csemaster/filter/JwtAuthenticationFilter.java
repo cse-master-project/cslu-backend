@@ -2,7 +2,7 @@ package com.example.csemaster.filter;
 
 import com.example.csemaster.entity.ExceptionEntity;
 import com.example.csemaster.exception.ExceptionEnum;
-import com.example.csemaster.features.account.TokenUtils;
+import com.example.csemaster.utils.TokenUtils;
 import com.example.csemaster.features.jwt.JwtProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;

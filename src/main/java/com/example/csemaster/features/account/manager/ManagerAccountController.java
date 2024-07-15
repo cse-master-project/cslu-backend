@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.example.csemaster.features.account.TokenUtils.extractAccessTokenFromHeader;
+import static com.example.csemaster.utils.TokenUtils.extractAccessTokenFromHeader;
 
 @Tag(name = "ManagerAccount", description = "관리자 계정 관련 기능")
 @Slf4j
