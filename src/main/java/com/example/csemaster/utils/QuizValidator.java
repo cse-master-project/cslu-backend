@@ -2,7 +2,6 @@ package com.example.csemaster.utils;
 
 import com.example.csemaster.entity.ChapterEntity;
 import com.example.csemaster.entity.SubjectEntity;
-import com.example.csemaster.utils.ListUtils;
 import com.example.csemaster.repository.ChapterRepository;
 import com.example.csemaster.repository.QuizSubjectRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class QuizValidator {
     private final QuizSubjectRepository quizSubjectRepository;
-    private final ChapterRepository chapterRepository;
 
     public SubjectEntity getSubjectEntity(String subject) {
         Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subject);

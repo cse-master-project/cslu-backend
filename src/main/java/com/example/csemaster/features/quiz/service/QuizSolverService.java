@@ -29,27 +29,24 @@ public class QuizSolverService {
     private final ActiveQuizRepository activeQuizRepository;
     private final QuizLogRepository quizLogRepository;
     private final QuizReportRepository quizReportRepository;
-    private final QuizSubjectRepository quizSubjectRepository;
     private final UserQuizRepository userQuizRepository;
     private final DefaultQuizRepository defaultQuizRepository;
-    private final QuizValidator quizValidator;
-
 
     @Value("${img.file.path}")
     private String imgPath;
 
-    public QuizResponse getQuiz(String userId, String subject, List<String> detailSubject, boolean hasUserQuiz, boolean hasDefaultQuiz, boolean hasSolvedQuiz) {
+    public QuizResponse getQuiz(String userId, String subject, List<String> chapters, boolean hasUserQuiz, boolean hasDefaultQuiz, boolean hasSolvedQuiz) {
         // detailSubject가 비었는지 확인 & detailSubject가 유효한지 검증
-        List<ActiveQuizEntity> quiz = null;
+        List<ActiveQuizEntity> quiz;
 
         // detailSubject 에 데이터가 없으면 모든 세부 목차 검색
-        if (detailSubject == null || detailSubject.isEmpty()) {
+        if (chapters == null || chapters.isEmpty()) {
             // 푼 퀴즈를 나오게 설정한 경우 포함해서 검색
             if (hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuizWithSolved(subject);
             else quiz = activeQuizRepository.getAnOpenQuiz(userId, subject);
         } else {
-            if (hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuizWithSolved(subject, detailSubject);
-            else quiz = activeQuizRepository.getAnOpenQuiz(userId, subject, detailSubject);
+            if (hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuizWithSolved(subject, chapters);
+            else quiz = activeQuizRepository.getAnOpenQuiz(userId, subject, chapters);
         }
         if (!quiz.isEmpty()) {
             // 필터링을 통해 사용자 문제와 기본 문제 설정에 따라 제거
@@ -68,7 +65,7 @@ public class QuizSolverService {
         List<ActiveQuizEntity> allQuiz = new ArrayList<>();
 
         for (String sub : subject) {
-            List<ActiveQuizEntity> quiz = null;
+            List<ActiveQuizEntity> quiz;
 
             // 푼 퀴즈를 나오게 설정한 경우 포함해서 검색
             if (hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuizWithSolved(sub);

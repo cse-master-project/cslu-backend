@@ -10,9 +10,7 @@ public class QuizResultCounter {
 
     public QuizResultCounter(List<String> subjectList) {
         this.categoryStats = new HashMap<>();
-        subjectList.forEach(subject -> {
-            this.categoryStats.put(subject, new int[]{0, 0});
-        });
+        subjectList.forEach(subject -> this.categoryStats.put(subject, new int[]{0, 0}));
     }
 
     public void pushLog(String subject, boolean isCorrect) {

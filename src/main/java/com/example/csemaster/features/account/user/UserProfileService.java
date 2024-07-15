@@ -65,7 +65,7 @@ public class UserProfileService {
 
         // 정답률 계산 후 리턴
         return quizResultCounter.getCorrectRate();
-    };
+    }
 
     private int getTotalCorrect(List<QuizResultDTO> quizResult) {
         int correctCnt = 0;

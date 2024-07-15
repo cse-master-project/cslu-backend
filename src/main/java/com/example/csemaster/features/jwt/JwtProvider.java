@@ -51,11 +51,11 @@ public class JwtProvider {
 
     public JwtProvider(@Value("${jwt.secret}") String key,
                        ManagerRefreshTokenRepository managerRefreshTokenRepository,
-                       UserRefreshTokenRepository userRefreshTokenRepository, ManagerRefreshTokenRepository managerRefreshTokenRepository1, UserRefreshTokenRepository userRefreshTokenRepository1,
+                       UserRefreshTokenRepository userRefreshTokenRepository,
                        AccessTokenBlackListRepository accessTokenBlackListRepository) {
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(key));
-        this.managerRefreshTokenRepository = managerRefreshTokenRepository1;
-        this.userRefreshTokenRepository = userRefreshTokenRepository1;
+        this.managerRefreshTokenRepository = managerRefreshTokenRepository;
+        this.userRefreshTokenRepository = userRefreshTokenRepository;
         this.accessTokenBlackListRepository = accessTokenBlackListRepository;
     }
 
