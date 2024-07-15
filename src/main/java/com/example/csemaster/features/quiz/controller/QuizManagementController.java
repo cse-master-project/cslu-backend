@@ -22,8 +22,8 @@ public class QuizManagementController {
 
     // 미승인 문제 조회
     @Operation(
-            summary = "미승인 문제 조회",
-            description = "승인 상태가 미승인(0)인 문제들 전체 조회"
+            summary = "사용자 문제 중 미승인 문제 조회 [관리자 전용]",
+            description = "사용자 문제 중 대기중(0)인 문제 전체를 조회할 수 있다."
     )
     @GetMapping("/unapproved")
     public List<UnApprovalQuizDTO> getUnApproval() {
@@ -33,8 +33,8 @@ public class QuizManagementController {
     // 0 : 대기, 1 : 승인, -1 : 거절
     // 문제 승인
     @Operation(
-            summary = "문제 승인",
-            description = "문제 아이디를 받아서 문제를 승인(1)으로 처리"
+            summary = "사용자 문제 승인 [관리자 전용]",
+            description = "사용자 문제 중 대기 중인 문제를 승인(1)할 수 있다."
     )
     @PutMapping("/{id}/approve")
     public ResponseEntity<?> userQuizApprove(@PathVariable("id") Long quizId) {
@@ -43,8 +43,8 @@ public class QuizManagementController {
 
     // 문제 반려
     @Operation(
-            summary = "문제 반려",
-            description = "문제 아이디를 받아서 문제를 반려(-1)로 처리 후 반려 사유 저장"
+            summary = "사용자 문제 반려 [관리자 전용]",
+            description = "사용자 문제 중 대기 중인 문제를 반려(-1)할 수 있으며 사유를 지정해야한다."
     )
     @PutMapping("/{id}/reject")
     public ResponseEntity<?> userQuizReject(@PathVariable("id") Long quizId, @RequestBody String reason) {
@@ -53,8 +53,8 @@ public class QuizManagementController {
 
     // 문제 수정
     @Operation(
-            summary = "문제 수정",
-            description = "문제 아이디를 받아서 문제 내용(jsonContent)을 수정"
+            summary = "문제 수정 [관리자 전용]",
+            description = "문제의 내용(jsonContent)만 수정할 수 있다."
     )
     @PatchMapping("/{quizId}")
     public ResponseEntity<?> updateQuiz(@PathVariable Long quizId, @RequestBody String newJsonContent) {
@@ -63,8 +63,8 @@ public class QuizManagementController {
 
     // 문제 삭제
     @Operation(
-            summary = "문제 삭제",
-            description = "문제 아이디를 받아서 is_deleted 필드에 true 처리하여 비활성화"
+            summary = "문제 삭제 [관리자 전용]",
+            description = "문제 ID로 해당 문제를 삭제할 수 있다. (소프트 삭제로 처리됨)"
     )
     @DeleteMapping("/{quizId}")
     public ResponseEntity<?> deleteQuiz(@PathVariable Long quizId) {

@@ -30,7 +30,7 @@ public class QuizCreateController {
 
     // 문제 신고
     @Operation(
-            summary = "문제 신고",
+            summary = "문제 신고 [사용자 전용]",
             description = "신고 사유를 받아서 문제를 신고"
     )
     @PostMapping("/report")
@@ -42,8 +42,8 @@ public class QuizCreateController {
 
     // 기본 문제 추가
     @Operation(
-            summary = "기본 문제 추가",
-            description = "카테고리, 서브 카테고리, 문제를 받아서 문제를 추가<br>관리자 아이디를 추출하여 기본 문제로 분류"
+            summary = "기본 문제 추가 [관리자 전용]",
+            description = "과목, 챕터, 문제를 받아서 문제를 추가<br>관리자 아이디를 추출하여 기본 문제로 분류"
     )
     @PostMapping("/default")
     public Long addDefaultQuiz(@RequestBody @Valid QuizDTO quizDTO) {
@@ -54,8 +54,8 @@ public class QuizCreateController {
 
     // 사용자 문제 추가
     @Operation(
-            summary = "사용자 문제 추가",
-            description = "카테고리, 서브 카테고리, 문제를 받아서 문제를 추가<br>사용자 아이디를 추출하여 사용자 문제로 분류"
+            summary = "사용자 문제 추가 [사용자 전용]",
+            description = "과목, 챕터, 문제를 받아서 문제를 추가<br>사용자 아이디를 추출하여 사용자 문제로 분류"
     )
     @PostMapping("/user")
     public Long addUserQuiz(@RequestBody @Valid QuizDTO quizDTO) {
@@ -68,7 +68,7 @@ public class QuizCreateController {
     // 이미지 추가
     @Operation(
             summary = "이미지 추가",
-            description = "문제 생성시 이미지는 별도로 전송, 리턴받은 문제 아이디로 요청함."
+            description = "문제 추가시 이미지는 해당 경로를 통해 별도로 전송해야한다. 요청시 필요한 문제 ID는 문제 추가 요청시 받을 수 있다."
     )
     @PostMapping("/image")
     public void uploadImage(@RequestBody QuizImageRequest request) {

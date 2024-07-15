@@ -37,8 +37,8 @@ public class QuizQueryController {
 
     // 모든 활성화된 문제 조회
     @Operation(
-            summary = "문제 전체 조회",
-            description = "활성화 상태인 문제 전체를 조회"
+            summary = "문제 전체 조회 [관리자 전용]",
+            description = "활성화 상태인 문제 전체를 조회 (활성화 기준: 승인된 유저 문제나 삭제되지 않은 문제) [페이징 적용]"
     )
     @GetMapping("")
     public Page<ActiveQuizEntity> getAllQuiz(Pageable pageable) {
@@ -48,7 +48,7 @@ public class QuizQueryController {
     // 현재 활성화된 유저 문제만 조회
     @Operation(
             summary = "사용자 문제 전체 조회",
-            description = "활성화 상태인 사용자 문제 전체를 조회"
+            description = "활성화 상태인 사용자 문제 전체를 조회 [페이징 적용]"
     )
     @GetMapping("/user")
     public Page<ActiveQuizEntity> getUserQuiz(Pageable pageable) {
@@ -58,7 +58,7 @@ public class QuizQueryController {
     // 현재 활성화된 기본 문제만 조회
     @Operation(
             summary = "기본 문제 전체 조회",
-            description = "활성화 상태인 기본 문제 전체를 조회"
+            description = "활성화 상태인 기본 문제 전체를 조회 [페이징 적용]"
     )
     @GetMapping("/default")
     public Page<ActiveQuizEntity> getDefaultQuiz(Pageable pageable) {
@@ -67,7 +67,7 @@ public class QuizQueryController {
 
     // 문제 아이디로 문제 조회
     @Operation(
-            summary = "문제 아이디로 특정 문제 조회"
+            summary = "문제 ID로 원하는 문제 하나를 조회한다. (예: /quiz/2 -> 2번 문제 조회)"
     )
     @GetMapping("/{quizId}")
     public UnApprovalQuizDTO getQuizById(@PathVariable Long quizId) { return quizSearchService.getQuizById(quizId); }
@@ -75,10 +75,10 @@ public class QuizQueryController {
     // 지정한 카테고리에 맞게 무작위로 하나의 문제 제공
     @Operation(
             summary = "문제 랜덤 조회",
-            description = "카테고리를 받아서 지정한 카테고리에 맞게 무작위로 하나의 문제 제공"
+            description = "지정한 과목과 챕터에서 무작위로 뽑은 문제를 한 개 제공 [모바일 문제 풀이 기능 전용]"
     )
     @GetMapping("/random")
-    public QuizResponse getRandomQuiz(@RequestParam String subject, @RequestParam(required = false) List<String> detailSubject,
+    public QuizResponse getRandomQuiz(@RequestParam String subject, @RequestParam(required = false) List<String> chapters,
                                       @RequestParam(required = false, defaultValue = "true") Boolean hasUserQuiz,
                                       @RequestParam(required = false, defaultValue = "true") Boolean hasDefaultQuiz,
                                       @RequestParam(required = false, defaultValue = "false") Boolean hasSolvedQuiz) {
@@ -88,18 +88,18 @@ public class QuizQueryController {
 
         // 검증
         if (!quizValidator.isValidSubject(subject)) throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
-        if (!quizValidator.isValidDetailSubject(subject, detailSubject)) throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
+        if (!quizValidator.isValidDetailSubject(subject, chapters)) throw new CustomException(ExceptionEnum.NOT_FOUND_DETAIL_SUBJECT);
 
         if (!hasDefaultQuiz && !hasUserQuiz) throw new CustomException(ExceptionEnum.ILLEGAL_ARGUMENT);
 
         // 무작위로 하나의 문제를 반환
-        return quizSolverService.getQuiz(userId, subject, detailSubject, hasUserQuiz, hasDefaultQuiz, hasSolvedQuiz);
+        return quizSolverService.getQuiz(userId, subject, chapters, hasUserQuiz, hasDefaultQuiz, hasSolvedQuiz);
     }
 
     // 여러 카테고리 문제를 무작위로 조회
     @Operation(
-            summary = "여러 카테고리 문제를 무작위로 조회",
-            description = "여러 카테고리를 선택하면 해당 카테고리의 모든 하위 카테고리에서 무작위로 하나의 문제를 제공"
+            summary = "과목을 여러개 고를 수 있는 문제 랜덤 조회 [모바일 문제 풀이 기능 전용]",
+            description = "여러 과목들의 모든 하위 챕터에서 무작위로 하나의 문제를 제공 [모바일 문제 풀이 기능 전용]"
     )
     @GetMapping("/random/only-subject")
     public QuizResponse getRandomQuizWithSubject(@RequestParam List<String> subject,
@@ -122,17 +122,19 @@ public class QuizQueryController {
     // 문제 이미지 조회
     @Operation(
             summary = "문제 이미지 조회",
-            description = "문제 아이디를 받아서 해당하는 문제의 이미지를 조회"
+            description = "문제 ID로 해당 문제의 이미지를 조회 (base64 인코딩 사용)"
     )
     @GetMapping("/{quizId}/image")
     public ResponseEntity<?> getQuizImage(@PathVariable("quizId") Long quizId) {
+        // 문제가 없는 경우 예외 처리 안함
         return quizSolverService.getQuizImage(quizId);
     }
 
     // 문제 푼 결과 저장
     @Operation(
-            summary = "문제 풀이 결과 저장",
-            description = "문제 아이디와 정답 여부를 받아서 풀이 결과를 저장"
+            summary = "문제 풀이 결과 저장 [모바일 문제 풀이 기능 전용]",
+            description = "문제 ID와 정답 여부를 입력해 풀이 결과를 저장할 수 있다. " +
+                    "문제를 풀지 않은 결과가 자동으로 저장되지 않으며, 해당 경로를 통하여 저장된 결과만 기록된다."
     )
     @PostMapping("/submit")
     public ResponseEntity<?> solveQuiz(@RequestBody QuizSolverRequest request)  {
@@ -144,17 +146,21 @@ public class QuizQueryController {
 
     // 해당 유저가 만든 퀴즈 조회
     @Operation(
-            summary = "특정 사용자가 추가한 문제만 조회",
-            description = "사용자 아이디를 받아서 해당 사용자가 추가한 문제만 조회"
+            summary = "자신이 추가한 문제만 조회 [사용자 전용]",
+            description = "로그인된 유저가 만든 문제를 조회한다."
     )
     @GetMapping("/my")
-    public List<UserQuizResponse> getMyQuiz(@RequestParam String userId) {
+    public List<UserQuizResponse> getMyQuiz() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+
         return quizSearchService.getMyQuiz(userId);
     }
 
     // 문제의 승인 여부 확인
     @Operation(
-            summary = "사용자 문제의 승인 여부 조회"
+            summary = "사용자 문제 승인 여부 조회 [사용자 전용]",
+            description = "자신이 만든 문제의 승인 여부를 quiz id를 통해 확인할 수 있다."
     )
     @GetMapping("/my/reject")
     public List<QuizRejectResponse> getQuizReject(@RequestParam Long quizId) {
@@ -163,7 +169,8 @@ public class QuizQueryController {
 
     // 전체 퀴즈 오류 신고 조회
     @Operation(
-            summary = "신고가 들어온 문제 전체를 조회"
+            summary = "전체 신고 조회 [관리자 전용]",
+            description = "모든 문제에 대한 모든 신고를 조회할 수 있다."
     )
     @GetMapping("/report")
     public List<QuizReportResponse> allQuizReport() {
@@ -172,8 +179,8 @@ public class QuizQueryController {
 
     // 특정 퀴즈의 전체 오류 신고 조회
     @Operation(
-            summary = "특정 문제에 들어온 신고 조회",
-            description = "문제 아이디를 받아서 해당 문제에 들어온 신고들을 조회"
+            summary = "특정 문제에 들어온 신고 조회 [관리자 전용]",
+            description = "문제 ID로 해당 문제에 들어온 모든 신고들을 조회할 수 있다."
     )
     @GetMapping("/{quizId}/report")
     public List<QuizReportResponse> getAllReportForQuiz(@PathVariable Long quizId) {
@@ -182,8 +189,8 @@ public class QuizQueryController {
 
     // 특정 오류 신고 조회
     @Operation(
-            summary = "특정 신고를 조회",
-            description = "문제 신고 아이디를 받아서 해당하는 신고를 조회"
+            summary = "특정 신고 조회 [관리자 전용]",
+            description = "신고글의 ID로 상세 내용을 조회할 수 있다."
     )
     @GetMapping("/report/{quizReportId}")
     public QuizReportResponse getQuizReport(@PathVariable Long quizReportId) {
