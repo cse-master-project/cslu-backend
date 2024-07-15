@@ -4,7 +4,6 @@ import com.example.csemaster.dto.response.QuizResponse;
 import com.example.csemaster.entity.*;
 import com.example.csemaster.exception.CustomException;
 import com.example.csemaster.exception.ExceptionEnum;
-import com.example.csemaster.utils.QuizValidator;
 import com.example.csemaster.mapper.QuizMapper;
 import com.example.csemaster.repository.*;
 import lombok.RequiredArgsConstructor;

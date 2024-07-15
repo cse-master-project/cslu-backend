@@ -2,7 +2,6 @@ package com.example.csemaster.utils;
 
 import com.example.csemaster.entity.ChapterEntity;
 import com.example.csemaster.entity.SubjectEntity;
-import com.example.csemaster.repository.ChapterRepository;
 import com.example.csemaster.repository.QuizSubjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
