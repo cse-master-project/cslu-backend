@@ -11,19 +11,19 @@ import java.time.LocalDateTime;
 public class UnApprovalQuizDTO {
     private Long quizId;
     private String subject;
-    private String detailSubject;
+    private String chapter;
     private Integer quizType;
     private String jsonContent;
     private LocalDateTime createAt;
-    private String userNickname;
+    private String creator;
 
-    public UnApprovalQuizDTO(QuizEntity quiz, String nickname) {
+    public UnApprovalQuizDTO(QuizEntity quiz, String creator) {
         this.quizId = quiz.getQuizId();
         this.subject = quiz.getSubject();
-        this.detailSubject = quiz.getDetailSubject();
+        this.chapter = quiz.getChapter();
         this.quizType = quiz.getQuizType();
         this.jsonContent = quiz.getJsonContent();
         this.createAt = quiz.getCreateAt();
-        this.userNickname = nickname;
+        this.creator = creator;
     }
 }

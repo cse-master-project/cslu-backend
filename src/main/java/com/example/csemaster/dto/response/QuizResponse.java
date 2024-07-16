@@ -13,9 +13,10 @@ public class QuizResponse {
     private Long quizId;
 
     private String subject;
-    private String detailSubject;
+    private String chapter;
     private Integer quizType;
     // private double correctRate;
     private String jsonContent;
     private Boolean hasImage;
+    private String creator;
 }

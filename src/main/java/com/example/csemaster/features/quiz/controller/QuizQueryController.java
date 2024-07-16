@@ -70,7 +70,7 @@ public class QuizQueryController {
             summary = "문제 ID로 원하는 문제 하나를 조회한다. (예: /quiz/2 -> 2번 문제 조회)"
     )
     @GetMapping("/{quizId}")
-    public UnApprovalQuizDTO getQuizById(@PathVariable Long quizId) { return quizSearchService.getQuizById(quizId); }
+    public QuizResponse getQuizById(@PathVariable Long quizId) { return quizSearchService.getQuizById(quizId); }
 
     // 지정한 카테고리에 맞게 무작위로 하나의 문제 제공
     @Operation(
@@ -88,7 +88,7 @@ public class QuizQueryController {
 
         // 검증
         if (!quizValidator.isValidSubject(subject)) throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
-        if (!quizValidator.isValidDetailSubject(subject, chapters)) throw new CustomException(ExceptionEnum.NOT_FOUND_CHAPTER);
+        if (!quizValidator.isValidChapter(subject, chapters)) throw new CustomException(ExceptionEnum.NOT_FOUND_CHAPTER);
 
         if (!hasDefaultQuiz && !hasUserQuiz) throw new CustomException(ExceptionEnum.ILLEGAL_ARGUMENT);
 

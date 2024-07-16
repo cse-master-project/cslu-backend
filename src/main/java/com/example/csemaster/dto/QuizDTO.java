@@ -23,7 +23,7 @@ public class QuizDTO {
     @NotBlank
     private String subject;
     @NotBlank
-    private String detailSubject;
+    private String chapter;
     @NotNull
     @Min(value = 1, message = "NOT_VALID_STATE")
     @Max(value = 5, message = "NOT_VALID_STATE")
@@ -33,4 +33,6 @@ public class QuizDTO {
 
     @Schema(hidden = true)
     private Boolean isDeleted;
+    @Schema(hidden = true)
+    private String creator;
 }
