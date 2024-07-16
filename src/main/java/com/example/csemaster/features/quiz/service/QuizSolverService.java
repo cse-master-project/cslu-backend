@@ -35,10 +35,10 @@ public class QuizSolverService {
     private String imgPath;
 
     public QuizResponse getQuiz(String userId, String subject, List<String> chapters, boolean hasUserQuiz, boolean hasDefaultQuiz, boolean hasSolvedQuiz) {
-        // detailSubject가 비었는지 확인 & detailSubject가 유효한지 검증
+        // Chapter 가 비었는지 확인 & Chapter 가 유효한지 검증
         List<ActiveQuizEntity> quiz;
 
-        // detailSubject 에 데이터가 없으면 모든 세부 목차 검색
+        // Chapter 에 데이터가 없으면 모든 세부 목차 검색
         if (chapters == null || chapters.isEmpty()) {
             // 푼 퀴즈를 나오게 설정한 경우 포함해서 검색
             if (hasSolvedQuiz) quiz = activeQuizRepository.getAnOpenQuizWithSolved(subject);

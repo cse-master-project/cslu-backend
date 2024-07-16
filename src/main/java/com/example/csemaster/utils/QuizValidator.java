@@ -29,9 +29,9 @@ public class QuizValidator {
     }
 
     // detail subject 유효성 검사
-    public boolean isValidDetailSubject(String subject, List<String> chapter) {
+    public boolean isValidChapter(String subject, List<String> chapter) {
         try {
-            // 요청받은 subject 의 detailSubject 검색
+            // 요청받은 subject 의 Chapter 검색
             List<ChapterEntity> bass = getSubjectEntity(subject).getChapters();
             // db 의 내용과 요청한 내용과 동일한지 비교
             return ListUtils.compareList(bass.stream().map(ChapterEntity::getChapter).toList(), chapter);

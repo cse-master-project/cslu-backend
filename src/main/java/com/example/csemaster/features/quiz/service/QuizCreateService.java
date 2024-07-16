@@ -141,14 +141,14 @@ public class QuizCreateService {
     }
 
     public Long addQuiz(QuizDTO quizDTO) {
-        // subject, detailSubject 확인
+        // subject, chapter 확인
         Optional<SubjectEntity> subject = quizSubjectRepository.findBySubject(quizDTO.getSubject());
         if (subject.isEmpty()) {
             throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);
         }
 
-        Optional<ChapterEntity> detailSubject = chapterRepository.findBySubjectIdAndChapter(subject.get().getSubjectId(), quizDTO.getDetailSubject());
-        if (detailSubject.isEmpty()) {
+        Optional<ChapterEntity> chapter = chapterRepository.findBySubjectIdAndChapter(subject.get().getSubjectId(), quizDTO.getChapter());
+        if (chapter.isEmpty()) {
             throw new CustomException(ExceptionEnum.NOT_FOUND_CHAPTER);
         }
 

@@ -63,10 +63,10 @@ public class QuizSubjectService {
 
         Integer maxIdx = chapterRepository.getMaxIndex(subject).orElse(-1);
 
-        // 새 detailSubject 생성
+        // 새 Chapter 생성
         ChapterEntity newChapter = new ChapterEntity(subjectId, chapter, maxIdx + 1);
 
-        // 새 DetailSubjectEntity 저장
+        // 새 ChapterEntity 저장
         chapterRepository.save(newChapter);
 
         log.info("Create new detail Subject( {} - {} )]", subject, chapter);
@@ -95,7 +95,7 @@ public class QuizSubjectService {
         return ResponseEntity.ok().build();
     }
 
-   public SubjectDTO updateDetailSubject(ChapterUpdateDTO updateDTO) {
+   public SubjectDTO updateChapter(ChapterUpdateDTO updateDTO) {
        // 기존의 텍스트와 새로운 텍스트 비교시 변경점이 있는지 확인
        if (updateDTO.getChapter().equals(updateDTO.getNewChapter())) {
            throw new CustomException(ExceptionEnum.NO_CHANGE);
@@ -166,7 +166,7 @@ public class QuizSubjectService {
     }
 
     @Transactional
-    public SubjectResponse adjustDetailSubject(String subject, List<ChapterDTO> chapters) {
+    public SubjectResponse adjustChapter(String subject, List<ChapterDTO> chapters) {
         List<ChapterEntity> bass = chapterRepository.findBySubject(subject);
         // 검색 결과가 없으면 해당 subject 가 유효하지 않는다는 의미
         if (bass.isEmpty()) throw new CustomException(ExceptionEnum.NOT_FOUND_SUBJECT);

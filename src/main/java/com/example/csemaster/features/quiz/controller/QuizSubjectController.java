@@ -48,7 +48,7 @@ public class QuizSubjectController {
             summary = "챕터 추가",
             description = "지정한 과목에 새로운 챕터 추가"
     )
-    @PostMapping("/detail")
+    @PostMapping("/chapter")
     public List<String> addChapter(@RequestBody @Valid ChapterRequest request) {
         return quizSubjectService.addChapter(request.getSubject(), request.getChapter());
     }
@@ -68,9 +68,9 @@ public class QuizSubjectController {
             summary = "챕터 수정",
             description = "기존의 챕터 이름을 새로운 챕터 이름으로 변경할 수 있다."
     )
-    @PatchMapping("/detail")
+    @PatchMapping("/chapter")
     public SubjectDTO updateChapter(@RequestBody @Valid ChapterUpdateDTO updateDTO) {
-        return quizSubjectService.updateDetailSubject(updateDTO);
+        return quizSubjectService.updateChapter(updateDTO);
     }
 
     // 카테고리 삭제
@@ -88,7 +88,7 @@ public class QuizSubjectController {
             summary = "챕터 삭제",
             description = "챕터를 삭제할 수 있다. 과목과 마찬가지로 해당 챕터에 속한 문제가 있을 경우 삭제할 수 없다."
     )
-    @DeleteMapping("/detail")
+    @DeleteMapping("/chapter")
     public SubjectDTO deleteChapter(@RequestBody @Valid ChapterRequest request) {
         return quizSubjectService.deleteChapter(request.getSubject(), request.getChapter());
     }
@@ -98,9 +98,9 @@ public class QuizSubjectController {
             summary = "챕터 정렬 순서 재설정",
             description = "특정한 과목 내의 챕터들의 정렬 순서를 변경할 수 있다. 모든 항목의 인덱스를 지정해주어야한다."
     )
-    @PostMapping("/detail/sort-order")
-    public SubjectResponse adjustDetailSubject(@RequestBody @Valid SubjectSortRequest request) {
-        return quizSubjectService.adjustDetailSubject(request.getSubject(), request.getChapters());
+    @PostMapping("/chapter/sort-order")
+    public SubjectResponse adjustChapter(@RequestBody @Valid SubjectSortRequest request) {
+        return quizSubjectService.adjustChapter(request.getSubject(), request.getChapters());
     }
 
 }

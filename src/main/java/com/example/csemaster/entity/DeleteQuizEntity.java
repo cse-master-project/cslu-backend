@@ -22,7 +22,7 @@ public class DeleteQuizEntity {
     private String subject;
 
     @Column(name = "detail_subject")
-    private String detailSubject;
+    private String chapter;
 
     @Column(name = "quiz_type")
     private Integer quizType;

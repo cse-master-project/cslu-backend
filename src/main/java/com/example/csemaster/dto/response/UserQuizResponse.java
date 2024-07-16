@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class UserQuizResponse {
     private Long quizId;
     private String subject;
-    private String detailSubject;
+    private String chapter;
     private Integer quizType;
     private String jsonContent;
     private LocalDateTime createAt;
@@ -20,7 +20,7 @@ public class UserQuizResponse {
     public UserQuizResponse(QuizEntity quiz, UserQuizEntity user) {
         this.quizId = quiz.getQuizId();
         this.subject = quiz.getSubject();
-        this.detailSubject = quiz.getDetailSubject();
+        this.chapter = quiz.getChapter();
         this.quizType = quiz.getQuizType();
         this.jsonContent = quiz.getJsonContent();
         this.createAt = quiz.getCreateAt();

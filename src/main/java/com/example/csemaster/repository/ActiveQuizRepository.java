@@ -13,8 +13,8 @@ public interface ActiveQuizRepository extends JpaRepository<ActiveQuizEntity, Lo
     @Query("SELECT q " +
             "FROM ActiveQuizEntity q " +
             "LEFT OUTER JOIN QuizLogEntity l ON q.quizId = l.quizId AND l.userId = :userId AND l.answerStatus = true " +
-            "WHERE q.subject = :subject AND q.detailSubject IN :detailSubject AND l.quizId IS NULL")
-    List<ActiveQuizEntity> getAnOpenQuiz(@Param("userId") String userId, @Param("subject") String subject, @Param("detailSubject") List<String> detailSubject);
+            "WHERE q.subject = :subject AND q.chapter IN :chapters AND l.quizId IS NULL")
+    List<ActiveQuizEntity> getAnOpenQuiz(@Param("userId") String userId, @Param("subject") String subject, @Param("chapter") List<String> chapters);
 
     @Query("SELECT q " +
             "FROM ActiveQuizEntity q " +
@@ -24,8 +24,8 @@ public interface ActiveQuizRepository extends JpaRepository<ActiveQuizEntity, Lo
 
     @Query("SELECT q " +
             "FROM ActiveQuizEntity q " +
-            "WHERE q.subject = :subject AND q.detailSubject IN :detailSubject")
-    List<ActiveQuizEntity> getAnOpenQuizWithSolved(@Param("subject") String subject, @Param("detailSubject") List<String> detailSubject);
+            "WHERE q.subject = :subject AND q.chapter IN :chapters")
+    List<ActiveQuizEntity> getAnOpenQuizWithSolved(@Param("subject") String subject, @Param("chapter") List<String> chapters);
 
     @Query("SELECT q " +
             "FROM ActiveQuizEntity q " +

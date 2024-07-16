@@ -22,7 +22,7 @@ public class ActiveQuizEntity {
     private String subject;
 
     @Column(name = "detail_subject")
-    private String detailSubject;
+    private String chapter;
 
     @Column(name = "quiz_type")
     private Integer quizType;
@@ -38,4 +38,7 @@ public class ActiveQuizEntity {
 
     @Column(name = "has_image")
     private Boolean hasImage;
+
+    @Column(name = "creator")
+    private String creator;
 }
