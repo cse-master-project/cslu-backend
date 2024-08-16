@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ public interface ActiveQuizRepository extends JpaRepository<ActiveQuizEntity, Lo
             "FROM ActiveQuizEntity q " +
             "LEFT OUTER JOIN QuizLogEntity l ON q.quizId = l.quizId AND l.userId = :userId AND l.answerStatus = true " +
             "WHERE q.subject = :subject AND q.chapter IN :chapters AND l.quizId IS NULL")
-    List<ActiveQuizEntity> getAnOpenQuiz(@Param("userId") String userId, @Param("subject") String subject, @Param("chapter") List<String> chapters);
+    List<ActiveQuizEntity> getAnOpenQuiz(@Param("userId") String userId, @Param("subject") String subject, @Param("chapters") List<String> chapters);
 
     @Query("SELECT q " +
             "FROM ActiveQuizEntity q " +
@@ -26,7 +25,7 @@ public interface ActiveQuizRepository extends JpaRepository<ActiveQuizEntity, Lo
     @Query("SELECT q " +
             "FROM ActiveQuizEntity q " +
             "WHERE q.subject = :subject AND q.chapter IN :chapters")
-    List<ActiveQuizEntity> getAnOpenQuizWithSolved(@Param("subject") String subject, @Param("chapter") List<String> chapters);
+    List<ActiveQuizEntity> getAnOpenQuizWithSolved(@Param("subject") String subject, @Param("chapters") List<String> chapters);
 
     @Query("SELECT q " +
             "FROM ActiveQuizEntity q " +
