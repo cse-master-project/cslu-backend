@@ -1,4 +1,4 @@
-package com.example.csemaster.v2.domain.quiz.service;
+package com.example.csemaster.v2.domain.quiz.category;
 
 import com.example.csemaster.v2.dto.*;
 import com.example.csemaster.v2.dto.response.SubjectResponse;

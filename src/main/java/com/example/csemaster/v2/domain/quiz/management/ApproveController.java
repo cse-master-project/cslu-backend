@@ -1,7 +1,6 @@
-package com.example.csemaster.v2.domain.quiz.controller;
+package com.example.csemaster.v2.domain.quiz.management;
 
-import com.example.csemaster.v2.domain.quiz.service.ApproveService;
-import com.example.csemaster.v2.domain.quiz.service.QueryService;
+import com.example.csemaster.v2.domain.quiz.query.QueryService;
 import com.example.csemaster.v2.dto.UnApprovalQuizDTO;
 import com.example.csemaster.v2.dto.response.QuizRejectResponse;
 import io.swagger.v3.oas.annotations.Operation;

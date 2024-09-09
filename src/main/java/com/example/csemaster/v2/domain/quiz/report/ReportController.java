@@ -1,7 +1,6 @@
-package com.example.csemaster.v2.domain.quiz.controller;
+package com.example.csemaster.v2.domain.quiz.report;
 
-import com.example.csemaster.v2.domain.quiz.service.ReportService;
-import com.example.csemaster.v2.domain.quiz.service.SolveService;
+import com.example.csemaster.v2.domain.quiz.solve.SolveService;
 import com.example.csemaster.v2.dto.request.QuizReportRequest;
 import com.example.csemaster.v2.dto.response.QuizReportResponse;
 import io.swagger.v3.oas.annotations.Operation;

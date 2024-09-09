@@ -1,4 +1,4 @@
-package com.example.csemaster.v2.domain.quiz.service;
+package com.example.csemaster.v2.domain.quiz.create;
 
 import com.example.csemaster.core.dao.actor.ManagerEntity;
 import com.example.csemaster.core.dao.actor.UserEntity;
@@ -10,6 +10,7 @@ import com.example.csemaster.core.dao.quiz.core.UserQuizEntity;
 import com.example.csemaster.core.exception.ApiErrorType;
 import com.example.csemaster.core.exception.ApiException;
 import com.example.csemaster.core.repository.*;
+import com.example.csemaster.v2.domain.quiz.QuizVerificationService;
 import com.example.csemaster.v2.dto.QuizDTO;
 import com.example.csemaster.v2.mapper.AddQuizMapper;
 import lombok.RequiredArgsConstructor;

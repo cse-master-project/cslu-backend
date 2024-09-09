@@ -1,8 +1,7 @@
-package com.example.csemaster.v2.domain.quiz.controller;
+package com.example.csemaster.v2.domain.quiz.solve;
 
 import com.example.csemaster.core.exception.ApiErrorType;
 import com.example.csemaster.core.exception.ApiException;
-import com.example.csemaster.v2.domain.quiz.service.SolveService;
 import com.example.csemaster.v2.dto.request.QuizSolverRequest;
 import com.example.csemaster.v2.dto.response.QuizResponse;
 import com.example.csemaster.v2.utils.QuizValidator;

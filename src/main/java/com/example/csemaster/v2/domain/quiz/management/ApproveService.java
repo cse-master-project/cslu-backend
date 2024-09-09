@@ -1,4 +1,4 @@
-package com.example.csemaster.v2.domain.quiz.service;
+package com.example.csemaster.v2.domain.quiz.management;
 
 import com.example.csemaster.core.exception.ApiErrorType;
 import com.example.csemaster.core.exception.ApiException;

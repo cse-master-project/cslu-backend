@@ -1,4 +1,4 @@
-package com.example.csemaster.v2.domain.quiz.service;
+package com.example.csemaster.v2.domain.quiz.create;
 
 import com.example.csemaster.core.dao.quiz.core.QuizEntity;
 import com.example.csemaster.core.dao.quiz.core.UserQuizEntity;

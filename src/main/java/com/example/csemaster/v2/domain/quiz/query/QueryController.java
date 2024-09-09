@@ -1,7 +1,6 @@
-package com.example.csemaster.v2.domain.quiz.controller;
+package com.example.csemaster.v2.domain.quiz.query;
 
 import com.example.csemaster.core.dao.quiz.core.ActiveQuizEntity;
-import com.example.csemaster.v2.domain.quiz.service.QueryService;
 import com.example.csemaster.v2.dto.response.QuizResponse;
 import com.example.csemaster.v2.dto.response.UserQuizResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,7 +21,7 @@ import java.util.List;
 @RestController(value = "V2QueryForWebController")
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/quiz")
-public class QueryForWebController {
+public class QueryController {
     private final QueryService queryService;
 
     // 모든 활성화된 문제 조회

@@ -1,4 +1,4 @@
-package com.example.csemaster.v2.domain.quiz.controller;
+package com.example.csemaster.v2.domain.quiz.category;
 
 import com.example.csemaster.v2.dto.ChapterUpdateDTO;
 import com.example.csemaster.v2.dto.SubjectDTO;
@@ -7,7 +7,6 @@ import com.example.csemaster.v2.dto.SubjectUpdateDTO;
 import com.example.csemaster.v2.dto.request.ChapterRequest;
 import com.example.csemaster.v2.dto.request.SubjectSortRequest;
 import com.example.csemaster.v2.dto.response.SubjectResponse;
-import com.example.csemaster.v2.domain.quiz.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

@@ -1,9 +1,10 @@
-package com.example.csemaster.v2.domain.quiz.service;
+package com.example.csemaster.v2.domain.quiz.management;
 
 import com.example.csemaster.core.exception.ApiException;
 import com.example.csemaster.core.exception.ApiErrorType;
 import com.example.csemaster.core.dao.quiz.core.QuizEntity;
 import com.example.csemaster.core.repository.QuizRepository;
+import com.example.csemaster.v2.domain.quiz.QuizVerificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
