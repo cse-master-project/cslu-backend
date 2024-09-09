@@ -1,8 +1,9 @@
 package com.example.csemaster.v2.domain.quiz.controller;
 
-import com.example.csemaster.v2.dto.UnApprovalQuizDTO;
 import com.example.csemaster.v2.domain.quiz.service.ApprovalQuizService;
-import com.example.csemaster.v2.domain.quiz.service.QuizManagerService;
+import com.example.csemaster.v2.domain.quiz.service.QuizSearchService;
+import com.example.csemaster.v2.dto.UnApprovalQuizDTO;
+import com.example.csemaster.v2.dto.response.QuizRejectResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -11,14 +12,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "QuizManagement v2", description = "문제 관리 관련 기능<br> 0: 대기, 1: 승인, -1: 거절")
-@RestController(value = "V2QuizManagementController")
+@Tag(name = "QuizApprove v2", description = "문제 승인 기능<br> 0: 대기, 1: 승인, -1: 거절")
+@RestController(value = "V2QuizApproveController")
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/management/quiz")
-public class QuizManagementController {
-
-    private final QuizManagerService quizManagerService;
+public class ApproveController {
     private final ApprovalQuizService approvalQuizService;
+    private final QuizSearchService quizSearchService;
 
     // 미승인 문제 조회
     @Operation(
@@ -51,23 +51,13 @@ public class QuizManagementController {
         return approvalQuizService.setQuizRejection(quizId, reason, -1);
     }
 
-    // 문제 수정
+    // 문제의 승인 여부 확인
     @Operation(
-            summary = "문제 수정 [관리자 전용]",
-            description = "문제의 내용(jsonContent)만 수정할 수 있다."
+            summary = "사용자 문제 승인 여부 조회 [사용자 전용]",
+            description = "자신이 만든 문제의 승인 여부를 quiz id를 통해 확인할 수 있다."
     )
-    @PatchMapping("/{quizId}")
-    public ResponseEntity<?> updateQuiz(@PathVariable Long quizId, @RequestBody String newJsonContent) {
-        return quizManagerService.updateQuiz(quizId, newJsonContent);
-    }
-
-    // 문제 삭제
-    @Operation(
-            summary = "문제 삭제 [관리자 전용]",
-            description = "문제 ID로 해당 문제를 삭제할 수 있다. (소프트 삭제로 처리됨)"
-    )
-    @DeleteMapping("/{quizId}")
-    public ResponseEntity<?> deleteQuiz(@PathVariable Long quizId) {
-        return quizManagerService.deleteQuiz(quizId);
+    @GetMapping("/my/reject")
+    public List<QuizRejectResponse> getQuizReject(@RequestParam Long quizId) {
+        return quizSearchService.getQuizReject(quizId);
     }
 }

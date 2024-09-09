@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "QuizSubject v2", description = "카테고리 관련 기능")
-@RestController(value = "V2QuizSubjectController")
+@Tag(name = "Category v2", description = "카테고리 기능")
+@RestController(value = "V2CategoryController")
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/quiz/subject")
-public class QuizSubjectController {
+public class CategoryController {
 
     private final QuizSubjectService quizSubjectService;
 
@@ -44,7 +44,6 @@ public class QuizSubjectController {
     public List<String> addSubject(@RequestBody @Valid SubjectRequest subjectRequest) {
         return quizSubjectService.addSubject(subjectRequest);
     }
-
 
     // 서브 카테고리 추가
     @Operation(
