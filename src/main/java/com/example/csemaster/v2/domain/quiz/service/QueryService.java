@@ -1,13 +1,14 @@
 package com.example.csemaster.v2.domain.quiz.service;
 
-import com.example.csemaster.core.repository.*;
-import com.example.csemaster.v2.dto.response.QuizRejectResponse;
+import com.example.csemaster.core.dao.actor.UserEntity;
+import com.example.csemaster.core.dao.quiz.core.ActiveQuizEntity;
+import com.example.csemaster.core.exception.ApiErrorType;
+import com.example.csemaster.core.exception.ApiException;
+import com.example.csemaster.core.repository.ActiveQuizRepository;
+import com.example.csemaster.core.repository.QuizRepository;
+import com.example.csemaster.core.repository.UserRepository;
 import com.example.csemaster.v2.dto.response.QuizResponse;
 import com.example.csemaster.v2.dto.response.UserQuizResponse;
-import com.example.csemaster.core.dao.quiz.core.ActiveQuizEntity;
-import com.example.csemaster.core.dao.actor.UserEntity;
-import com.example.csemaster.core.exception.ApiException;
-import com.example.csemaster.core.exception.ApiErrorType;
 import com.example.csemaster.v2.mapper.QuizMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,14 +22,12 @@ import java.util.Optional;
 @Service(value = "V2QuizSearchService")
 @Slf4j
 @RequiredArgsConstructor
-public class QuizSearchService {
+public class QueryService {
     private final ActiveQuizRepository activeQuizRepository;
     private final UserRepository userRepository;
     private final QuizRepository quizRepository;
-    private final DefaultQuizRepository defaultQuizRepository;
-    private final UserQuizRepository userQuizRepository;
-    private final ActiveUserRepository activeUserRepository;
 
+    // 전체 퀴즈 조회 (페이징)
     public Page<ActiveQuizEntity> getQuiz(Pageable pageable) {
         try {
             return activeQuizRepository.findAllBy(pageable);
@@ -37,6 +36,15 @@ public class QuizSearchService {
         }
     }
 
+    // 퀴즈 아이디로 퀴즈 조회
+    public QuizResponse getQuizById(Long quizId) {
+        return QuizMapper.INSTANCE.entityToResponse(
+                activeQuizRepository.findById(quizId)
+                        .orElseThrow(() -> new ApiException(ApiErrorType.NOT_FOUND_ID))
+        );
+    }
+
+    // 유저 퀴즈 조회 (페이징)
     public Page<ActiveQuizEntity> getUserQuiz(Pageable pageable) {
         try {
             return activeQuizRepository.findAllUserQuiz(pageable);
@@ -45,6 +53,7 @@ public class QuizSearchService {
         }
     }
 
+    // 기본 퀴즈 조회 (페이징)
     public Page<ActiveQuizEntity> getDefaultQuiz(Pageable pageable) {
         try {
             return activeQuizRepository.findAllDefaultQuiz(pageable);
@@ -54,6 +63,8 @@ public class QuizSearchService {
         }
     }
 
+    // 자신이 만든 퀴즈 조회
+    // TODO : 페이징 쓰도록 수정
     public List<UserQuizResponse> getMyQuiz(String userId) {
         try {
             Optional<UserEntity> user = userRepository.findById(userId);
@@ -67,20 +78,5 @@ public class QuizSearchService {
         } catch (ApiException e) {
             throw new ApiException(ApiErrorType.RUNTIME_EXCEPTION);
         }
-    }
-
-    public List<QuizRejectResponse> getQuizReject(Long quizId) {
-        try {
-            return quizRepository.getQuizReject(quizId);
-        } catch (ApiException e) {
-            throw new ApiException(ApiErrorType.RUNTIME_EXCEPTION);
-        }
-    }
-
-    public QuizResponse getQuizById(Long quizId) {
-        return QuizMapper.INSTANCE.entityToResponse(
-                activeQuizRepository.findById(quizId)
-                    .orElseThrow(() -> new ApiException(ApiErrorType.NOT_FOUND_ID))
-        );
     }
 }

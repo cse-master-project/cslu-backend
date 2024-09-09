@@ -7,7 +7,7 @@ import com.example.csemaster.v2.dto.SubjectUpdateDTO;
 import com.example.csemaster.v2.dto.request.ChapterRequest;
 import com.example.csemaster.v2.dto.request.SubjectSortRequest;
 import com.example.csemaster.v2.dto.response.SubjectResponse;
-import com.example.csemaster.v2.domain.quiz.service.QuizSubjectService;
+import com.example.csemaster.v2.domain.quiz.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -23,7 +23,7 @@ import java.util.List;
 @RequestMapping("/api/v2/quiz/subject")
 public class CategoryController {
 
-    private final QuizSubjectService quizSubjectService;
+    private final CategoryService categoryService;
 
     // 카테고리 조회
     @Operation(
@@ -32,7 +32,7 @@ public class CategoryController {
     )
     @GetMapping()
     public List<SubjectResponse> getAllSubject() {
-        return quizSubjectService.getAllSubject();
+        return categoryService.getAllSubject();
     }
 
     // 카테고리 추가
@@ -42,7 +42,7 @@ public class CategoryController {
     )
     @PostMapping()
     public List<String> addSubject(@RequestBody @Valid SubjectRequest subjectRequest) {
-        return quizSubjectService.addSubject(subjectRequest);
+        return categoryService.addSubject(subjectRequest);
     }
 
     // 서브 카테고리 추가
@@ -52,7 +52,7 @@ public class CategoryController {
     )
     @PostMapping("/chapter")
     public List<String> addChapter(@RequestBody @Valid ChapterRequest request) {
-        return quizSubjectService.addChapter(request.getSubject(), request.getChapter());
+        return categoryService.addChapter(request.getSubject(), request.getChapter());
     }
 
     // 카테고리 수정
@@ -62,7 +62,7 @@ public class CategoryController {
     )
     @PatchMapping()
     public ResponseEntity<?> updateSubject(@RequestBody @Valid SubjectUpdateDTO subjectUpdateDTO) {
-        return quizSubjectService.updateSubject(subjectUpdateDTO);
+        return categoryService.updateSubject(subjectUpdateDTO);
     }
 
     // 서브 카테고리 수정
@@ -72,7 +72,7 @@ public class CategoryController {
     )
     @PatchMapping("/chapter")
     public SubjectDTO updateChapter(@RequestBody @Valid ChapterUpdateDTO updateDTO) {
-        return quizSubjectService.updateChapter(updateDTO);
+        return categoryService.updateChapter(updateDTO);
     }
 
     // 카테고리 삭제
@@ -82,7 +82,7 @@ public class CategoryController {
     )
     @DeleteMapping()
     public List<String> deleteSubject(@RequestBody @Valid SubjectRequest subjectRequest) {
-        return quizSubjectService.deleteSubject(subjectRequest);
+        return categoryService.deleteSubject(subjectRequest);
     }
 
     // 서브 카테고리 삭제
@@ -92,7 +92,7 @@ public class CategoryController {
     )
     @DeleteMapping("/chapter")
     public SubjectDTO deleteChapter(@RequestBody @Valid ChapterRequest request) {
-        return quizSubjectService.deleteChapter(request.getSubject(), request.getChapter());
+        return categoryService.deleteChapter(request.getSubject(), request.getChapter());
     }
 
     // 서브 카테고리 순서 변경
@@ -102,7 +102,7 @@ public class CategoryController {
     )
     @PostMapping("/chapter/sort-order")
     public SubjectResponse adjustChapter(@RequestBody @Valid SubjectSortRequest request) {
-        return quizSubjectService.adjustChapter(request.getSubject(), request.getChapters());
+        return categoryService.adjustChapter(request.getSubject(), request.getChapters());
     }
 
 }

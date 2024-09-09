@@ -12,14 +12,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-@Service(value = "V2QuizManagerService")
+@Service(value = "V2ManagementService")
 @Slf4j
 @RequiredArgsConstructor
-public class QuizManagerService {
+public class ManagementService {
 
     private final QuizRepository quizRepository;
-    private final QuizCreateService quizCreateService;
+    private final QuizVerificationService quizVerificationService;
 
+    // 문제 삭제
     @Transactional
     public ResponseEntity<?> deleteQuiz(Long quizId) {
         Optional<QuizEntity> quiz = quizRepository.findByQuizId(quizId);
@@ -37,6 +38,7 @@ public class QuizManagerService {
         return ResponseEntity.ok().build();
     }
 
+    // 문제 수정
     public ResponseEntity<?> updateQuiz(Long quizId, String newJsonContent) {
         Optional<QuizEntity> quiz = quizRepository.findByQuizId(quizId);
 
@@ -52,7 +54,8 @@ public class QuizManagerService {
         }
 
         // 수정한 jsonContent 형식 확인
-        boolean checkNewJsonContent = quizCreateService.isValidJsonContent(quiz.get().getQuizType(), newJsonContent);
+        // FIXME : 임시로 QuizVerificationService 의 변수를 사용하도록 했으니 변경 후 여기도 바꿔야함.
+        boolean checkNewJsonContent = quizVerificationService.isValidJsonContent(quiz.get().getQuizType(), newJsonContent);
         if (!checkNewJsonContent) {
             throw new ApiException(ApiErrorType.INCORRECT_QUIZ_CONTENT);
         }

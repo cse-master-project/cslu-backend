@@ -1,6 +1,6 @@
 package com.example.csemaster.v2.domain.quiz.controller;
 
-import com.example.csemaster.v2.domain.quiz.service.QuizCreateService;
+import com.example.csemaster.v2.domain.quiz.service.CreateService;
 import com.example.csemaster.v2.dto.QuizDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v2/quiz")
 @Slf4j
 public class CreateController {
-    private final QuizCreateService quizCreateService;
+    private final CreateService createService;
 
     // 기본 문제 추가
     @Operation(
@@ -31,7 +31,7 @@ public class CreateController {
     public Long addDefaultQuiz(@RequestBody @Valid QuizDTO quizDTO) {
         String managerId = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        return quizCreateService.addQuizAndDefaultQuiz(quizDTO, managerId);
+        return createService.addQuiz(quizDTO, managerId);
     }
 
     // 사용자 문제 추가
@@ -44,6 +44,6 @@ public class CreateController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
-        return quizCreateService.addQuizAndUserQuiz(quizDTO, userId);
+        return createService.addQuiz(quizDTO, userId);
     }
 }

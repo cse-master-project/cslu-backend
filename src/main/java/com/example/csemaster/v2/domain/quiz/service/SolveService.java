@@ -1,41 +1,34 @@
 package com.example.csemaster.v2.domain.quiz.service;
 
-import com.example.csemaster.core.repository.*;
-import com.example.csemaster.v2.dto.response.QuizResponse;
-import com.example.csemaster.core.dao.quiz.core.ActiveQuizEntity;
 import com.example.csemaster.core.dao.quiz.accessory.QuizLogEntity;
 import com.example.csemaster.core.dao.quiz.accessory.QuizReportEntity;
-import com.example.csemaster.core.exception.ApiException;
+import com.example.csemaster.core.dao.quiz.core.ActiveQuizEntity;
 import com.example.csemaster.core.exception.ApiErrorType;
+import com.example.csemaster.core.exception.ApiException;
+import com.example.csemaster.core.repository.*;
+import com.example.csemaster.v2.dto.response.QuizResponse;
 import com.example.csemaster.v2.mapper.QuizMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@Service(value = "V2QuizSolverService")
+@Service(value = "V2SolverService")
 @Slf4j
 @RequiredArgsConstructor
-public class QuizSolverService {
+public class SolveService {
     private final ActiveQuizRepository activeQuizRepository;
     private final QuizLogRepository quizLogRepository;
     private final QuizReportRepository quizReportRepository;
     private final UserQuizRepository userQuizRepository;
     private final DefaultQuizRepository defaultQuizRepository;
 
-    @Value("${img.file.path}")
-    private String imgPath;
-
+    // 문제 랜덤 조회
     public QuizResponse getQuiz(String userId, String subject, List<String> chapters, boolean hasUserQuiz, boolean hasDefaultQuiz, boolean hasSolvedQuiz) {
         // Chapter 가 비었는지 확인 & Chapter 가 유효한지 검증
         List<ActiveQuizEntity> quiz;
@@ -62,6 +55,7 @@ public class QuizSolverService {
         }
     }
 
+    // 문제 랜덤 조회 (과목 여러개)
     public QuizResponse getQuizWithSubjects(String userId, List<String> subject, boolean hasUserQuiz, boolean hasDefaultQuiz, boolean hasSolvedQuiz) {
         List<ActiveQuizEntity> allQuiz = new ArrayList<>();
 
@@ -91,6 +85,7 @@ public class QuizSolverService {
         }
     }
 
+    // 유저 문제, 기본 문제 구분해서 조건대로 필터링
     public List<ActiveQuizEntity> quizFiltering(List<ActiveQuizEntity> quiz, boolean hasUserQuiz, boolean hasDefaultQuiz) {
         if (!hasUserQuiz) {
             quiz.removeIf(q -> userQuizRepository.findById(q.getQuizId()).isPresent());
@@ -102,6 +97,7 @@ public class QuizSolverService {
         return quiz;
     }
 
+    // 문제 풀이 결과 저장
     public ResponseEntity<?> saveQuizResult(String userId, Long quizId, Boolean isCorrect) {
         try {
             Integer maxTryCnt = quizLogRepository.getMaxTryCnt(userId, quizId);
@@ -124,6 +120,7 @@ public class QuizSolverService {
         }
     }
 
+    // 문제 신고 저장
     public ResponseEntity<?> saveQuizReport(String userId, Long quizId, String content) {
         try {
             QuizReportEntity quizReport = new QuizReportEntity();
@@ -143,21 +140,5 @@ public class QuizSolverService {
 
     }
 
-    public ResponseEntity<?> getQuizImage(Long quizId) {
-        try {
-            BufferedImage image = ImageIO.read(new File(imgPath + "/" + quizId +".jpg"));
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-            ImageIO.write(image, "jpg", baos);
-            byte[] imageData = baos.toByteArray();
-
-            String base64Image = Base64.getEncoder().encodeToString(imageData);
-
-            return ResponseEntity.ok().body(base64Image);
-        } catch (IOException e) {
-            log.error(e.toString());
-            throw new ApiException(ApiErrorType.INTERNAL_SERVER_ERROR);
-        }
-    }
 }

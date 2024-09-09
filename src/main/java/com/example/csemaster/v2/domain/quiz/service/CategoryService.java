@@ -20,16 +20,17 @@ import java.util.stream.Collectors;
 @Service(value = "V2QuizSubjectService")
 @Slf4j
 @RequiredArgsConstructor
-public class QuizSubjectService {
-
+public class CategoryService {
     private final QuizSubjectRepository quizSubjectRepository;
     private final ChapterRepository chapterRepository;
 
+    // 모든 과목과 챕터 조회
     public List<SubjectResponse> getAllSubject() {
         List<SubjectEntity> subjects = quizSubjectRepository.findAll();
         return subjects.stream().map(e -> new SubjectResponse(e.getSubject(), e.getChapters().stream().map(ChapterEntity::getChapter).toList())).collect(Collectors.toList());
     }
 
+    // 과목 추가
     public List<String> addSubject(SubjectRequest subjectRequest) {
         Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subjectRequest.getSubject());
 
@@ -47,6 +48,7 @@ public class QuizSubjectService {
         return quizSubjectRepository.getAllSubject();
     }
 
+    // 챕터 추가
     public List<String> addChapter(String subject, String chapter) {
         Long subjectId = quizSubjectRepository.findBySubject(subject).map(SubjectEntity::getSubjectId).orElse(null);
 
@@ -74,6 +76,7 @@ public class QuizSubjectService {
         return chapterRepository.findChapterBySubject(subject);
     }
 
+    // 과목 이름 변경
     public ResponseEntity<?> updateSubject(SubjectUpdateDTO subjectUpdateDTO) {
         Optional<SubjectEntity> subject = quizSubjectRepository.findBySubject(subjectUpdateDTO.getSubject());
 
@@ -95,6 +98,7 @@ public class QuizSubjectService {
         return ResponseEntity.ok().build();
     }
 
+    // 챕터 이름 변경
    public SubjectDTO updateChapter(ChapterUpdateDTO updateDTO) {
        // 기존의 텍스트와 새로운 텍스트 비교시 변경점이 있는지 확인
        if (updateDTO.getChapter().equals(updateDTO.getNewChapter())) {
@@ -130,6 +134,7 @@ public class QuizSubjectService {
        return new SubjectDTO(updateDTO.getSubject(), chapterRepository.findChapterBySubject(updateDTO.getSubject()));
     }
 
+    // 과목 삭제
     public List<String> deleteSubject(SubjectRequest subjectRequest) {
         Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subjectRequest.getSubject());
         if (subjectEntity.isEmpty()) {
@@ -141,6 +146,7 @@ public class QuizSubjectService {
         return quizSubjectRepository.getAllSubject();
     }
 
+    // 챕터 삭제
     public SubjectDTO deleteChapter(String subject, String chapter) {
         Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subject);
         if (subjectEntity.isEmpty()) {
@@ -165,6 +171,7 @@ public class QuizSubjectService {
         return new SubjectDTO(subject, chapterRepository.findChapterBySubject(subject));
     }
 
+    // 챕터 정렬
     @Transactional
     public SubjectResponse adjustChapter(String subject, List<ChapterDTO> chapters) {
         List<ChapterEntity> bass = chapterRepository.findBySubject(subject);

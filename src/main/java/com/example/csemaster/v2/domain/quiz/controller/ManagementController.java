@@ -1,6 +1,6 @@
 package com.example.csemaster.v2.domain.quiz.controller;
 
-import com.example.csemaster.v2.domain.quiz.service.QuizManagerService;
+import com.example.csemaster.v2.domain.quiz.service.ManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/management/quiz")
 public class ManagementController {
-    private final QuizManagerService quizManagerService;
+    private final ManagementService managementService;
 
     // 문제 수정
     @Operation(
@@ -21,7 +21,7 @@ public class ManagementController {
     )
     @PatchMapping("/{quizId}")
     public ResponseEntity<?> updateQuiz(@PathVariable Long quizId, @RequestBody String newJsonContent) {
-        return quizManagerService.updateQuiz(quizId, newJsonContent);
+        return managementService.updateQuiz(quizId, newJsonContent);
     }
 
     // 문제 삭제
@@ -31,6 +31,6 @@ public class ManagementController {
     )
     @DeleteMapping("/{quizId}")
     public ResponseEntity<?> deleteQuiz(@PathVariable Long quizId) {
-        return quizManagerService.deleteQuiz(quizId);
+        return managementService.deleteQuiz(quizId);
     }
 }

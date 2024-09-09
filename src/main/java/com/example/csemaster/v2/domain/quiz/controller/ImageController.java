@@ -1,7 +1,6 @@
 package com.example.csemaster.v2.domain.quiz.controller;
 
-import com.example.csemaster.v2.domain.quiz.service.QuizCreateService;
-import com.example.csemaster.v2.domain.quiz.service.QuizSolverService;
+import com.example.csemaster.v2.domain.quiz.service.ImageService;
 import com.example.csemaster.v2.dto.request.QuizImageRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,8 +15,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/quiz")
 public class ImageController {
-    private final QuizCreateService quizCreateService;
-    private final QuizSolverService quizSolverService;
+    private final ImageService imageService;
+
     // 이미지 추가
     @Operation(
             summary = "이미지 추가",
@@ -30,9 +29,9 @@ public class ImageController {
 
         // 아이디의 길이로 유저, 매니저 구분
         if (id.length() <= 20) {
-            quizCreateService.managerUploadImage(request.getQuizId(), request.getBase64String());
+            imageService.managerUploadImage(request.getQuizId(), request.getBase64String());
         } else {
-            quizCreateService.userUploadImage(id, request.getQuizId(), request.getBase64String());
+            imageService.userUploadImage(id, request.getQuizId(), request.getBase64String());
         }
     }
 
@@ -44,6 +43,6 @@ public class ImageController {
     @GetMapping("/{quizId}/image")
     public ResponseEntity<?> getQuizImage(@PathVariable("quizId") Long quizId) {
         // 문제가 없는 경우 예외 처리 안함
-        return quizSolverService.getQuizImage(quizId);
+        return imageService.getQuizImage(quizId);
     }
 }

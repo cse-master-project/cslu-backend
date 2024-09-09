@@ -1,7 +1,7 @@
 package com.example.csemaster.v2.domain.quiz.controller;
 
 import com.example.csemaster.core.dao.quiz.core.ActiveQuizEntity;
-import com.example.csemaster.v2.domain.quiz.service.QuizSearchService;
+import com.example.csemaster.v2.domain.quiz.service.QueryService;
 import com.example.csemaster.v2.dto.response.QuizResponse;
 import com.example.csemaster.v2.dto.response.UserQuizResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/quiz")
 public class QueryForWebController {
-    private final QuizSearchService quizSearchService;
+    private final QueryService queryService;
 
     // 모든 활성화된 문제 조회
     @Operation(
@@ -32,7 +32,7 @@ public class QueryForWebController {
     )
     @GetMapping("")
     public Page<ActiveQuizEntity> getAllQuiz(Pageable pageable) {
-        return quizSearchService.getQuiz(pageable);
+        return queryService.getQuiz(pageable);
     }
 
     // 현재 활성화된 유저 문제만 조회
@@ -42,7 +42,7 @@ public class QueryForWebController {
     )
     @GetMapping("/user")
     public Page<ActiveQuizEntity> getUserQuiz(Pageable pageable) {
-        return quizSearchService.getUserQuiz(pageable);
+        return queryService.getUserQuiz(pageable);
     }
 
     // 현재 활성화된 기본 문제만 조회
@@ -52,7 +52,7 @@ public class QueryForWebController {
     )
     @GetMapping("/default")
     public Page<ActiveQuizEntity> getDefaultQuiz(Pageable pageable) {
-        return quizSearchService.getDefaultQuiz(pageable);
+        return queryService.getDefaultQuiz(pageable);
     }
 
     // 문제 아이디로 문제 조회
@@ -60,7 +60,7 @@ public class QueryForWebController {
             summary = "문제 ID로 원하는 문제 하나를 조회한다. (예: /quiz/2 -> 2번 문제 조회)"
     )
     @GetMapping("/{quizId}")
-    public QuizResponse getQuizById(@PathVariable Long quizId) { return quizSearchService.getQuizById(quizId); }
+    public QuizResponse getQuizById(@PathVariable Long quizId) { return queryService.getQuizById(quizId); }
 
     // 해당 유저가 만든 퀴즈 조회
     @Operation(
@@ -72,6 +72,6 @@ public class QueryForWebController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
-        return quizSearchService.getMyQuiz(userId);
+        return queryService.getMyQuiz(userId);
     }
 }

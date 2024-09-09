@@ -45,7 +45,6 @@ public class QuizCreateService {
     @Value("${img.file.path}")
     private String imgPath;
 
-    // TODO : 문제 유형별로 함수로 나눠서 이 함수 줄이기
     // jsonContent 형식 검사
     public boolean isValidJsonContent(Integer quizType, String jsonContent) {
         /* 1. 4지선다 / 2. 단답식 / 3. 선 긋기 / 4. O/X / 5. 빈칸 채우기 */

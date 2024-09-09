@@ -17,11 +17,18 @@ import java.util.stream.Collectors;
 
 @Service(value = "V2QuizReportService")
 @RequiredArgsConstructor
-public class QuizReportService {
+public class ReportService {
     private final QuizReportRepository quizReportRepository;
     private final ActiveUserRepository activeUserRepository;
     private final QuizReportMapper quizReportMapper;
 
+    // 모든 신고 조회
+    public List<QuizReportResponse> allQuizReport() {
+        List<QuizReportEntity> quizReports = quizReportRepository.findAll();
+        return quizReportMapper.toQuizReportResponseList(quizReports);
+    }
+
+    // 신고 조회 (신고 아이디로 조회)
     public QuizReportResponse getQuizReport(Long quizReportId) {
         Optional<QuizReportEntity> quizReport = quizReportRepository.findByQuizReportId(quizReportId);
 
@@ -37,11 +44,7 @@ public class QuizReportService {
         return response;
     }
 
-    public List<QuizReportResponse> allQuizReport() {
-        List<QuizReportEntity> quizReports = quizReportRepository.findAll();
-        return quizReportMapper.toQuizReportResponseList(quizReports);
-    }
-
+    // 특정 문제의 모든 신고 조회 (퀴즈 아이디로 조회)
     public List<QuizReportResponse> getAllReportForQuiz(Long quizId) {
         return quizReportRepository.findByQuizId(quizId)
                 .stream()

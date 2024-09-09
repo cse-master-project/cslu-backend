@@ -1,7 +1,7 @@
 package com.example.csemaster.v2.domain.quiz.controller;
 
-import com.example.csemaster.v2.domain.quiz.service.ApprovalQuizService;
-import com.example.csemaster.v2.domain.quiz.service.QuizSearchService;
+import com.example.csemaster.v2.domain.quiz.service.ApproveService;
+import com.example.csemaster.v2.domain.quiz.service.QueryService;
 import com.example.csemaster.v2.dto.UnApprovalQuizDTO;
 import com.example.csemaster.v2.dto.response.QuizRejectResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Tag(name = "QuizApprove v2", description = "문제 승인 기능<br> 0: 대기, 1: 승인, -1: 거절")
-@RestController(value = "V2QuizApproveController")
+@RestController(value = "V2ApproveController")
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/management/quiz")
 public class ApproveController {
-    private final ApprovalQuizService approvalQuizService;
-    private final QuizSearchService quizSearchService;
+    private final ApproveService approveService;
+    private final QueryService queryService;
 
     // 미승인 문제 조회
     @Operation(
@@ -27,7 +27,7 @@ public class ApproveController {
     )
     @GetMapping("/unapproved")
     public List<UnApprovalQuizDTO> getUnApproval() {
-        return approvalQuizService.getUnApprovalQuiz();
+        return approveService.getUnApprovalQuiz();
     }
 
     // 0 : 대기, 1 : 승인, -1 : 거절
@@ -38,7 +38,7 @@ public class ApproveController {
     )
     @PutMapping("/{id}/approve")
     public ResponseEntity<?> userQuizApprove(@PathVariable("id") Long quizId) {
-        return approvalQuizService.setQuizPermission(quizId, 1);
+        return approveService.setQuizPermission(quizId, 1);
     }
 
     // 문제 반려
@@ -48,16 +48,17 @@ public class ApproveController {
     )
     @PutMapping("/{id}/reject")
     public ResponseEntity<?> userQuizReject(@PathVariable("id") Long quizId, @RequestBody String reason) {
-        return approvalQuizService.setQuizRejection(quizId, reason, -1);
+        return approveService.setQuizRejection(quizId, reason, -1);
     }
 
     // 문제의 승인 여부 확인
+    // FIXME : 리스트를 반환할 필요가 없음. 반려된 문제인지 검증 필요
     @Operation(
-            summary = "사용자 문제 승인 여부 조회 [사용자 전용]",
+            summary = "사용자 문제 반려 사유 조회 [사용자 전용]",
             description = "자신이 만든 문제의 승인 여부를 quiz id를 통해 확인할 수 있다."
     )
     @GetMapping("/my/reject")
     public List<QuizRejectResponse> getQuizReject(@RequestParam Long quizId) {
-        return quizSearchService.getQuizReject(quizId);
+        return approveService.getQuizReject(quizId);
     }
 }

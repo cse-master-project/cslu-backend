@@ -1,7 +1,7 @@
 package com.example.csemaster.v2.domain.quiz.controller;
 
-import com.example.csemaster.v2.domain.quiz.service.QuizReportService;
-import com.example.csemaster.v2.domain.quiz.service.QuizSolverService;
+import com.example.csemaster.v2.domain.quiz.service.ReportService;
+import com.example.csemaster.v2.domain.quiz.service.SolveService;
 import com.example.csemaster.v2.dto.request.QuizReportRequest;
 import com.example.csemaster.v2.dto.response.QuizReportResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,8 +20,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/quiz")
 public class ReportController {
-    private final QuizReportService quizReportService;
-    private final QuizSolverService quizSolverService;
+    private final ReportService reportService;
+    private final SolveService quizSolveService;
 
     // 문제 신고
     @Operation(
@@ -32,7 +32,7 @@ public class ReportController {
     public ResponseEntity<?> quizReport(@Validated @RequestBody QuizReportRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
-        return quizSolverService.saveQuizReport(userId, request.getQuizId(), request.getContent());
+        return quizSolveService.saveQuizReport(userId, request.getQuizId(), request.getContent());
     }
 
     // 전체 퀴즈 오류 신고 조회
@@ -42,7 +42,7 @@ public class ReportController {
     )
     @GetMapping("/report")
     public List<QuizReportResponse> allQuizReport() {
-        return quizReportService.allQuizReport();
+        return reportService.allQuizReport();
     }
 
     // 특정 퀴즈의 전체 오류 신고 조회
@@ -52,7 +52,7 @@ public class ReportController {
     )
     @GetMapping("/{quizId}/report")
     public List<QuizReportResponse> getAllReportForQuiz(@PathVariable Long quizId) {
-        return quizReportService.getAllReportForQuiz(quizId);
+        return reportService.getAllReportForQuiz(quizId);
     }
 
     // 특정 오류 신고 조회
@@ -62,6 +62,6 @@ public class ReportController {
     )
     @GetMapping("/report/{quizReportId}")
     public QuizReportResponse getQuizReport(@PathVariable Long quizReportId) {
-        return quizReportService.getQuizReport(quizReportId);
+        return reportService.getQuizReport(quizReportId);
     }
 }

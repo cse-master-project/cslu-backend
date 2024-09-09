@@ -2,7 +2,7 @@ package com.example.csemaster.v2.domain.quiz.controller;
 
 import com.example.csemaster.core.exception.ApiErrorType;
 import com.example.csemaster.core.exception.ApiException;
-import com.example.csemaster.v2.domain.quiz.service.QuizSolverService;
+import com.example.csemaster.v2.domain.quiz.service.SolveService;
 import com.example.csemaster.v2.dto.request.QuizSolverRequest;
 import com.example.csemaster.v2.dto.response.QuizResponse;
 import com.example.csemaster.v2.utils.QuizValidator;
@@ -22,7 +22,9 @@ import java.util.List;
 @RequestMapping("/api/v2/quiz")
 public class SolveController {
     private final QuizValidator quizValidator;
-    private final QuizSolverService quizSolverService;
+    private final SolveService quizSolveService;
+
+    // TODO : 가독성 좋게 코드 리팩토링 할 것
 
     // 지정한 카테고리에 맞게 무작위로 하나의 문제 제공
     @Operation(
@@ -45,7 +47,7 @@ public class SolveController {
         if (!hasDefaultQuiz && !hasUserQuiz) throw new ApiException(ApiErrorType.ILLEGAL_ARGUMENT);
 
         // 무작위로 하나의 문제를 반환
-        return quizSolverService.getQuiz(userId, subject, chapters, hasUserQuiz, hasDefaultQuiz, hasSolvedQuiz);
+        return quizSolveService.getQuiz(userId, subject, chapters, hasUserQuiz, hasDefaultQuiz, hasSolvedQuiz);
     }
 
     // 여러 카테고리 문제를 무작위로 조회
@@ -68,7 +70,7 @@ public class SolveController {
         if(!hasDefaultQuiz && !hasUserQuiz) throw new ApiException(ApiErrorType.ILLEGAL_ARGUMENT);
 
         // 무작위로 하나의 문제를 반환
-        return quizSolverService.getQuizWithSubjects(userId, subject, hasUserQuiz, hasDefaultQuiz, hasSolvedQuiz);
+        return quizSolveService.getQuizWithSubjects(userId, subject, hasUserQuiz, hasDefaultQuiz, hasSolvedQuiz);
     }
 
     // 문제 푼 결과 저장
@@ -82,6 +84,6 @@ public class SolveController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
-        return quizSolverService.saveQuizResult(userId, request.getQuizId(), request.getIsCorrect());
+        return quizSolveService.saveQuizResult(userId, request.getQuizId(), request.getIsCorrect());
     }
 }
