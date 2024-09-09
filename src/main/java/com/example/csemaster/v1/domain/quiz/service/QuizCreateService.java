@@ -86,9 +86,9 @@ public class QuizCreateService {
 
             // 2. 단답식
             if (quizType.equals(2)) {
-                // 'answer' 필드가 빈 문자열이 아닌지 확인
-                if (answerValue.isEmpty()) {
-                    log.debug("answer 필드가 비어있음");
+                // 'answer' 필드가 배열인지 비어있는지 확인
+                if (!answerNode.isArray() || answerNode.isEmpty()) {
+                    log.debug("answer 필드가 배열이 아니거나 비어있음");
                     return false;
                 }
             }
@@ -137,6 +137,14 @@ public class QuizCreateService {
                 if (answerNode.size() > 3) {
                     log.debug("answer 필드의 요소가 세 개를 초과함");
                     return false;
+                }
+
+                // answer 필드의 내용 검사
+                for (int i = 0; i < answerNode.size(); i++) {
+                    if (!answerNode.isArray() && answerNode.isEmpty()) {
+                        log.debug("answer 중에 배열이 아니거나 비어있는 요소가 있음.");
+                        return false;
+                    }
                 }
             }
 
