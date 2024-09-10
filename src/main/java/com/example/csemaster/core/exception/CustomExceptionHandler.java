@@ -20,7 +20,7 @@ public class CustomExceptionHandler {
                 .status(e.getError().getStatus())
                 .body(ErrorResponse.builder()
                         .errorType(e.getError().getError())
-                        .errorDescription(e.getError().getDescription())
+                        .errorDescription(e.getDescription())
                         .build());
     }
     @ExceptionHandler({RuntimeException.class})
