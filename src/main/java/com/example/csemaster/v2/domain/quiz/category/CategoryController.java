@@ -30,8 +30,12 @@ public class CategoryController {
             description = "전체 과목 목록과 하위 챕터 조회"
     )
     @GetMapping()
-    public List<SubjectResponse> getAllSubject() {
-        return categoryService.getAllSubject();
+    public List<?> getAllSubject(@RequestParam(required = false, defaultValue = "false") @Valid boolean onlySubject) {
+        if (onlySubject) {
+            return categoryService.getSubjects();
+        } else {
+            return categoryService.getAllSubject();
+        }
     }
 
     // 카테고리 추가
@@ -62,6 +66,14 @@ public class CategoryController {
     @PatchMapping()
     public ResponseEntity<?> updateSubject(@RequestBody @Valid SubjectUpdateDTO subjectUpdateDTO) {
         return categoryService.updateSubject(subjectUpdateDTO);
+    }
+
+    @Operation(
+            summary = "특정 과목의 챕터만 조회"
+    )
+    @GetMapping("/chapter")
+    public SubjectDTO getChapter(@RequestParam @Valid String subject) {
+        return categoryService.getChapter(subject);
     }
 
     // 서브 카테고리 수정

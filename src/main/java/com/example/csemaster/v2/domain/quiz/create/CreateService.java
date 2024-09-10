@@ -10,7 +10,7 @@ import com.example.csemaster.core.dao.quiz.core.UserQuizEntity;
 import com.example.csemaster.core.exception.ApiErrorType;
 import com.example.csemaster.core.exception.ApiException;
 import com.example.csemaster.core.repository.*;
-import com.example.csemaster.v2.domain.quiz.QuizVerificationService;
+import com.example.csemaster.core.tools.QuizValidator;
 import com.example.csemaster.v2.dto.QuizDTO;
 import com.example.csemaster.v2.mapper.AddQuizMapper;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +32,6 @@ public class CreateService {
     private final UserQuizRepository userQuizRepository;
     private final QuizSubjectRepository quizSubjectRepository;
     private final ChapterRepository chapterRepository;
-
-    private final QuizVerificationService quizVerificationService;
 
     // 문제 추가
     @Transactional
@@ -68,7 +66,7 @@ public class CreateService {
 
         // jsonContent 형식 검사
         // FIXME : 임시로 QuizVerificationService 의 변수를 사용하도록 했으니 변경 후 여기도 바꿔야함.
-        if (!quizVerificationService.isValidJsonContent(quizDTO.getQuizType(), quizDTO.getJsonContent())) {
+        if (!QuizValidator.isValidJsonContent(quizDTO.getQuizType(), quizDTO.getJsonContent())) {
             throw new ApiException(ApiErrorType.INCORRECT_QUIZ_CONTENT);
         }
 

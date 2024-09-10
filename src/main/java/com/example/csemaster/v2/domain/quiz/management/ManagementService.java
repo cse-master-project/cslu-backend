@@ -4,7 +4,7 @@ import com.example.csemaster.core.exception.ApiException;
 import com.example.csemaster.core.exception.ApiErrorType;
 import com.example.csemaster.core.dao.quiz.core.QuizEntity;
 import com.example.csemaster.core.repository.QuizRepository;
-import com.example.csemaster.v2.domain.quiz.QuizVerificationService;
+import com.example.csemaster.core.tools.QuizValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,6 @@ import java.util.Optional;
 public class ManagementService {
 
     private final QuizRepository quizRepository;
-    private final QuizVerificationService quizVerificationService;
 
     // 문제 삭제
     @Transactional
@@ -56,7 +55,7 @@ public class ManagementService {
 
         // 수정한 jsonContent 형식 확인
         // FIXME : 임시로 QuizVerificationService 의 변수를 사용하도록 했으니 변경 후 여기도 바꿔야함.
-        boolean checkNewJsonContent = quizVerificationService.isValidJsonContent(quiz.get().getQuizType(), newJsonContent);
+        boolean checkNewJsonContent = QuizValidator.isValidJsonContent(quiz.get().getQuizType(), newJsonContent);
         if (!checkNewJsonContent) {
             throw new ApiException(ApiErrorType.INCORRECT_QUIZ_CONTENT);
         }

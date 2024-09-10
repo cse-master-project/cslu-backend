@@ -1,20 +1,22 @@
 package com.example.csemaster.v2.domain.quiz.category;
 
-import com.example.csemaster.v2.dto.*;
-import com.example.csemaster.v2.dto.response.SubjectResponse;
-import com.example.csemaster.core.exception.ApiException;
-import com.example.csemaster.core.exception.ApiErrorType;
-import com.example.csemaster.core.dao.quiz.category.SubjectEntity;
 import com.example.csemaster.core.dao.quiz.category.ChapterEntity;
+import com.example.csemaster.core.dao.quiz.category.SubjectEntity;
+import com.example.csemaster.core.exception.ApiErrorType;
+import com.example.csemaster.core.exception.ApiException;
 import com.example.csemaster.core.repository.ChapterRepository;
 import com.example.csemaster.core.repository.QuizSubjectRepository;
+import com.example.csemaster.v2.dto.*;
+import com.example.csemaster.v2.dto.response.SubjectResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service(value = "V2QuizSubjectService")
@@ -28,6 +30,12 @@ public class CategoryService {
     public List<SubjectResponse> getAllSubject() {
         List<SubjectEntity> subjects = quizSubjectRepository.findAll();
         return subjects.stream().map(e -> new SubjectResponse(e.getSubject(), e.getChapters().stream().map(ChapterEntity::getChapter).toList())).collect(Collectors.toList());
+    }
+
+    // TODO : 테스트 필요
+    // 모든 과목 목록 조회
+    public List<SubjectRequest> getSubjects() {
+        return quizSubjectRepository.findAll().stream().map(e -> new SubjectRequest(e.getSubject())).toList();
     }
 
     // 과목 추가
@@ -46,6 +54,17 @@ public class CategoryService {
         log.info("Create new subject( {} )]", subjectRequest.getSubject());
 
         return quizSubjectRepository.getAllSubject();
+    }
+
+    // TODO : 테스트 필요
+    // 챕터 조회
+    public SubjectDTO getChapter(String subject) {
+        Optional<SubjectEntity> subjectEntity = quizSubjectRepository.findBySubject(subject);
+        if (subjectEntity.isPresent()) {
+            return new SubjectDTO(subjectEntity.get().getSubject(), subjectEntity.get().getChapters().stream().map(ChapterEntity::getChapter).toList());
+        } else {
+            throw new ApiException(ApiErrorType.NOT_FOUND_SUBJECT);
+        }
     }
 
     // 챕터 추가
