@@ -55,10 +55,7 @@ public class ManagementService {
 
         // 수정한 jsonContent 형식 확인
         // FIXME : 임시로 QuizVerificationService 의 변수를 사용하도록 했으니 변경 후 여기도 바꿔야함.
-        boolean checkNewJsonContent = QuizValidator.isValidJsonContent(quiz.get().getQuizType(), newJsonContent);
-        if (!checkNewJsonContent) {
-            throw new ApiException(ApiErrorType.INCORRECT_QUIZ_CONTENT);
-        }
+        QuizValidator.isValidJsonContent(quiz.get().getQuizType(), newJsonContent);
 
         // 수정한 jsonContent 저장
         quiz.get().setJsonContent(newJsonContent);

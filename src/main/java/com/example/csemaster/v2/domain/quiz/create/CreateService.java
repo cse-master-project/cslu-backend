@@ -66,9 +66,7 @@ public class CreateService {
 
         // jsonContent 형식 검사
         // FIXME : 임시로 QuizVerificationService 의 변수를 사용하도록 했으니 변경 후 여기도 바꿔야함.
-        if (!QuizValidator.isValidJsonContent(quizDTO.getQuizType(), quizDTO.getJsonContent())) {
-            throw new ApiException(ApiErrorType.INCORRECT_QUIZ_CONTENT);
-        }
+        QuizValidator.isValidJsonContent(quizDTO.getQuizType(), quizDTO.getJsonContent());
 
         // Quiz 테이블에 추가
         QuizEntity quizEntity = addQuizMapper.toQuizEntity(quizDTO);
