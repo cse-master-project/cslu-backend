@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class QuizValidator {
+public class CategoryValidator {
     private final QuizSubjectRepository quizSubjectRepository;
 
     public SubjectEntity getSubjectEntity(String subject) {

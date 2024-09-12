@@ -4,6 +4,7 @@ import com.example.csemaster.core.exception.ApiException;
 import com.example.csemaster.core.exception.ApiErrorType;
 import com.example.csemaster.core.dao.quiz.core.QuizEntity;
 import com.example.csemaster.core.repository.QuizRepository;
+import com.example.csemaster.core.tools.QuizValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -52,10 +53,7 @@ public class QuizManagerService {
         }
 
         // 수정한 jsonContent 형식 확인
-        boolean checkNewJsonContent = quizCreateService.isValidJsonContent(quiz.get().getQuizType(), newJsonContent);
-        if (!checkNewJsonContent) {
-            throw new ApiException(ApiErrorType.INCORRECT_QUIZ_CONTENT);
-        }
+        QuizValidator.isValidJsonContent(quiz.get().getQuizType(), newJsonContent);
 
         // 수정한 jsonContent 저장
         quiz.get().setJsonContent(newJsonContent);

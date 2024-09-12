@@ -4,7 +4,7 @@ import com.example.csemaster.core.exception.ApiErrorType;
 import com.example.csemaster.core.exception.ApiException;
 import com.example.csemaster.v2.dto.request.QuizSolverRequest;
 import com.example.csemaster.v2.dto.response.QuizResponse;
-import com.example.csemaster.v2.utils.QuizValidator;
+import com.example.csemaster.v2.utils.CategoryValidator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/quiz")
 public class SolveController {
-    private final QuizValidator quizValidator;
+    private final CategoryValidator categoryValidator;
     private final SolveService quizSolveService;
 
     // TODO : 가독성 좋게 코드 리팩토링 할 것
@@ -40,8 +40,8 @@ public class SolveController {
         String userId = authentication.getName();
 
         // 검증
-        if (!quizValidator.isValidSubject(subject)) throw new ApiException(ApiErrorType.NOT_FOUND_SUBJECT);
-        if (!quizValidator.isValidChapter(subject, chapters)) throw new ApiException(ApiErrorType.NOT_FOUND_CHAPTER);
+        if (!categoryValidator.isValidSubject(subject)) throw new ApiException(ApiErrorType.NOT_FOUND_SUBJECT);
+        if (!categoryValidator.isValidChapter(subject, chapters)) throw new ApiException(ApiErrorType.NOT_FOUND_CHAPTER);
 
         if (!hasDefaultQuiz && !hasUserQuiz) throw new ApiException(ApiErrorType.ILLEGAL_ARGUMENT);
 
@@ -64,7 +64,7 @@ public class SolveController {
         String userId = authentication.getName();
 
         // 검증
-        if (!quizValidator.isValidSubject(subject)) throw new ApiException(ApiErrorType.NOT_FOUND_SUBJECT);
+        if (!categoryValidator.isValidSubject(subject)) throw new ApiException(ApiErrorType.NOT_FOUND_SUBJECT);
 
         if(!hasDefaultQuiz && !hasUserQuiz) throw new ApiException(ApiErrorType.ILLEGAL_ARGUMENT);
 

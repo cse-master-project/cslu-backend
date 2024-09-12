@@ -7,14 +7,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Arrays;
 import java.util.Set;
 
 @Slf4j
 public class QuizValidator {
-    // TODO : 문제 유형별로 함수로 나눠서 이 함수 줄이고, core 패키지로 옮기기 (O)
-    // TODO : 검증에 실패한 이유를 프론트에 알려주기
-    // TODO : 테스트 필요
     // jsonContent 형식 검사
     public static void isValidJsonContent(Integer quizType, String jsonContent) {
         try {
