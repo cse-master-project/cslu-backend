@@ -19,8 +19,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service(value = "V2ImageService")
 @Slf4j
@@ -45,13 +50,14 @@ public class ImageService {
     }
 
     // TODO : core 패키지로 옮기기
-    // 이미지 파일 저장
-    private void saveImage(Long quizId, String base64String) {
+    // 이미지 파일 임시 저장
+    public String saveImage(String base64String) {
         try {
             String[] strings = base64String.split(",");
-            String filename = imgPath + "/" + quizId + ".jpg";  // 무조건 jpg 로 저장
+            String uuid = UUID.randomUUID().toString();
+            String filename = imgPath + "/temp/" + uuid + ".jpg";  // 무조건 jpg 로 저장
 
-            File directory = new File(imgPath);
+            File directory = new File(imgPath + "/temp");
             if (!directory.exists()) {
                 directory.mkdirs(); // 폴더가 존재하지 않는다면 생성
             }
@@ -62,6 +68,7 @@ public class ImageService {
             fos.write(decodedBytes);
             fos.close();
 
+            return uuid;
             // log.info("file save successful. [quizId: " + quizId + "]");
         } catch (IOException e) {
             // 입출력 실패시 500
@@ -69,14 +76,26 @@ public class ImageService {
         }
     }
 
+    // 이미지 복사 (이미지 최종 저장)
+    private void copyImage(Long quizId, String uuid) {
+        try {
+            Path tempPath = Paths.get(imgPath + "/temp", uuid + ".jpg");
+            Path finalPath = Paths.get(imgPath, quizId + ".jpg");
+
+            Files.copy(tempPath, finalPath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new ApiException(ApiErrorType.INTERNAL_SERVER_ERROR, "image copy error");
+        }
+    }
+
     // 유저 이미지 업로드
     @Transactional
-    public void userUploadImage(String userId, Long quizId, String base64String) {
+    public void userUploadImage(String userId, Long quizId, String uuid) {
         Optional<UserQuizEntity> userQuiz = userQuizRepository.findByQuizIdAndUserId(quizId, userId);
         Optional<QuizEntity> quiz = quizRepository.findByQuizId(quizId);
         if (userQuiz.isPresent() && quiz.isPresent()) {
             if (quiz.get().getHasImage().equals(false)) {
-                saveImage(quizId, base64String);
+                copyImage(quizId, uuid);
 
                 userQuiz.get().getQuiz().setHasImage(true);
                 quizRepository.save(userQuiz.get().getQuiz());
@@ -92,11 +111,11 @@ public class ImageService {
     }
 
     // 매니저 이미지 업로드
-    public void managerUploadImage(Long quizId, String base64String) {
+    public void managerUploadImage(Long quizId, String uuid) {
         Optional<QuizEntity> quiz = quizRepository.findByQuizId(quizId);
         if (quiz.isPresent()) {
             if (quiz.get().getHasImage().equals(false)) {
-                saveImage(quizId, base64String);
+                copyImage(quizId, uuid);
 
                 quiz.get().setHasImage(true);
                 quizRepository.save(quiz.get());

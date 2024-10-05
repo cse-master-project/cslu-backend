@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class QuizImageRequest {
-    private String base64String;
+    private String uuid;
     private Long quizId;
 }

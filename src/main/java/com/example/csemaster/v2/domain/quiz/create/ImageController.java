@@ -1,5 +1,6 @@
 package com.example.csemaster.v2.domain.quiz.create;
 
+import com.example.csemaster.v2.dto.request.Base64Request;
 import com.example.csemaster.v2.dto.request.QuizImageRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +20,7 @@ public class ImageController {
     // 이미지 추가
     @Operation(
             summary = "이미지 추가",
-            description = "문제 추가시 이미지는 해당 경로를 통해 별도로 전송해야한다. 요청시 필요한 문제 ID는 문제 추가 요청시 받을 수 있다."
+            description = "문제 추가 시 이미지는 해당 경로를 통해 별도로 전송해야 한다. 요청 시 필요한 문제 ID는 문제 추가 요청 시, uuid는 이미지 임시 저장 요청 시 받을 수 있다."
     )
     @PostMapping("/image")
     public void uploadImage(@RequestBody QuizImageRequest request) {
@@ -28,10 +29,20 @@ public class ImageController {
 
         // 아이디의 길이로 유저, 매니저 구분
         if (id.length() <= 20) {
-            imageService.managerUploadImage(request.getQuizId(), request.getBase64String());
+            imageService.managerUploadImage(request.getQuizId(), request.getUuid());
         } else {
-            imageService.userUploadImage(id, request.getQuizId(), request.getBase64String());
+            imageService.userUploadImage(id, request.getQuizId(), request.getUuid());
         }
+    }
+
+    // 이미지 임시 추가
+    @Operation(
+            summary = "이미지 임시 추가",
+            description = "문제 생성 전 이미지 저장 가능 여부를 확인한다. 반환 값인 uuid(이미지 임시 저장명)가 이미지 추가 요청 시 필요하다."
+    )
+    @PostMapping("/image/temp")
+    public String saveImage(@RequestBody Base64Request request) {
+        return imageService.saveImage(request.getBase64String());
     }
 
     // 문제 이미지 조회
