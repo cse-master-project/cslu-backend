@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service(value = "V2QuizSubjectService")
 @Slf4j
@@ -171,20 +172,17 @@ public class CategoryService {
         if (subjectEntity.isEmpty()) {
             throw new ApiException(ApiErrorType.NOT_FOUND_SUBJECT);
         } else {
-            List<ChapterEntity> chapters = subjectEntity.get().getChapters();
-            // 검색한 전체 목록에서 삭제할 레코드 검색
-            ChapterEntity delChapter = chapters.stream().filter(e -> e.getChapter().equals(chapter)).findAny().orElse(null);
-            // 검색 결과 없으면 유효하지 않은 요청
-            if (delChapter == null) throw new ApiException(ApiErrorType.NOT_FOUND_CHAPTER);
-            // 삭제한 챕터 뒤부터 index 1만큼 당기기
-            for (int i = delChapter.getSortIndex() + 1; i < chapters.size(); i++) {
-                chapters.get(i).setSortIndex(i - 1);
-            }
+            ChapterEntity chapterEntity = chapterRepository.findBySubjectIdAndChapter(subjectEntity.get().getSubjectId(), chapter).orElse(null);
+            if (chapterEntity == null) throw new ApiException(ApiErrorType.NOT_FOUND_CHAPTER);
 
-            // 삭제 후 바꾼 index 저장
+            chapterRepository.delete(chapterEntity);
+            int delIndex = chapterEntity.getSortIndex();
+
+            List<ChapterEntity> chapters = chapterRepository.findChapterEntityBySubject(subject);
+            for(int i = delIndex; i < chapters.size(); i++) {
+                chapters.get(i).setSortIndex(i);
+            }
             chapterRepository.saveAll(chapters);
-            chapterRepository.delete(delChapter);
-            chapterRepository.flush();
         }
 
         return new SubjectDTO(subject, chapterRepository.findChapterBySubject(subject));

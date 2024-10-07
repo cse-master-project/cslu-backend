@@ -23,6 +23,11 @@ public interface ChapterRepository extends JpaRepository<ChapterEntity, Long> {
             "ORDER BY d.sortIndex ASC ")
     List<String> findChapterBySubject(String subject);
 
+    @Query("SELECT d FROM ChapterEntity d " +
+            "WHERE d.subjectId = (SELECT s.subjectId FROM SubjectEntity s WHERE s.subject = :subject) " +
+            "ORDER BY d.sortIndex ASC ")
+    List<ChapterEntity> findChapterEntityBySubject(String subject);
+
     @Query("SELECT MAX(d.sortIndex) FROM ChapterEntity d " +
             "WHERE d.subjectId = (SELECT s.subjectId FROM SubjectEntity s WHERE s.subject = :subject) ")
     Optional<Integer> getMaxIndex(String subject);

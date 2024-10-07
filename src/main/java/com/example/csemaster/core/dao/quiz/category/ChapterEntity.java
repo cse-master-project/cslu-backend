@@ -18,7 +18,7 @@ public class ChapterEntity {
     @Column(name = "subject_id_for_detail_subject")
     private Long subjectId;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "subject_id_for_detail_subject", referencedColumnName = "subject_id", insertable = false, updatable = false)
     private SubjectEntity subjectEntity;
 
