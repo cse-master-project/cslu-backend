@@ -6,6 +6,8 @@ import com.example.csemaster.v2.dto.response.QuizRejectResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,11 +24,11 @@ public class ApproveController {
     // 미승인 문제 조회
     @Operation(
             summary = "사용자 문제 중 미승인 문제 조회 [관리자 전용]",
-            description = "사용자 문제 중 대기중(0)인 문제 전체를 조회할 수 있다."
+            description = "사용자 문제 중 대기중(0)인 문제 전체를 조회할 수 있다. [페이징 적용]"
     )
     @GetMapping("/unapproved")
-    public List<UnApprovalQuizDTO> getUnApproval() {
-        return approveService.getUnApprovalQuiz();
+    public Page<UnApprovalQuizDTO> getUnApproval(Pageable pageable) {
+        return approveService.getUnApprovalQuiz(pageable);
     }
 
     // 0 : 대기, 1 : 승인, -1 : 거절

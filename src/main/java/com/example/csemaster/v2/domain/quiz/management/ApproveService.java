@@ -10,6 +10,8 @@ import com.example.csemaster.core.repository.UserQuizRepository;
 import com.example.csemaster.v2.dto.response.QuizRejectResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +25,9 @@ public class ApproveService {
     private final QuizRejectRepository quizRejectRepository;
     private final QuizRepository quizRepository;
 
-    // 미승인 문제 조회
-    public List<UnApprovalQuizDTO> getUnApprovalQuiz() {
-        return userQuizRepository.getAnApprovalQuiz();
+    // 미승인 문제 조회 (페이징)
+    public Page<UnApprovalQuizDTO> getUnApprovalQuiz(Pageable pageable) {
+        return userQuizRepository.getAnApprovalQuiz(pageable);
     }
 
     // 문제 승인

@@ -3,6 +3,8 @@ package com.example.csemaster.core.repository;
 import com.example.csemaster.v2.dto.response.QuizRejectResponse;
 import com.example.csemaster.core.dao.quiz.core.QuizEntity;
 import com.example.csemaster.v2.dto.response.UserQuizResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,7 +20,7 @@ public interface QuizRepository extends JpaRepository<QuizEntity, Long> {
     @Query("SELECT new com.example.csemaster.v2.dto.response.UserQuizResponse(q, uq) " +
             "FROM QuizEntity q JOIN UserQuizEntity uq ON q.quizId = uq.userQuizId " +
             "WHERE uq.userId.userId = :userId")
-    List<UserQuizResponse> getUserQuiz(@Param("userId") String user);
+    Page<UserQuizResponse> getUserQuiz(@Param("userId") String user, Pageable pageable);
 
     @Query("SELECT new com.example.csemaster.v1.dto.response.UserQuizResponse(q, uq) " +
             "FROM QuizEntity q JOIN UserQuizEntity uq ON q.quizId = uq.userQuizId " +

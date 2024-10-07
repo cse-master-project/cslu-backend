@@ -64,13 +64,13 @@ public class QueryController {
     // 해당 유저가 만든 퀴즈 조회
     @Operation(
             summary = "자신이 추가한 문제만 조회 [사용자 전용]",
-            description = "로그인된 유저가 만든 문제를 조회한다."
+            description = "로그인된 유저가 만든 문제를 조회한다. [페이징 적용]"
     )
     @GetMapping("/my")
-    public List<UserQuizResponse> getMyQuiz() {
+    public Page<UserQuizResponse> getMyQuiz(Pageable pageable) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
-        return queryService.getMyQuiz(userId);
+        return queryService.getMyQuiz(userId, pageable);
     }
 }

@@ -2,6 +2,8 @@ package com.example.csemaster.core.repository;
 
 import com.example.csemaster.core.dao.quiz.core.UserQuizEntity;
 import com.example.csemaster.v2.dto.UnApprovalQuizDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -19,7 +21,7 @@ public interface UserQuizRepository extends JpaRepository<UserQuizEntity, Long> 
             "FROM UserQuizEntity q " +
             "JOIN ActiveUserEntity u ON u.userId = q.userId.userId " +
             "WHERE q.permissionStatus = 0")
-    List<UnApprovalQuizDTO> getAnApprovalQuiz();
+    Page<UnApprovalQuizDTO> getAnApprovalQuiz(Pageable pageable);
 
     @Query("SELECT q FROM UserQuizEntity q " +
             "WHERE q.userQuizId = :quizId AND q.userId.userId = :userId")

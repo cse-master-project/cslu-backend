@@ -63,9 +63,8 @@ public class QueryService {
         }
     }
 
-    // 자신이 만든 퀴즈 조회
-    // TODO : 페이징 쓰도록 수정
-    public List<UserQuizResponse> getMyQuiz(String userId) {
+    // 자신이 만든 퀴즈 조회 (페이징)
+    public Page<UserQuizResponse> getMyQuiz(String userId, Pageable pageable) {
         try {
             Optional<UserEntity> user = userRepository.findById(userId);
 
@@ -74,7 +73,7 @@ public class QueryService {
                 throw new ApiException(ApiErrorType.INVALID_IDENTIFIER);
             }
 
-            return quizRepository.getUserQuiz(userId);
+            return quizRepository.getUserQuiz(userId, pageable);
         } catch (ApiException e) {
             throw new ApiException(ApiErrorType.RUNTIME_EXCEPTION);
         }
