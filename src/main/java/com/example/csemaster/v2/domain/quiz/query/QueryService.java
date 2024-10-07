@@ -2,9 +2,11 @@ package com.example.csemaster.v2.domain.quiz.query;
 
 import com.example.csemaster.core.dao.actor.UserEntity;
 import com.example.csemaster.core.dao.quiz.core.ActiveQuizEntity;
+import com.example.csemaster.core.dao.quiz.core.AllQuizEntity;
 import com.example.csemaster.core.exception.ApiErrorType;
 import com.example.csemaster.core.exception.ApiException;
 import com.example.csemaster.core.repository.ActiveQuizRepository;
+import com.example.csemaster.core.repository.AllQuizRepository;
 import com.example.csemaster.core.repository.QuizRepository;
 import com.example.csemaster.core.repository.UserRepository;
 import com.example.csemaster.v2.dto.response.QuizResponse;
@@ -24,6 +26,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class QueryService {
     private final ActiveQuizRepository activeQuizRepository;
+    private final AllQuizRepository allQuizRepository;
     private final UserRepository userRepository;
     private final QuizRepository quizRepository;
 
@@ -39,7 +42,7 @@ public class QueryService {
     // 퀴즈 아이디로 퀴즈 조회
     public QuizResponse getQuizById(Long quizId) {
         return QuizMapper.INSTANCE.entityToResponse(
-                activeQuizRepository.findById(quizId)
+                allQuizRepository.findById(quizId)
                         .orElseThrow(() -> new ApiException(ApiErrorType.NOT_FOUND_ID))
         );
     }
