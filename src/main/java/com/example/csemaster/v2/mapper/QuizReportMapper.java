@@ -14,5 +14,4 @@ public interface QuizReportMapper {
 
     @Mapping(target = "userNickname", ignore = true)
     QuizReportResponse toQuizReportResponse(QuizReportEntity quizReportEntity);
-    List<QuizReportResponse> toQuizReportResponseList(List<QuizReportEntity> quizReportEntities);
 }

@@ -9,6 +9,8 @@ import com.example.csemaster.v2.mapper.QuizReportMapper;
 import com.example.csemaster.core.repository.ActiveUserRepository;
 import com.example.csemaster.core.repository.QuizReportRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,10 +24,19 @@ public class ReportService {
     private final ActiveUserRepository activeUserRepository;
     private final QuizReportMapper quizReportMapper;
 
-    // 모든 신고 조회
-    public List<QuizReportResponse> allQuizReport() {
-        List<QuizReportEntity> quizReports = quizReportRepository.findAll();
-        return quizReportMapper.toQuizReportResponseList(quizReports);
+    // 모든 신고 조회 (페이징)
+    public Page<QuizReportResponse> allQuizReport(Pageable pageable) {
+        Page<QuizReportEntity> quizReports = quizReportRepository.findAll(pageable);
+
+        return quizReports
+                .map(quizReport -> {
+                    QuizReportResponse response = QuizReportMapper.INSTANCE.toQuizReportResponse(quizReport);
+                    ActiveUserEntity activeUser = activeUserRepository.findById(quizReport.getUserId()).orElse(null);
+                    if (activeUser != null) response.setUserNickname(activeUser.getNickname());
+                    else response.setUserNickname("탈퇴한 사용자");
+
+                    return response;
+                });
     }
 
     // 신고 조회 (신고 아이디로 조회)
@@ -44,11 +55,18 @@ public class ReportService {
         return response;
     }
 
-    // 특정 문제의 모든 신고 조회 (퀴즈 아이디로 조회)
-    public List<QuizReportResponse> getAllReportForQuiz(Long quizId) {
-        return quizReportRepository.findByQuizId(quizId)
-                .stream()
-                .map(QuizReportMapper.INSTANCE::toQuizReportResponse)
-                .collect(Collectors.toList());
+    // 특정 문제의 모든 신고 조회 (퀴즈 아이디로 조회) (페이징)
+    public Page<QuizReportResponse> getAllReportForQuiz(Long quizId, Pageable pageable) {
+        Page<QuizReportEntity> quizReports = quizReportRepository.findByQuizId(quizId, pageable);
+
+        return quizReports
+                .map(quizReport -> {
+                    QuizReportResponse response = QuizReportMapper.INSTANCE.toQuizReportResponse(quizReport);
+                    ActiveUserEntity activeUser = activeUserRepository.findById(quizReport.getUserId()).orElse(null);
+                    if (activeUser != null) response.setUserNickname(activeUser.getNickname());
+                    else response.setUserNickname("탈퇴한 사용자");
+
+                    return response;
+                });
     }
 }
