@@ -55,4 +55,14 @@ public class ImageController {
         // 문제가 없는 경우 예외 처리 안함
         return imageService.getQuizImage(quizId);
     }
+
+    // 이미지 삭제
+    @Operation(
+            summary = "이미지 삭제",
+            description = "문제 ID로 해당 문제의 이미지를 삭제"
+    )
+    @DeleteMapping("/{quizId}/image")
+    public ResponseEntity<?> uploadImage(@PathVariable("quizId") Long quizId) {
+        return imageService.deleteImage(quizId);
+    }
 }

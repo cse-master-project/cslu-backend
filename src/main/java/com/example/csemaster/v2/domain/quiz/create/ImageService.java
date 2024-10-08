@@ -149,4 +149,30 @@ public class ImageService {
             throw new ApiException(ApiErrorType.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // 이미지 삭제
+    public ResponseEntity<?> deleteImage(Long quizId) {
+        try {
+            Optional<QuizEntity> quiz = quizRepository.findByQuizId(quizId);
+
+            if (quiz.isPresent()) {
+                if (quiz.get().getHasImage().equals(true)) {
+                    Path path = Paths.get(imgPath, quizId + ".jpg");
+                    Files.delete(path);
+
+                    quiz.get().setHasImage(false);
+                    quizRepository.save(quiz.get());
+
+                    log.info("Quiz image deleted [quizId: {}]", quizId);
+                    return ResponseEntity.ok().build();
+                } else {
+                    throw new ApiException(ApiErrorType.NOT_FOUND_IMAGE);
+                }
+            } else {
+                throw new ApiException(ApiErrorType.NOT_FOUND_ID);
+            }
+        } catch (IOException e) {
+            throw new ApiException(ApiErrorType.INTERNAL_SERVER_ERROR, "image delete error");
+        }
+    }
 }

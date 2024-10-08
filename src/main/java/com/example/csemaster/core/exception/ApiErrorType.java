@@ -42,7 +42,8 @@ public enum ApiErrorType {
 
     ARGS_NOT_VALID(HttpStatus.BAD_REQUEST, "method argument not valid", "Input value is not valid"),
     DONE_QUIZ(HttpStatus.NOT_FOUND, "all quiz solve", "we don't have quiz"),
-    DUPLICATE_IMAGE(HttpStatus.BAD_REQUEST, "duplicate image", "This quiz is already an image registered quiz.");
+    DUPLICATE_IMAGE(HttpStatus.BAD_REQUEST, "duplicate image", "This quiz is already an image registered quiz."),
+    NOT_FOUND_IMAGE(HttpStatus.NOT_FOUND, "not found image", "It's a image that does not exist in the database");
 
     private final HttpStatus status;
     private final String error;
