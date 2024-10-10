@@ -1,6 +1,7 @@
 package com.example.csemaster.v2.domain.quiz.query;
 
 import com.example.csemaster.core.dao.quiz.core.ActiveQuizEntity;
+import com.example.csemaster.v2.dto.response.QuizRejectResponse;
 import com.example.csemaster.v2.dto.response.QuizResponse;
 import com.example.csemaster.v2.dto.response.UserQuizResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,10 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -72,5 +70,16 @@ public class QueryController {
         String userId = authentication.getName();
 
         return queryService.getMyQuiz(userId, pageable);
+    }
+
+    // 문제의 승인 여부 확인
+    // FIXME : 리스트를 반환할 필요가 없음. 반려된 문제인지 검증 필요
+    @Operation(
+            summary = "사용자 문제 반려 사유 조회 [사용자 전용]",
+            description = "자신이 만든 문제의 승인 여부를 quiz id를 통해 확인할 수 있다."
+    )
+    @GetMapping("/my/reject")
+    public List<QuizRejectResponse> getQuizReject(@RequestParam Long quizId) {
+        return queryService.getQuizReject(quizId);
     }
 }

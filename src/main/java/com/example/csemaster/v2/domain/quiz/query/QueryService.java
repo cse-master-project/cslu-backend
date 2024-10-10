@@ -9,6 +9,7 @@ import com.example.csemaster.core.repository.ActiveQuizRepository;
 import com.example.csemaster.core.repository.AllQuizRepository;
 import com.example.csemaster.core.repository.QuizRepository;
 import com.example.csemaster.core.repository.UserRepository;
+import com.example.csemaster.v2.dto.response.QuizRejectResponse;
 import com.example.csemaster.v2.dto.response.QuizResponse;
 import com.example.csemaster.v2.dto.response.UserQuizResponse;
 import com.example.csemaster.v2.mapper.QuizMapper;
@@ -77,6 +78,15 @@ public class QueryService {
             }
 
             return quizRepository.getUserQuiz(userId, pageable);
+        } catch (ApiException e) {
+            throw new ApiException(ApiErrorType.RUNTIME_EXCEPTION);
+        }
+    }
+
+    // FIXME : 리스트를 반환할 필요가 없음. 반려된 문제인지 검증 필요
+    public List<QuizRejectResponse> getQuizReject(Long quizId) {
+        try {
+            return quizRepository.getQuizReject(quizId);
         } catch (ApiException e) {
             throw new ApiException(ApiErrorType.RUNTIME_EXCEPTION);
         }

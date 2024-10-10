@@ -58,12 +58,5 @@ public class ApproveService {
                 }).orElse(ResponseEntity.notFound().build());
     }
 
-    // FIXME : 리스트를 반환할 필요가 없음. 반려된 문제인지 검증 필요
-    public List<QuizRejectResponse> getQuizReject(Long quizId) {
-        try {
-            return quizRepository.getQuizReject(quizId);
-        } catch (ApiException e) {
-            throw new ApiException(ApiErrorType.RUNTIME_EXCEPTION);
-        }
-    }
+
 }

@@ -52,14 +52,5 @@ public class ApproveController {
         return approveService.setQuizRejection(quizId, reason, -1);
     }
 
-    // 문제의 승인 여부 확인
-    // FIXME : 리스트를 반환할 필요가 없음. 반려된 문제인지 검증 필요
-    @Operation(
-            summary = "사용자 문제 반려 사유 조회 [사용자 전용]",
-            description = "자신이 만든 문제의 승인 여부를 quiz id를 통해 확인할 수 있다."
-    )
-    @GetMapping("/my/reject")
-    public List<QuizRejectResponse> getQuizReject(@RequestParam Long quizId) {
-        return approveService.getQuizReject(quizId);
-    }
+
 }
