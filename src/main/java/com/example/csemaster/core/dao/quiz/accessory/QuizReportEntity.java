@@ -32,6 +32,9 @@ public class QuizReportEntity {
     @Column(name = "quiz_report_at")
     private LocalDateTime reportAt;
 
+    @Column(name = "is_processed")
+    private Boolean isProcessed;
+
     @ManyToOne
     @JoinColumn(name="quiz_id_for_report", referencedColumnName = "quiz_id", insertable = false, updatable = false)
     private QuizEntity quiz;

@@ -1,21 +1,19 @@
 package com.example.csemaster.v2.domain.quiz.report;
 
-import com.example.csemaster.v2.dto.response.QuizReportResponse;
 import com.example.csemaster.core.dao.actor.ActiveUserEntity;
-import com.example.csemaster.core.exception.ApiException;
-import com.example.csemaster.core.exception.ApiErrorType;
 import com.example.csemaster.core.dao.quiz.accessory.QuizReportEntity;
-import com.example.csemaster.v2.mapper.QuizReportMapper;
+import com.example.csemaster.core.exception.ApiErrorType;
+import com.example.csemaster.core.exception.ApiException;
 import com.example.csemaster.core.repository.ActiveUserRepository;
 import com.example.csemaster.core.repository.QuizReportRepository;
+import com.example.csemaster.v2.dto.response.QuizReportResponse;
+import com.example.csemaster.v2.mapper.QuizReportMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service(value = "V2QuizReportService")
 @RequiredArgsConstructor
@@ -37,6 +35,19 @@ public class ReportService {
 
                     return response;
                 });
+    }
+
+    public Page<QuizReportResponse> getUnProcessedQuizReport(Pageable pageable) {
+        Page<QuizReportEntity> quizReports = quizReportRepository.findUnprocessed(pageable);
+
+        return quizReports.map(quizReport -> {
+            QuizReportResponse response = QuizReportMapper.INSTANCE.toQuizReportResponse(quizReport);
+            ActiveUserEntity activeUser = activeUserRepository.findById(quizReport.getUserId()).orElse(null);
+            if (activeUser != null) response.setUserNickname(activeUser.getNickname());
+            else response.setUserNickname("탈퇴한 사용자");
+
+            return response;
+        });
     }
 
     // 신고 조회 (신고 아이디로 조회)

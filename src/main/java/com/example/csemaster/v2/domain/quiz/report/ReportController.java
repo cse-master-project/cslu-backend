@@ -39,11 +39,16 @@ public class ReportController {
     // 전체 퀴즈 오류 신고 조회
     @Operation(
             summary = "전체 신고 조회 [관리자 전용]",
-            description = "모든 문제에 대한 모든 신고를 조회할 수 있다. [페이징 적용]"
+            description = "모든 문제에 대한 모든 신고를 조회할 수 있으며, 처리 여부를 필터링해서 조회할 수 있다.\n" +
+                    "isProcessed=false 일때 처리 안된 신고 내역만 조회됨. [페이징 사용]"
     )
     @GetMapping("/report")
-    public Page<QuizReportResponse> allQuizReport(Pageable pageable) {
-        return reportService.allQuizReport(pageable);
+    public Page<QuizReportResponse> allQuizReport(@ValidPageable(QuizReportEntity.class) Pageable pageable, @RequestParam(required = false, defaultValue = "false") Boolean isProcessed) {
+        if (isProcessed) {
+            return reportService.allQuizReport(pageable);
+        } else {
+            return reportService.getUnProcessedQuizReport(pageable);
+        }
     }
 
     // 특정 퀴즈의 전체 오류 신고 조회
