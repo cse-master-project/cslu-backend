@@ -5,6 +5,7 @@ import com.example.csemaster.core.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -30,28 +31,30 @@ public class SecurityConfig {
 
                 // 엔드포인트별 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/user/auth/google/login").permitAll()
-                        .requestMatchers("/api/user/auth/google/sign-up").permitAll()
-                        .requestMatchers("/api/user/auth/google/check").permitAll()
-                        .requestMatchers("/api/user/auth/refresh").permitAll()
-                        .requestMatchers("/api/manager/login").permitAll()
-                        .requestMatchers("/api/manager/refresh").permitAll()
-                        .requestMatchers("/api/v2/user/auth/google/login").permitAll()
-                        .requestMatchers("/api/v2/user/auth/google/sign-up").permitAll()
-                        .requestMatchers("/api/v2/user/auth/google/check").permitAll()
-                        .requestMatchers("/api/v2/user/auth/refresh").permitAll()
-                        .requestMatchers("/api/v2/manager/login").permitAll()
-                        .requestMatchers("/api/v2/manager/refresh").permitAll()
-
-                        .requestMatchers("/api/manager/**").hasRole("ADMIN")
-                        .requestMatchers("/api/user/**").hasRole("USER")
-                        .requestMatchers("/api/quiz/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/api/management/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v2/manager/**").hasRole("ADMIN")
+                        // 계정 관리
                         .requestMatchers("/api/v2/user/**").hasRole("USER")
-                        .requestMatchers("/api/v2/quiz/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/api/v2/management/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v2/user/auth/**").permitAll()
+                        .requestMatchers("/api/v2/manager/**").permitAll()
 
+                        // 문제 조회
+                        .requestMatchers("/api/v2/quiz/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v2/quiz/**").hasRole("USER")
+
+                        // 문제 풀이
+                        .requestMatchers("/api/v2/quiz/my/**").hasAnyRole("USER")
+                        .requestMatchers("/api/v2/quiz/submit").hasRole("USER")
+                        .requestMatchers("/api/v2/quiz/random/**").hasRole("USER")
+
+                        // 문제 신고
+                        .requestMatchers("/api/v2/quiz/report/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v2/quiz/report").hasRole("USER")
+
+                        // 문제 생성
+                        .requestMatchers(HttpMethod.POST, "/api/v2/quiz/default").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v2/quiz/user").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/api/v2/quiz/image/**").hasAnyRole("USER", "ADMIN")
+
+                        // 기타
                         .requestMatchers("/v3/**", "/swagger-ui/**").permitAll()
                         .requestMatchers("/dev/**").permitAll()
                         .anyRequest().denyAll())

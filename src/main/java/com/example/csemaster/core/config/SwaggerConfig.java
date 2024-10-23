@@ -29,13 +29,7 @@ public class SwaggerConfig {
                 .components(components);
     }
 
-    @Bean
-    public GroupedOpenApi groupV2() {
-        return GroupedOpenApi.builder()
-                .group("v2")
-                .pathsToMatch("/api/v2/**")
-                .build();
-    }
+
 
     @Bean
     public GroupedOpenApi groupV1() {
@@ -45,6 +39,13 @@ public class SwaggerConfig {
                 .build();
     }
 
+    @Bean
+    public GroupedOpenApi groupV2() {
+        return GroupedOpenApi.builder()
+                .group("v2")
+                .pathsToMatch("/api/v2/**")
+                .build();
+    }
 
     private Info apiInfo() {
         return new Info()
