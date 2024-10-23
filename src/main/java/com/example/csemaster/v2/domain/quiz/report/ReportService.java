@@ -80,4 +80,14 @@ public class ReportService {
                     return response;
                 });
     }
+
+    public void setQuizReportStatus(Long reportId, Boolean status) {
+        quizReportRepository.findByQuizReportId(reportId).ifPresentOrElse(
+                quizReportEntity -> {
+                    quizReportEntity.setIsProcessed(status);
+                    quizReportRepository.save(quizReportEntity);
+                },
+                () -> { throw new ApiException(ApiErrorType.NOT_FOUND_ID); }
+        );
+    }
 }

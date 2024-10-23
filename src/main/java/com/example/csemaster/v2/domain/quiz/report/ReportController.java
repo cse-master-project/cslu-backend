@@ -1,5 +1,7 @@
 package com.example.csemaster.v2.domain.quiz.report;
 
+import com.example.csemaster.core.dao.quiz.accessory.QuizReportEntity;
+import com.example.csemaster.core.tools.ValidPageable;
 import com.example.csemaster.v2.domain.quiz.solve.SolveService;
 import com.example.csemaster.v2.dto.request.QuizReportRequest;
 import com.example.csemaster.v2.dto.response.QuizReportResponse;
@@ -69,5 +71,14 @@ public class ReportController {
     @GetMapping("/report/{quizReportId}")
     public QuizReportResponse getQuizReport(@PathVariable Long quizReportId) {
         return reportService.getQuizReport(quizReportId);
+    }
+
+    @Operation(
+            summary = "신고 처리",
+            description = "신고 내역 처리 후 완료 상태로 변경할 수 있다. (0: 미완료, 1: 처리완료)"
+    )
+    @PatchMapping("/report/{quizReportId}/status")
+    public void patchReportStatus(@PathVariable Long quizReportId, @RequestParam Boolean status) {
+        reportService.setQuizReportStatus(quizReportId, status);
     }
 }
