@@ -16,9 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-@Tag(name = "QuizReport v2", description = "문제 신고 조회 기능")
+@Tag(name = "Quiz Report", description = "문제 신고 조회 기능")
 @RestController(value = "V2ReportController")
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/quiz")

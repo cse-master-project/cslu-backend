@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static com.example.csemaster.core.tools.TokenUtils.extractAccessTokenFromHeader;
 
-@Tag(name = "ManagerAccount v2", description = "관리자 계정 관련 기능")
+@Tag(name = "Manager Account", description = "관리자 계정 관련 기능")
 @Slf4j
 @RestController(value = "V2ManagerAccountController")
 @RequiredArgsConstructor

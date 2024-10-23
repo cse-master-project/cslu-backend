@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "QueryForWeb v2", description = "문제 조회 기능 (웹)")
+@Tag(name = "Quiz Query", description = "문제 조회 기능 (웹)")
 @RestController(value = "V2QueryForWebController")
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/quiz")
@@ -24,7 +24,7 @@ public class QueryController {
 
     // 모든 활성화된 문제 조회
     @Operation(
-            summary = "문제 전체 조회 [관리자 전용]",
+            summary = "문제 전체 조회",
             description = "활성화 상태인 문제 전체를 조회 (활성화 기준: 승인된 유저 문제나 삭제되지 않은 문제) [페이징 적용]"
     )
     @GetMapping("")

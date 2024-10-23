@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Category v2", description = "카테고리 기능")
+@Tag(name = "Quiz Category", description = "카테고리 기능")
 @RestController(value = "V2CategoryController")
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/quiz/subject")

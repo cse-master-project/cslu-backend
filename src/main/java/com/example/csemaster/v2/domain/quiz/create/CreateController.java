@@ -1,6 +1,5 @@
 package com.example.csemaster.v2.domain.quiz.create;
 
-import com.example.csemaster.v2.domain.quiz.create.CreateService;
 import com.example.csemaster.v2.dto.QuizDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "QuizCreate v2", description = "문제 생성 기능")
+@Tag(name = "Quiz Create", description = "문제 생성 기능")
 @RestController(value = "V2CreateController")
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/quiz")

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "UserAccount v2", description = "사용자 계정 관련 기능")
+@Tag(name = "User Account", description = "사용자 계정 관련 기능")
 @Slf4j
 @RestController(value = "V2UserAccountController")
 @RequiredArgsConstructor

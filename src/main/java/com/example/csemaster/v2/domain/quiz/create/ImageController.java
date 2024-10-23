@@ -10,7 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "QuizImage v2", description = "이미지 조회, 추가")
+@Tag(name = "Quiz Create", description = "이미지 조회, 추가")
 @RestController(value = "V2ImageController")
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/quiz")

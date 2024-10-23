@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "QuizManagement v2", description = "문제 관리 기능")
+@Tag(name = "Quiz Management", description = "문제 관리 기능")
 @RestController(value = "V2ManagementController")
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/management/quiz")
+@RequestMapping("/api/v2/quiz")
 public class ManagementController {
     private final ManagementService managementService;
 

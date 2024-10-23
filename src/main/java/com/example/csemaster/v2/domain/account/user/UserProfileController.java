@@ -15,7 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "UserProfile v2", description = "사용자 정보 관련 기능")
+@Tag(name = "User Profile", description = "사용자 정보 관련 기능")
 @Slf4j
 @RestController(value = "V2UserProfileController")
 @RequiredArgsConstructor

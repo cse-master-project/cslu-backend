@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Solve v2", description = "문제 풀이 기능")
+@Tag(name = "Quiz Solve", description = "문제 풀이 기능")
 @RestController(value = "V2SolveController")
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/quiz")

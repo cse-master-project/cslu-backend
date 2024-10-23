@@ -2,7 +2,6 @@ package com.example.csemaster.v2.domain.quiz.management;
 
 import com.example.csemaster.v2.domain.quiz.query.QueryService;
 import com.example.csemaster.v2.dto.UnApprovalQuizDTO;
-import com.example.csemaster.v2.dto.response.QuizRejectResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -11,12 +10,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-@Tag(name = "QuizApprove v2", description = "문제 승인 기능<br> 0: 대기, 1: 승인, -1: 거절")
+@Tag(name = "Quiz Approve", description = "문제 승인 기능<br> 0: 대기, 1: 승인, -1: 거절")
 @RestController(value = "V2ApproveController")
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/management/quiz")
+@RequestMapping("/api/v2/quiz")
 public class ApproveController {
     private final ApproveService approveService;
     private final QueryService queryService;
