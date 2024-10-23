@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 
 @RequiredArgsConstructor
@@ -34,8 +35,8 @@ public class CustomExceptionHandler {
                         .build());
     }
 
-    @ExceptionHandler({MethodArgumentNotValidException.class})
-    public ResponseEntity<ErrorResponse> exceptionHandler(HttpServletRequest request, final MethodArgumentNotValidException e) {
+    @ExceptionHandler({MethodArgumentNotValidException.class, HandlerMethodValidationException.class})
+    public ResponseEntity<ErrorResponse> exceptionHandler(HttpServletRequest request, final Exception e) {
         log.error(e.getMessage(), e);
         return ResponseEntity
                 .status(ApiErrorType.ARGS_NOT_VALID.getStatus())
