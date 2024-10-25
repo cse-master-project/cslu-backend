@@ -30,15 +30,20 @@ public class LoggingFilter implements Filter {
             log.error(e.getMessage(), e);
         } finally {
             log.info("Request URI : {}, from IP : {}", requestURI, clientIP);
-
             // request body 출력
             String reqContent = new String(httpServletRequest.getContentAsByteArray());
-            log.debug("Request Body : {}" , reqContent);
 
             // response body 출력
             String resContent = new String(httpServletResponse.getContentAsByteArray());
             int httpStatus = httpServletResponse.getStatus();
-            log.debug("State : {}, Response Body : {}" , httpStatus, resContent);
+
+            // 토큰 정보 필터링
+            if (requestURI.matches("(.*)login(.*)|(.*)refresh(.*)")) {
+                log.debug("State : {}" , httpStatus);
+            } else {
+                log.debug("Request Body : {}" , reqContent);
+                log.debug("State : {}, Response Body : {}" , httpStatus, resContent);
+            }
             // 로깅시 읽은 response body 복제
             httpServletResponse.copyBodyToResponse();
 
