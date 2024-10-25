@@ -32,8 +32,8 @@ public class SecurityConfig {
                 // 엔드포인트별 권한 설정
                 .authorizeHttpRequests(auth -> auth
                         // 계정 관리
-                        .requestMatchers("/api/v2/user/**").hasRole("USER")
                         .requestMatchers("/api/v2/user/auth/**").permitAll()
+                        .requestMatchers("/api/v2/user/**").hasRole("USER")
                         .requestMatchers("/api/v2/manager/**").permitAll()
 
                         // 문제 조회
