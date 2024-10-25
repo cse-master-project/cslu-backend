@@ -38,6 +38,7 @@ public class SecurityConfig {
 
                         // 문제 조회
                         .requestMatchers("/api/v2/quiz/**").hasAnyRole("ADMIN")
+                        .requestMatchers("/api/v2/management/**").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v2/quiz/**").hasRole("USER")
 
                         // 문제 풀이

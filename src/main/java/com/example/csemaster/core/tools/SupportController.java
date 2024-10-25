@@ -1,11 +1,11 @@
 package com.example.csemaster.core.tools;
 
+import com.example.csemaster.v2.domain.quiz.management.ManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -17,13 +17,13 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/dev")
 @Slf4j
 public class SupportController {
     @Value("${log.file.path}")
     private String logPath;
+    private final ManagementService managementService;
 
-    @GetMapping("/log")
+    @GetMapping("/dev/log")
     public String getLog() {
         StringBuilder contentBuilder = new StringBuilder();
         try {
@@ -39,5 +39,15 @@ public class SupportController {
             log.error(e.getMessage(), e);
         }
         return contentBuilder.toString();
+    }
+
+    @PatchMapping("/api/v2/management/quiz/{quizId}")
+    public ResponseEntity<?> updateQuizTmp(@PathVariable Long quizId, @RequestBody String newJsonContent) {
+        return managementService.updateQuiz(quizId, newJsonContent);
+    }
+
+    @DeleteMapping("/api/v2/management/quiz/{quizId}")
+    public ResponseEntity<?> deleteQuizTmp(@PathVariable Long quizId) {
+        return managementService.deleteQuiz(quizId);
     }
 }
