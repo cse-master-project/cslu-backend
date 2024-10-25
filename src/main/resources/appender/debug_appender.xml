@@ -6,7 +6,7 @@
     <appender name="DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_DEBUG_PATH}/${LOG_DEBUG_FILE_NAME}.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%d{yy-MM-dd HH:mm:ss} [%-5level] [traceId=%X{traceId}] %-40.40logger{10} : %msg%n</pattern>
+            <pattern>%d{yy-MM-dd HH:mm:ss} [%-5level] [traceId=%X{traceId}] %-40.40logger{10} : %msg%n%ex{short}</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>DEBUG</level>
@@ -23,7 +23,7 @@
     <!-- debug 모드 CONSOLE 로그 출력 세팅 -->
     <appender name="CONSOLE_DEBUG" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>%d{MM-dd HH:mm:ss} [%15.15thread] %clr([traceId=%X{traceId}]){magenta} %clr(%-5level) %clr(%logger{35}.%M){cyan} - %msg%n</Pattern>
+            <Pattern>%d{MM-dd HH:mm:ss} [%15.15thread] %clr([traceId=%X{traceId}]){magenta} %clr(%-5level) %clr(%logger{35}.%M){cyan} - %msg%n%ex{short}</Pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>DEBUG</level>
