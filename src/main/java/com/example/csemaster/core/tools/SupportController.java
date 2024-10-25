@@ -1,6 +1,7 @@
 package com.example.csemaster.core.tools;
 
 import com.example.csemaster.v2.domain.quiz.management.ManagementService;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,11 +43,13 @@ public class SupportController {
     }
 
     @PatchMapping("/api/v2/management/quiz/{quizId}")
+    @Hidden
     public ResponseEntity<?> updateQuizTmp(@PathVariable Long quizId, @RequestBody String newJsonContent) {
         return managementService.updateQuiz(quizId, newJsonContent);
     }
 
     @DeleteMapping("/api/v2/management/quiz/{quizId}")
+    @Hidden
     public ResponseEntity<?> deleteQuizTmp(@PathVariable Long quizId) {
         return managementService.deleteQuiz(quizId);
     }
