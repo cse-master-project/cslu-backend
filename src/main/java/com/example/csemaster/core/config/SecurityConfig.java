@@ -37,9 +37,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v2/manager/**").permitAll()
 
                         // 문제 조회
-                        .requestMatchers("/api/v2/quiz/**").hasAnyRole("ADMIN")
-                        .requestMatchers("/api/v2/management/**").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v2/quiz/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/v2/quiz/subject/**").hasRole("USER")
 
                         // 문제 풀이
                         .requestMatchers("/api/v2/quiz/my/**").hasAnyRole("USER")
@@ -47,13 +46,16 @@ public class SecurityConfig {
                         .requestMatchers("/api/v2/quiz/random/**").hasRole("USER")
 
                         // 문제 신고
-                        .requestMatchers("/api/v2/quiz/report/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v2/quiz/report").hasRole("USER")
+                        .requestMatchers("/api/v2/quiz/report/**").hasRole("ADMIN")
 
                         // 문제 생성
                         .requestMatchers(HttpMethod.POST, "/api/v2/quiz/default").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v2/quiz/user").hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/api/v2/quiz/image/**").hasAnyRole("USER", "ADMIN")
+
+                        .requestMatchers("/api/v2/quiz/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v2/management/**").hasAnyRole("ADMIN")
 
                         // 기타
                         .requestMatchers("/v3/**", "/swagger-ui/**").permitAll()
