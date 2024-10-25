@@ -129,6 +129,7 @@ public class SolveService {
             quizReport.setUserId(userId);
             quizReport.setContent(content);
             quizReport.setReportAt(LocalDateTime.now());
+            quizReport.setIsProcessed(false);
 
             quizReportRepository.save(quizReport);
 
