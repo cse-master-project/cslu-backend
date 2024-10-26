@@ -37,8 +37,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v2/manager/**").permitAll()
 
                         // 문제 조회
-                        .requestMatchers(HttpMethod.GET, "/api/v2/quiz/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.GET, "/api/v2/quiz/subject/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/v2/quiz/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v2/quiz/subject/**").hasAnyRole("USER", "ADMIN")
 
                         // 문제 풀이
                         .requestMatchers("/api/v2/quiz/my/**").hasAnyRole("USER")
@@ -50,7 +50,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v2/quiz/report/**").hasRole("ADMIN")
 
                         // 문제 생성
-                        .requestMatchers(HttpMethod.POST, "/api/v2/quiz/default").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v2/quiz/default").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v2/quiz/user").hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/api/v2/quiz/image/**").hasAnyRole("USER", "ADMIN")
 
