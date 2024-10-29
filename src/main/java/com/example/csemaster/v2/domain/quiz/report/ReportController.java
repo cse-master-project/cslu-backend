@@ -54,7 +54,7 @@ public class ReportController {
     // 특정 퀴즈의 전체 오류 신고 조회
     @Operation(
             summary = "특정 문제에 들어온 신고 조회 [관리자 전용]",
-            description = "문제 ID로 해당 문제에 들어온 모든 신고들을 조회할 수 있다."
+            description = "문제 ID로 해당 문제에 들어온 모든 신고들을 조회할 수 있다. [페이징 적용]"
     )
     @GetMapping("/{quizId}/report")
     public Page<QuizReportResponse> getAllReportForQuiz(@PathVariable Long quizId, Pageable pageable) {
@@ -64,7 +64,7 @@ public class ReportController {
     // 특정 오류 신고 조회
     @Operation(
             summary = "특정 신고 조회 [관리자 전용]",
-            description = "신고글의 ID로 상세 내용을 조회할 수 있다. [페이징 적용]"
+            description = "신고글의 ID로 상세 내용을 조회할 수 있다."
     )
     @GetMapping("/report/{quizReportId}")
     public QuizReportResponse getQuizReport(@PathVariable Long quizReportId) {

@@ -13,7 +13,7 @@ public interface QuizReportRepository extends JpaRepository<QuizReportEntity, Lo
     Optional<QuizReportEntity> findByQuizReportId(Long quizReportId);
 
     @Query("SELECT r FROM QuizReportEntity r " +
-            "WHERE r.quizId = :quizId")
+            "WHERE r.quizId = :quizId and r.isProcessed = false")
     Page<QuizReportEntity> findByQuizId(Long quizId, Pageable pageable);
 
     // v1
