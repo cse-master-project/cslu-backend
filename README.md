@@ -68,4 +68,3 @@ Spring Boot 기반의 REST API로, 실시간 문제 데이터 처리, 사용자 
 | GET    | /api/quiz/random                       | 랜덤 문제 조회            |
 | POST   | /api/quiz/submit                       | 문제 풀이 제출            |
 
-https://docs.google.com/spreadsheets/d/1E_B1Mn7FbFQsqiZuWPjnH5RRe5uFBIAkrUzkHxUUgMs/edit?gid=0#gid=0
