@@ -20,7 +20,7 @@ Spring Boot 기반의 REST API로, 실시간 문제 데이터 처리, 사용자 
 - **전체 개발기간** : 2024.02.13 ~ 2024.09.26
 - 2024.02 : 프로젝트 기획, 데이터 구조 설정 및 DB 설계
 - 2024.03 ~ 2024.05 : API 구현
-- 2024.06 ~ 2024.10. : 서버 운영, 클라이언트 연동 지원, 유지보수
+- 2024.06 ~ 2024.10 : 서버 운영, 클라이언트 연동 지원, 유지보수
 
 <br>
 
@@ -47,7 +47,7 @@ Spring Boot 기반의 REST API로, 실시간 문제 데이터 처리, 사용자 
   - 미승인 문제 및 신고 목록 관리
 
 - **API 문서화 및 테스트**
-  - Swagger 기반 API 명세 자동 생성
+  - Swagger를 활용한 API 명세 자동화
 
 - **로깅 및 예외 처리**
   - API 요청/응답 및 예외 로그 기록
@@ -67,4 +67,12 @@ Spring Boot 기반의 REST API로, 실시간 문제 데이터 처리, 사용자 
 | POST   | /api/quiz/user                         | 사용자 문제 생성          |
 | GET    | /api/quiz/random                       | 랜덤 문제 조회            |
 | POST   | /api/quiz/submit                       | 문제 풀이 제출            |
+
+
+<br>
+
+
+## ERD
+<img src="https://github.com/user-attachments/assets/94566798-9d6e-45bc-a8c0-97bac36586e3" width="700"/><br>
+※ 실제 DB 구조보다 간소화된 버전이며, 주요 흐름 중심으로 구성한 ERD입니다.
 
